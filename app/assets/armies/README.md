@@ -2,6 +2,7 @@
 
 | Folder | Content | Source |
 |---|---|---|
+| `soldiers/` | Marching squad per army (3 soldiers facing right), transparent PNG, max 640px | AI-generated (Gemini) by the project owner |
 | `forts/` | Base (castle) art per army, 512×512 PNG with transparent background | AI-generated (Gemini / Canva) by the project owner |
 
 Background removed and resized with a local script. Commanders and the remaining forts are
