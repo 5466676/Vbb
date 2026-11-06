@@ -20,8 +20,8 @@ Decisions that clarified or changed the original brief are logged in `DECISIONS.
   the soldiers shown in attack animations, and its flag emblem.
 - Each army also has **one small passive perk** (always on) and **one active ability**
   (usable once per match). Both are kept small so that no army is clearly stronger.
-- Some armies are free; the rest are unlocked with gold earned by playing (cosmetic unlocks only,
-  see economy rules in the brief §7). Perks are identical whether an army was free or unlocked.
+- **All armies are free** for every player from the start. Gold (earned only by playing) buys
+  other cosmetics such as portrait frames, map themes and victory effects (brief §7).
 
 ### 2.1 Launch armies *(draft — perks to be tuned by simulation)*
 

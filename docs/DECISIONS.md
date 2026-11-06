@@ -76,3 +76,7 @@ The owner rejected the first UI mockup (flat dark "app" look) and reshaped the g
    the likely choice for the match screen; to be decided at the start of phase 6.
 7. **Art:** the map itself is drawn in code (cheap on low-end phones). Commander portraits, castles and
    soldiers come from AI-generated images, with simple placeholders until they are ready.
+
+### Update — all armies free (2026-11-06)
+The owner decided that **every army is free** from the start. Gold still buys other cosmetics only
+(frames, map themes, victory effects). Replaces "some armies unlock with gold" in item 2 above.
