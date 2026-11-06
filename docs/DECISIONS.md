@@ -102,3 +102,45 @@ The owner decided that **every army is free** from the start. Gold still buys ot
   the extra art requests (Crusader/Roman forts in ink style, new Islamic soldiers, full-size commanders).
   We ship the Canva versions of the Crusader and Roman forts and the eight commanders (200 px previews,
   enough for the small UI slots; replace if larger art is wanted later).
+
+## Phase 2 — Engine (2026-11-06)
+
+**Built:** `backend/app/engine/` — `create_match`, `apply(state, action) -> (state, events)` and
+`apply_inplace`; Pydantic `MatchState`; SplitMix64 RNG stored in the state; ranking; all of
+GAME_RULES §2–§8 (expansion, turn-based battle, towers, elimination, teams, the 8 armies' perks and
+abilities, the 4 power-ups). `backend/app/bots/simple.py`: bots (easy/medium/hard + seat keeper for
+disconnects) with their own RNG.
+
+**Engine contract for the room layer (phase 4):**
+- The engine asks for questions with a `question_needed` event; the room replies with `ProvideQuestion`.
+  The `question` event never contains the answer; answers come out only in `question_result`.
+- Every phase change increments `phase_id`. The room schedules a `Timeout(phase_id)` for the deadline;
+  a stale timeout is ignored. Phases end early when everyone involved has acted.
+- Illegal actions raise `RuleError` and leave the state unchanged.
+- Answer times (`elapsed_ms`) are measured by the room and validated against per-seat limits + 150 ms.
+
+**Rule clarifications made while implementing (GAME_RULES updated):**
+1. The attacker must answer correctly to win a duel. The brief's "rank above the defender" would let a
+   fast wrong answer beat a slower wrong one or silence, which rewards guessing.
+2. Tiebreak draws and double silence favour the defender; opposing tie abilities cancel.
+3. A shield block asks no question and changes no value.
+
+**Simulation (`tests/test_simulation.py`):** 500 bot matches for each of FFA 2–8 and teams 2v2/3v3/4v4
+(5,000 matches, ~100 s), invariants checked after every action, every 7th action through the copying
+`apply`. The wall-clock model uses the real timers plus 2.5 s reveal, 1.5 s claim and 3.5 s duel
+animations; bots answer in 1.5–9.5 s.
+
+Battle rounds were re-tuned from 7/5/4/3/3/2/2 to **12/12/9/8/6/5/4** (2…8 players):
+
+| Mode | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 2v2 | 3v3 | 4v4 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Mean length (min) | 4.9 | 7.8 | 9.0 | 10.0 | 9.7 | 9.7 | 9.5 | 8.5 | 9.6 | 9.4 |
+| Matches in 8–12 min | 0% | 41% | 80% | 95% | 98% | 99% | 99% | 61% | 94% | 98% |
+
+**Open question for the owner:** 2–3 player matches end early because a base (3 towers) falls quickly
+on small maps. Simulation of alternatives: 5 towers for 3–4 players brings them to 88–98% inside 8–12 min;
+a 1v1 cannot reliably reach 8 min without making bases much harder to take.
+
+**Army balance (3,000 four-player bot matches, fair = 25%):** ayyubid 26, crusader 29, islamic 23,
+mongol 25, ottoman 25, pharaoh 24, roman 25, ww2 23 (%). Within the test bound (15–37.5%); crusader is
+slightly strong and is the first candidate for tuning once real players exist.

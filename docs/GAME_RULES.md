@@ -67,7 +67,7 @@ Every player starts **every match** with **one of each**. They cannot be bought,
 |---|---|
 | حذف إجابتين | Removes two wrong options from the current MCQ (for this player only). |
 | تلميح | Shows a range that contains the answer of the current numeric question. |
-| درع | Protects one of your territories: the next attack on it fails automatically. |
+| درع | Protects one of your territories: the next attack on it fails automatically (no question, no value change). |
 | مضاعفة | Your next successful capture or defence adds +200 instead of the normal amount. |
 
 ## 6. Match flow
@@ -96,15 +96,21 @@ R *(config, draft)* by player count, chosen so a match stays near 8–12 minutes
 
 | Players | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|
-| R | 7 | 5 | 4 | 3 | 3 | 2 | 2 |
+| R | 12 | 12 | 9 | 8 | 6 | 5 | 4 |
+
+(Calibrated by the phase-2 simulation. 2–3 player matches often end earlier because a base falls;
+see DECISIONS.md.)
 
 A turn:
 1. **Choose target (8 s):** the attacker picks one enemy territory adjacent to their land.
    On timeout the server picks one at random. If no target exists the turn is skipped.
 2. **Duel question:** one MCQ to the **attacker and the defender only**. Everyone else watches.
 3. **Resolve:**
-   - The attacker wins if they rank above the defender; otherwise the defender holds.
+   - The attacker wins only if they **answer correctly** and rank above the defender; otherwise the
+     defender holds (so both wrong, or both silent, is a hold).
    - Both correct with an answer-time gap **< 0.5 s** → tie → one numeric tiebreak question for the two of them.
+     In the tiebreak an exact draw (same distance, same time) or two missing answers favour the defender.
+     If the attacker's الإنكشارية and the defender's السلحفاة are both armed, they cancel and the tiebreak is played.
    - Captured normal territory: changes owner, value **+100**.
    - Successful hit on a base: removes **one tower**. At 0 towers the base falls, the defender is
      eliminated, and the base and **all** their territories go to the attacker.
@@ -126,3 +132,4 @@ A turn:
 - Answer time is measured server-side from when the question was sent to that client,
   with a latency grace of at most **150 ms**.
 - Late and duplicate answers are rejected.
+- A question, pick window or targeting window ends **as soon as everyone involved has acted**; the timer is only the upper bound.
