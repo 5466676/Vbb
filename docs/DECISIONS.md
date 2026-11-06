@@ -94,3 +94,11 @@ The owner decided that **every army is free** from the start. Gold still buys ot
   Territory borders, owner colours, shields and castles are always drawn in code on top.
 - **Decorations:** a Gemini sprite sheet (16 items) cut into `app/assets/decor/painted/`;
   Kenney Cartography (CC0) kept as a fallback.
+
+### Update — art set closed (2026-11-06)
+- Maps: fantasy 2p–8p and the real World map are painted and checked against their coastlines.
+  The 5-player coastline was updated to follow the bay Gemini painted.
+- **Dropped by the owner:** Arab world, Levant and historical maps (removed from GAME_RULES §3);
+  the extra art requests (Crusader/Roman forts in ink style, new Islamic soldiers, full-size commanders).
+  We ship the Canva versions of the Crusader and Roman forts and the eight commanders (200 px previews,
+  enough for the small UI slots; replace if larger art is wanted later).

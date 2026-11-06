@@ -11,4 +11,4 @@ The mask is the source of truth for the coastline:
 | Name | Use |
 |---|---|
 | `fantasy-2p` … `fantasy-8p` | Fantasy continents per player count (4p lives in the original mockup) |
-| `real-world`, `real-arab-world`, `real-levant` | Real geography from Natural Earth 1:50m land (public domain). The `.json` next to each holds the lon/lat window and projection. |
+| `real-world` (used), `real-arab-world`, `real-levant` (not used — dropped) | Real geography from Natural Earth 1:50m land (public domain). The `.json` next to each holds the lon/lat window and projection. |

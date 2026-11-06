@@ -45,10 +45,8 @@ No present-day armies or current conflicts. No Nazi symbols.
 - Territory count ≈ `players × 5`, same scaling for teams.
 - **Map types**, chosen by **player vote** in the lobby (majority wins, ties broken at random;
   quick match picks at random):
-  - **Fantasy** — invented continents, pre-generated per player count.
-  - **World**, **Arab world**, **Levant (بلاد الشام)** — real geography. Real regions are grouped
-    into `players × 5` territories per player count.
-  - **Historical** — real geography with the borders of a past era (e.g. the time of the Crusades).
+  - **Fantasy** — painted continents, one per player count (2–8).
+  - **World** — the real world map; real regions are grouped into `players × 5` territories.
 - For every map and player count: every territory is reachable and bases are as far apart as possible.
 - Territory values: normal **200**, base **1000**.
 - Each player starts with one **base** (قلعة) with **3 towers** (lives). The base art follows the player's army.
