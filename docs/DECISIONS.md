@@ -80,3 +80,17 @@ The owner rejected the first UI mockup (flat dark "app" look) and reshaped the g
 ### Update — all armies free (2026-11-06)
 The owner decided that **every army is free** from the start. Gold still buys other cosmetics only
 (frames, map themes, victory effects). Replaces "some armies unlock with gold" in item 2 above.
+
+## Phase 1c — Art pipeline (2026-11-06)
+
+- **Army art:** commanders generated in Canva (style-matched to one reference portrait);
+  forts generated in Gemini by the owner. Backgrounds removed locally; stored as 512px PNG in
+  `app/assets/armies/`. Preferred style going forward: ink line + soft watercolour (matches the map).
+  No present-day national symbols: the Ottoman image's crescent flag was removed; the game draws
+  the seat-colour flag on each fort.
+- **Maps = fixed coastline + painted base + generated territories.** Every template has a land mask
+  (`backend/maps/shapes/`). The owner paints it in Gemini from a guide image; Gemini kept the
+  coastline within a few pixels on the first test, and the client clips the painting to the mask.
+  Territory borders, owner colours, shields and castles are always drawn in code on top.
+- **Decorations:** a Gemini sprite sheet (16 items) cut into `app/assets/decor/painted/`;
+  Kenney Cartography (CC0) kept as a fallback.
