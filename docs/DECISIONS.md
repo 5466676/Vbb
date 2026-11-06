@@ -48,3 +48,31 @@ Answers to the open questions in the brief, agreed with the owner:
   blur and is documented as "never on the map".
 - **Not yet verified on a device**: no Android SDK/emulator in the dev container. Build an APK
   locally with `flutter build apk --split-per-abi`.
+
+## Phase 1b — Direction change after design review (2026-11-06)
+
+The owner rejected the first UI mockup (flat dark "app" look) and reshaped the game.
+`GAME_RULES.md` was rewritten accordingly. Changes against the original brief:
+
+1. **Look:** illustrated old-map style (parchment land, thick brown borders, teal sea, shields on
+   territories, framed commander portraits, flags in seat colours). **Landscape** orientation.
+   We follow the style only; no art or layout is copied from any existing game.
+   The dark-teal theme from phase 1 is superseded and will be replaced in phase 6.
+2. **Armies:** every player picks an army from a different era. Launch set of 8 (Islamic conquests,
+   Ayyubids, Crusaders, Romans, Pharaohs, Mongols, Ottomans, WW2 with generic uniforms).
+   Each army has its own commander, base art and soldiers, plus a small passive perk and a
+   once-per-match active ability (draft values in GAME_RULES §2.1, tuned in phase 2).
+   Some armies are free, the rest unlock with earned gold. No present-day armies, no Nazi symbols.
+3. **Battle is turn-based** (hybrid): expansion stays simultaneous for everyone; in battle each player
+   gets one turn per round and attacks one territory, and only attacker and defender answer.
+   Battle rounds per player count changed to 7/5/4/3/3/2/2 for 2…8 players so matches stay near 8–12 min.
+   The brief's "+50 for defending" rule is dropped (there is no defend choice in turn-based battle).
+4. **Power-ups:** remove two answers, numeric hint, shield, double gain. One of each per match for
+   every player; never bought (keeps the "gold buys cosmetics only" rule).
+5. **Maps:** fantasy + real (World, Arab world, Levant) + historical. Chosen by player vote in the lobby.
+   Real maps group real regions into `players × 5` territories.
+6. **Interactive map:** pinch-zoom/pan/tap, armies marching on attack, a short battle scene, and
+   ambient animation (waves, ships, flags, smoke). This makes the Flame engine (on top of Flutter)
+   the likely choice for the match screen; to be decided at the start of phase 6.
+7. **Art:** the map itself is drawn in code (cheap on low-end phones). Commander portraits, castles and
+   soldiers come from AI-generated images, with simple placeholders until they are ready.

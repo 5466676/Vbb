@@ -23,7 +23,11 @@
 | `start_match` | host only: start the match |
 | `answer` | answer the current question |
 | `pick_territory` | claim territory during expansion |
-| `choose_target` | choose attack target or defend during battle |
+| `choose_target` | attacker picks the target territory on their battle turn |
+| `choose_army` | pick an army in the lobby |
+| `vote_map` | vote for a map type in the lobby |
+| `use_powerup` | use a power-up (remove two, hint, shield, double) |
+| `use_ability` | use the army's once-per-match ability |
 | `ping` | keep-alive / latency measurement |
 
 ## Server → client
@@ -38,8 +42,11 @@
 | `question_result` | correct answer + rankings |
 | `picks_open` | expansion pick window opened |
 | `territory_claimed` | territory claimed in expansion |
-| `targets_open` | battle targeting window opened |
-| `battle_results` | all changes of a battle round |
+| `turn_started` | a battle turn begins: attacker, deadline |
+| `target_chosen` | attacker chose a target; defender is known |
+| `powerup_used` | a player used a power-up (public effects only) |
+| `ability_used` | a player used their army ability |
+| `battle_result` | result of one duel: winner, territory change, tower hit |
 | `player_eliminated` | a player was eliminated |
 | `match_ended` | final scores and winner |
 | `full_state` | full match state (on reconnect) |

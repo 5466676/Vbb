@@ -1,8 +1,10 @@
 # CLAUDE.md — حرب العقول
 
 Real-time multiplayer Arabic trivia + territory-conquest game for **Android**.
-2–8 players, FFA and team modes. Every player answers every question at the same
-moment; battles resolve in parallel. Target match length 8–12 minutes.
+2–8 players, FFA and team modes, landscape. Each player picks an army from a different era
+(look + small perks). Expansion is simultaneous (everyone answers the same question);
+battle is turn-based duels (attacker vs defender). Illustrated old-map style.
+Target match length 8–12 minutes.
 
 ## Source of truth
 - `docs/GAME_RULES.md` — authoritative rules. Do not change rules without asking the owner.
