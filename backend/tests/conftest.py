@@ -1,0 +1,97 @@
+"""Fixtures for integration tests: a real redis-server and real uvicorn servers."""
+
+from __future__ import annotations
+
+import asyncio
+import shutil
+import socket
+import subprocess
+import time
+from collections.abc import AsyncIterator
+
+import pytest
+import redis
+import uvicorn
+
+from app.config import Settings
+from app.main import create_app
+
+
+def free_port() -> int:
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+@pytest.fixture(scope="session")
+def redis_url() -> str:
+    exe = shutil.which("redis-server")
+    if exe is None:
+        pytest.skip("redis-server is not installed")
+    port = free_port()
+    proc = subprocess.Popen(
+        [exe, "--port", str(port), "--save", "", "--appendonly", "no"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    client = redis.Redis(port=port)
+    for _ in range(100):
+        try:
+            client.ping()
+            break
+        except redis.ConnectionError:
+            time.sleep(0.05)
+    client.close()
+    yield f"redis://127.0.0.1:{port}/0"
+    proc.terminate()
+    proc.wait(timeout=5)
+
+
+class Servers:
+    """Start workers sharing one Redis (``await servers()`` -> base URL) and stop them."""
+
+    def __init__(self, redis_url: str) -> None:
+        self.redis_url = redis_url
+        self.running: dict[str, tuple[uvicorn.Server, asyncio.Task]] = {}
+
+    async def __call__(self, time_scale: float = 0.02, **overrides) -> str:
+        port = free_port()
+        settings = Settings(
+            redis_url=self.redis_url,
+            time_scale=time_scale,
+            jwt_secret="test-secret-for-integration-tests-0123456789",
+            **overrides,
+        )
+        config = uvicorn.Config(
+            create_app(settings),
+            host="127.0.0.1",
+            port=port,
+            log_level="warning",
+            ws="websockets-sansio",
+        )
+        server = uvicorn.Server(config)
+        task = asyncio.create_task(server.serve())
+        while not server.started:
+            await asyncio.sleep(0.02)
+        url = f"http://127.0.0.1:{port}"
+        self.running[url] = (server, task)
+        return url
+
+    async def stop(self, url: str) -> None:
+        server, task = self.running.pop(url)
+        server.should_exit = True
+        await task
+
+    async def stop_all(self) -> None:
+        for url in list(self.running):
+            await self.stop(url)
+
+
+@pytest.fixture
+async def start_server(redis_url: str) -> AsyncIterator[Servers]:
+    client = redis.Redis.from_url(redis_url)
+    client.flushdb()
+    client.close()
+    servers = Servers(redis_url)
+    yield servers
+    await servers.stop_all()

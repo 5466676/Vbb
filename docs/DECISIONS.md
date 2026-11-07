@@ -184,3 +184,40 @@ The client gets the same template files in phase 6 (the server only sends the te
 |---|---|---|---|---|---|---|---|
 | fantasy | 7.5 (48%) | 9.9 (93%) | 10.0 (100%) | 10.0 (97%) | 9.7 (99%) | 9.7 (99%) | 9.5 (100%) |
 | world | 8.3 (57%) | 10.2 (97%) | 10.1 (100%) | 10.4 (95%) | 9.9 (100%) | 9.9 (100%) | 9.6 (99%) |
+
+## Phase 4 — Rooms & protocol (2026-11-07)
+
+**Built:** guest JWT (`POST /auth/guest`, device → player id in Redis until phase 5), `/ws` endpoint,
+room actor, connection hub, Redis pub/sub bus, quick-match matchmaker, a sample question provider
+(25 MCQ + 15 numeric, replaced by the database bank in phase 5), `scripts/fake_clients.py`,
+and `docs/PROTOCOL.md` (every message).
+
+**Architecture (several workers share rooms through Redis):**
+- A room is one JSON record (`room:{code}`) written only by its **actor**, which runs on the worker
+  holding the lease `room:{code}:owner` (renewed every 2 s, expires after 6 s).
+- Any worker can hold a player's socket. Input goes to the room inbox (a Redis list) plus a
+  pub/sub wake-up; output is published on `room:{code}:out` and every worker forwards it to its sockets.
+- If a worker dies, its lease expires and a worker that still has players in the room takes the room
+  over, reloads the record and re-arms the timers from their stored deadlines (tested).
+- Answer time is measured by the hub that holds the socket (monotonic clock, from writing `question`
+  to receiving `answer`).
+- Disconnect during a match → a seat-keeper bot plays (random answers, auto picks, no extras) until the
+  player reconnects and gets `full_state`. In the lobby a disconnected player is removed after 30 s.
+- Leaving a match is allowed without penalty; a bot keeps the seat.
+- Quick match: queues per mode and size; a full queue starts a room, otherwise medium bots fill the
+  seats after 20 s.
+- `time_scale` setting multiplies every room-side wait (tests run a full match in seconds).
+- Animation pauses before the next window: start 3 s, answer reveal 2.5 s, claims 1.5 s, battle 3.5 s.
+
+**Bugs found by the integration tests and fixed:** login tokens were signed with the global settings
+instead of the app's; the engine's own `match_started` was forwarded next to the room's; one bad message
+could crash a room (now isolated per message); a refused join left the socket attached to the room.
+
+**Token in logs:** the access log showed `?token=…`. The socket now takes `Authorization: Bearer`
+(query string still accepted for simple clients) and the container runs uvicorn with `--no-access-log`.
+
+**Tests:** 14 integration tests over real uvicorn workers and a real redis-server: 8-player match via
+room code, per-player shuffle maps back correctly, teams, reconnect with `full_state`, disconnected seat
+played by a bot, duplicate/wrong/late answers, rate limit and bad frames, lobby rules, host + bots,
+quick match with bot fill, two workers sharing a room, owner worker dying mid-match, guest login,
+bad token. 116 tests in total.

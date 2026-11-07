@@ -20,6 +20,7 @@ Target match length 8–12 minutes.
 - `backend/app/engine/` — **pure** game logic: `apply(state, action) -> (new_state, events)`.
   No I/O, no clocks, no global random. Seeded RNG lives in `MatchState`.
 - `backend/app/rooms/` — room lifecycle, timers, Redis, WebSocket hub. Timers send `Timeout` actions.
+  One room = one actor on the worker holding the room lease; any worker can host sockets.
 - `backend/app/api/` — REST. `backend/app/models/` — DB models.
 - `backend/app/questions/` — question bank. `backend/app/bots/` — bot players.
 - `backend/maps/` — map templates (JSON) + generator.
@@ -33,6 +34,7 @@ ruff check backend
 cd backend && pip install -e ".[maps]" && python -m maps.generate --preview /tmp/maps
 # full stack
 docker compose up --build        # then: curl localhost:8000/health
+cd backend && python -m scripts.fake_clients --url http://localhost:8000 --players 8   # 8 fake players, full match
 # app
 cd app && flutter pub get && flutter analyze && flutter test
 flutter build apk --split-per-abi

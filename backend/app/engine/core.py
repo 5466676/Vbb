@@ -276,6 +276,7 @@ def _on_provide_question(
         "kind": q.kind.value,
         "text": q.text,
         "options": list(q.options),
+        "unit": q.unit,
         "participants": list(seats),
         "limits_ms": {str(k): v for k, v in limits.items()},
         "phase_id": state.phase_id,

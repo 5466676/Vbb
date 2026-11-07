@@ -10,7 +10,7 @@ services:
       HARB_ENV: dev
       HARB_DATABASE_URL: postgresql+asyncpg://harb:harb@postgres:5432/harb
       HARB_REDIS_URL: redis://redis:6379/0
-      HARB_JWT_SECRET: ${HARB_JWT_SECRET:-dev-only-change-me}
+      HARB_JWT_SECRET: ${HARB_JWT_SECRET:-dev-only-secret-change-me-in-production-32b}
       HARB_ADMIN_KEY: ${HARB_ADMIN_KEY:-dev-admin-key}
     depends_on:
       redis:

@@ -87,6 +87,7 @@ class Question(BaseModel):
     options: list[str] = Field(default_factory=list)  # MCQ only, canonical order
     correct_index: int | None = None  # MCQ only
     answer: float | None = None  # numeric only
+    unit: str = ""  # numeric only, e.g. "متر"
 
 
 class AnswerRecord(BaseModel):
