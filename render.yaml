@@ -1,0 +1,15 @@
+# Free online game server: render.com → New → Blueprint → this repository.
+services:
+  - type: web
+    name: harb-al-oqool
+    runtime: docker
+    plan: free
+    branch: main
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile.render
+    healthCheckPath: /health
+    envVars:
+      - key: HARB_JWT_SECRET
+        generateValue: true
+      - key: HARB_ADMIN_KEY
+        generateValue: true

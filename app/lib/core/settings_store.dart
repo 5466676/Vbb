@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-/// The owner's Tailscale Funnel URL goes here once known (e.g. https://pc.tailnet.ts.net).
-/// Until then the player enters it in Settings or opens a `harb://server?url=...` link.
-const kDefaultServerUrl = '';
+/// The free online server (Render, render.yaml). Settings or a `harb://server?url=...` link can
+/// point the app at another one (e.g. the home server behind Tailscale Funnel).
+const kDefaultServerUrl = 'https://harb-al-oqool.onrender.com';
 
 /// Everything kept on the device between launches (shared_preferences).
 class SettingsStore {
@@ -24,7 +25,8 @@ class SettingsStore {
     return id;
   }
 
-  String get serverUrl => _p.getString('server_url') ?? kDefaultServerUrl;
+  /// In a browser the game talks to the site it was opened from (the server serves it at /play).
+  String get serverUrl => _p.getString('server_url') ?? (kIsWeb ? Uri.base.origin : kDefaultServerUrl);
   Future<void> setServerUrl(String url) => _p.setString('server_url', normalizeServerUrl(url));
 
   String get name => _p.getString('name') ?? '';
