@@ -221,3 +221,8 @@ room code, per-player shuffle maps back correctly, teams, reconnect with `full_s
 played by a bot, duplicate/wrong/late answers, rate limit and bad frames, lobby rules, host + bots,
 quick match with bot fill, two workers sharing a room, owner worker dying mid-match, guest login,
 bad token. 116 tests in total.
+
+**Real-speed check (brief §9.4):** `scripts/fake_clients.py` with 8 fake players against the Docker stack
+(api + redis + postgres, time scale 1): full FFA match through a room code in 425 s (7.1 min), 0 errors
+on the clients, no exceptions in the server log. The fake players answer at random and early, so real
+matches will run longer.
