@@ -29,7 +29,8 @@ from app.models import Counter, Player, Question, SeenQuestion
 from app.models.question import CATEGORIES, GENERAL_PACK, SOLO_PACK
 
 log = logging.getLogger(__name__)
-SEED_FILE = Path(__file__).parent / "seed" / "seed_ar.json"
+SEED_DIR = Path(__file__).parent / "seed"
+SEED_FILE = SEED_DIR / "seed_ar.json"
 SEED_SOURCE = "harb-seed"
 
 
@@ -166,14 +167,18 @@ async def import_questions(
     return result
 
 
+# built-in question files, imported in this order on every start (duplicates are skipped)
+SEED_FILES = [SEED_FILE, SEED_DIR / "owner_v1.json"]
+
+
 def seed_packs() -> dict[str, list[dict[str, Any]]]:
     """The seed split in two: every third question per category goes to the offline solo pack."""
-    items = json.loads(SEED_FILE.read_text(encoding="utf-8"))
     out: dict[str, list[dict[str, Any]]] = {GENERAL_PACK: [], SOLO_PACK: []}
     per_cat: dict[str, int] = {}
-    for item in items:
-        n = per_cat[item["category"]] = per_cat.get(item["category"], 0) + 1
-        out[SOLO_PACK if n % 3 == 0 else GENERAL_PACK].append(item)
+    for path in SEED_FILES:
+        for item in json.loads(path.read_text(encoding="utf-8")):
+            n = per_cat[item["category"]] = per_cat.get(item["category"], 0) + 1
+            out[SOLO_PACK if n % 3 == 0 else GENERAL_PACK].append(item)
     return out
 
 

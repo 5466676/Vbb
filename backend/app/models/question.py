@@ -29,7 +29,18 @@ class QuestionType(StrEnum):
     NUMERIC = "numeric"
 
 
-CATEGORIES = ["دين", "تاريخ", "جغرافيا", "علوم", "رياضيات", "لغة عربية", "رياضة", "ثقافة عامة"]
+CATEGORIES = [
+    "دين",
+    "تاريخ",
+    "جغرافيا",
+    "علوم",
+    "رياضيات",
+    "لغة عربية",
+    "رياضة",
+    "ثقافة عامة",
+    "تكنولوجيا",
+    "حيوانات وطبيعة",
+]
 GENERAL_PACK = "general"
 # questions in this pack are downloaded to devices for offline solo play (answers included);
 # online rooms never use it, so cached answers cannot help in online matches

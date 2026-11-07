@@ -10,7 +10,7 @@ from app.db import make_engine, make_sessionmaker
 from app.engine.models import QuestionKind
 from app.models import Player, Question, SeenQuestion
 from app.models.question import CATEGORIES
-from app.questions.bank import SEED_FILE, DbProvider, NoQuestions, import_questions, parse_csv
+from app.questions.bank import SEED_FILES, DbProvider, NoQuestions, import_questions, parse_csv
 
 
 @pytest.fixture
@@ -27,12 +27,16 @@ async def add_players(sm, *ids):
         await s.commit()
 
 
+def seed_rows() -> list[dict]:
+    return [q for f in SEED_FILES for q in json.loads(f.read_text(encoding="utf-8"))]
+
+
 def test_seed_file_is_balanced_and_valid():
-    rows = json.loads(SEED_FILE.read_text(encoding="utf-8"))
-    assert len(rows) >= 300
+    rows = seed_rows()
+    assert len(rows) >= 450
     assert {r["category"] for r in rows} == set(CATEGORIES)
     for cat in CATEGORIES:
-        assert sum(r["category"] == cat for r in rows) >= 30
+        assert sum(r["category"] == cat for r in rows) >= 15
     assert sum(r["type"] == "numeric" for r in rows) >= 60
     correct = [r["correct_index"] for r in rows if r["type"] == "mcq"]
     assert set(correct) == {0, 1, 2, 3}, "the correct answer is not always in the same place"
@@ -45,8 +49,8 @@ async def test_seed_is_loaded_unreviewed_and_reimport_is_idempotent(sm):
         reviewed = (
             await s.execute(select(func.count()).where(Question.reviewed.is_(True)))
         ).scalar_one()
-        res = await import_questions(s, json.loads(SEED_FILE.read_text(encoding="utf-8")))
-    assert total == len(json.loads(SEED_FILE.read_text(encoding="utf-8")))
+        res = await import_questions(s, seed_rows())
+    assert total == len(seed_rows())
     assert reviewed == 0
     assert res.inserted == 0 and res.duplicates == total
 

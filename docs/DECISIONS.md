@@ -301,3 +301,15 @@ new device had made is detached.
 
 **Still Android only** (owner agreed). **Bug found by the tests:** the lock doubling overflowed
 after hundreds of failures; capped.
+
+## Owner's question bank, two new categories (2026-11-07)
+
+The owner writes questions with his own `build_questions.py` (JSON: `categories` + `questions`,
+`choice`/`number`). The checker and importer read that format directly
+(`app/questions/owner_format.py`), so he keeps his workflow. His categories added two of ours:
+**تكنولوجيا** and **حيوانات وطبيعة** (10 categories now); the other eight map onto the existing ones.
+First file: 200 questions, all valid; 49 were already in the seed (matched ignoring diacritics and
+hamza forms) and were dropped; two were held back because the "right" answer is disputed
+(longest river: Nile vs Amazon; number of continents: 6 or 7 depending on the school system).
+The other 149 are a second built-in seed file (`seed/owner_v1.json`), split like the first:
+every third per category goes to the offline `solo` pack. Bank: 453 questions (305 online, 148 offline).

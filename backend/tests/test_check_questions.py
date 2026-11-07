@@ -45,3 +45,53 @@ def test_split_writes_two_packs(tmp_path):
     assert r.returncode == 0, r.stdout
     assert (tmp_path / "q.general.json").exists() and (tmp_path / "q.solo.json").exists()
     assert "(4)" in r.stdout and "(2)" in r.stdout
+
+
+def test_owner_format_is_understood(tmp_path):
+    import json
+
+    data = {
+        "version": 1,
+        "categories": [
+            {"id": "tech", "name": "تكنولوجيا"},
+            {"id": "math", "name": "رياضيات وألغاز"},
+        ],
+        "questions": [
+            {
+                "id": "q1",
+                "category": "tech",
+                "type": "choice",
+                "question": "ما لغة Flutter؟",
+                "difficulty": 1,
+                "options": ["Dart", "Go", "Rust", "C"],
+                "answer": 0,
+            },
+            {
+                "id": "q2",
+                "category": "math",
+                "type": "number",
+                "question": "كم ضلعاً للمخمّس؟",
+                "difficulty": 1,
+                "answer": 5,
+            },
+            {
+                "id": "q3",
+                "category": "tech",
+                "type": "choice",
+                "question": "سؤال ناقص؟",
+                "difficulty": 1,
+                "options": ["أ", "ب"],
+                "answer": 0,
+            },
+        ],
+    }
+    f = tmp_path / "bank.json"
+    f.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    r = subprocess.run(
+        [sys.executable, "-m", "scripts.check_questions", str(f)],
+        cwd=BACKEND,
+        capture_output=True,
+        text=True,
+    )
+    assert "3 rows, 2 valid, 1 with problems" in r.stdout
+    assert "تكنولوجيا: 1 mcq, 0 numeric" in r.stdout and "رياضيات: 0 mcq, 1 numeric" in r.stdout

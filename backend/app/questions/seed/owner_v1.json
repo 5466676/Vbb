@@ -1,0 +1,2027 @@
+[
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 1,
+  "text_ar": "ما عاصمة أستراليا؟",
+  "options_ar": [
+   "ملبورن",
+   "سيدني",
+   "بيرث",
+   "كانبرا"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 1,
+  "text_ar": "ما أكبر محيط في العالم؟",
+  "options_ar": [
+   "المحيط الأطلسي",
+   "المحيط المتجمد الشمالي",
+   "المحيط الهندي",
+   "المحيط الهادئ"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 1,
+  "text_ar": "ما أكبر دولة في العالم من حيث المساحة؟",
+  "options_ar": [
+   "كندا",
+   "الصين",
+   "روسيا",
+   "الولايات المتحدة"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 1,
+  "text_ar": "في أي قارة تقع البرازيل؟",
+  "options_ar": [
+   "أمريكا الشمالية",
+   "أوروبا",
+   "أمريكا الجنوبية",
+   "أفريقيا"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 1,
+  "text_ar": "ما عاصمة اليابان؟",
+  "options_ar": [
+   "طوكيو",
+   "كيوتو",
+   "أوساكا",
+   "هيروشيما"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "ما أصغر دولة في العالم من حيث المساحة؟",
+  "options_ar": [
+   "سان مارينو",
+   "مالطا",
+   "الفاتيكان",
+   "موناكو"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "ينبع نهر الفرات من أي دولة؟",
+  "options_ar": [
+   "العراق",
+   "سوريا",
+   "إيران",
+   "تركيا"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "ما أكبر جزيرة في العالم؟",
+  "options_ar": [
+   "بورنيو",
+   "غينيا الجديدة",
+   "غرينلاند",
+   "مدغشقر"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "ما عاصمة المغرب؟",
+  "options_ar": [
+   "مراكش",
+   "فاس",
+   "الدار البيضاء",
+   "الرباط"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "أي مضيق يفصل بين أوروبا وأفريقيا؟",
+  "options_ar": [
+   "مضيق جبل طارق",
+   "مضيق البوسفور",
+   "مضيق باب المندب",
+   "مضيق هرمز"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 3,
+  "text_ar": "ما أعمق بحيرة في العالم؟",
+  "options_ar": [
+   "بحيرة سوبيريور",
+   "بحيرة بايكال",
+   "بحيرة تيتيكاكا",
+   "بحيرة فيكتوريا"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "أين تقع أخفض نقطة على اليابسة؟",
+  "options_ar": [
+   "وادي الموت",
+   "بحر قزوين",
+   "البحر الميت",
+   "منخفض القطارة"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "جغرافيا",
+  "difficulty": 1,
+  "text_ar": "أي دولة تُلقّب ببلاد الشمس المشرقة؟",
+  "options_ar": [
+   "تايلاند",
+   "كوريا الجنوبية",
+   "الصين",
+   "اليابان"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "من الخليفة الذي بنى مدينة بغداد؟",
+  "options_ar": [
+   "أبو جعفر المنصور",
+   "أبو العباس السفاح",
+   "المأمون",
+   "هارون الرشيد"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 1,
+  "text_ar": "من السلطان العثماني الذي فتح القسطنطينية؟",
+  "options_ar": [
+   "بايزيد الأول",
+   "مراد الثاني",
+   "محمد الفاتح",
+   "سليمان القانوني"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "ضد من كانت معركة عين جالوت؟",
+  "options_ar": [
+   "الفرس",
+   "المغول",
+   "الصليبيين",
+   "البيزنطيين"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 1,
+  "text_ar": "من أول رئيس للولايات المتحدة الأمريكية؟",
+  "options_ar": [
+   "أبراهام لينكولن",
+   "جون آدامز",
+   "جورج واشنطن",
+   "توماس جيفرسون"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 1,
+  "text_ar": "أي حضارة بنت أهرامات الجيزة؟",
+  "options_ar": [
+   "الفينيقية",
+   "الرومانية",
+   "البابلية",
+   "المصرية القديمة"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "من القائد الذي عبر بجيشه إلى الأندلس عام 711م وسُمّي المضيق باسمه؟",
+  "options_ar": [
+   "عقبة بن نافع",
+   "عبد الرحمن الداخل",
+   "طارق بن زياد",
+   "خالد بن الوليد"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "في أي دولة بدأت الثورة الصناعية؟",
+  "options_ar": [
+   "الولايات المتحدة",
+   "فرنسا",
+   "بريطانيا",
+   "ألمانيا"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 3,
+  "text_ar": "في أي مدينة سورية قديمة عُثر على أقدم أبجدية معروفة؟",
+  "options_ar": [
+   "أوغاريت",
+   "تدمر",
+   "ماري",
+   "إيبلا"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 1,
+  "text_ar": "من ملكة تدمر التي تحدّت روما؟",
+  "options_ar": [
+   "زنوبيا",
+   "كليوباترا",
+   "بلقيس",
+   "نفرتيتي"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "في أي عام انتهت الحرب العالمية الأولى؟",
+  "numeric_answer": 1918.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "من مؤسس الدولة العثمانية؟",
+  "options_ar": [
+   "أرطغرل",
+   "محمد الفاتح",
+   "عثمان الأول",
+   "أورخان"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تاريخ",
+  "difficulty": 1,
+  "text_ar": "من الإمبراطور الفرنسي الذي هُزم في معركة واترلو؟",
+  "options_ar": [
+   "لويس الرابع عشر",
+   "شارلمان",
+   "نابليون بونابرت",
+   "لويس السادس عشر"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "ما الرمز الكيميائي للذهب؟",
+  "options_ar": [
+   "Ag",
+   "Gd",
+   "Go",
+   "Au"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 1,
+  "text_ar": "ما أقرب كوكب إلى الشمس؟",
+  "options_ar": [
+   "الزهرة",
+   "عطارد",
+   "المريخ",
+   "الأرض"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 1,
+  "text_ar": "ما الغاز الذي تمتصه النباتات من الجو لصنع غذائها؟",
+  "options_ar": [
+   "الأكسجين",
+   "ثاني أكسيد الكربون",
+   "الهيدروجين",
+   "النيتروجين"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "علوم",
+  "difficulty": 1,
+  "text_ar": "عند كم درجة مئوية يغلي الماء عند مستوى سطح البحر؟",
+  "numeric_answer": 100.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 1,
+  "text_ar": "أي كوكب يُلقّب بالكوكب الأحمر؟",
+  "options_ar": [
+   "زحل",
+   "المشتري",
+   "الزهرة",
+   "المريخ"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 1,
+  "text_ar": "ما العضو المسؤول عن ضخ الدم في الجسم؟",
+  "options_ar": [
+   "الكلية",
+   "الرئتان",
+   "القلب",
+   "الكبد"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "كم ألف كيلومتر يقطع الضوء في الثانية تقريباً؟ (اكتب الرقم بالآلاف)",
+  "numeric_answer": 300.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "ما الغاز الأكثر وجوداً في الغلاف الجوي للأرض؟",
+  "options_ar": [
+   "الأرغون",
+   "النيتروجين",
+   "ثاني أكسيد الكربون",
+   "الأكسجين"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "كم عدد الكروموسومات في الخلية البشرية الطبيعية؟",
+  "numeric_answer": 46.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 1,
+  "text_ar": "ما أصلب مادة طبيعية معروفة؟",
+  "options_ar": [
+   "الكوارتز",
+   "الألماس",
+   "الغرانيت",
+   "الحديد"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 1,
+  "text_ar": "أي فيتامين يصنعه الجلد عند التعرض لأشعة الشمس؟",
+  "options_ar": [
+   "فيتامين ب12",
+   "فيتامين أ",
+   "فيتامين ج",
+   "فيتامين د"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "ما العنصر الذي رمزه الكيميائي Fe؟",
+  "options_ar": [
+   "الفلور",
+   "الفضة",
+   "الحديد",
+   "الرصاص"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "من مكتشف البنسلين؟",
+  "options_ar": [
+   "توماس أديسون",
+   "ألكسندر فليمنغ",
+   "لويس باستور",
+   "ماري كوري"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "من العالم العربي صاحب كتاب «المناظر» ومؤسس علم البصريات الحديث؟",
+  "options_ar": [
+   "أبو بكر الرازي",
+   "ابن سينا",
+   "الخوارزمي",
+   "ابن الهيثم"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "أي منتخب فاز بكأس العالم 2022؟",
+  "options_ar": [
+   "فرنسا",
+   "كرواتيا",
+   "البرازيل",
+   "الأرجنتين"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "أين أقيمت بطولة كأس العالم 2022؟",
+  "options_ar": [
+   "قطر",
+   "الإمارات",
+   "السعودية",
+   "روسيا"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "كم دقيقة مدة مباراة كرة القدم الأصلية (بدون وقت إضافي)؟",
+  "numeric_answer": 90.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "أي منتخب فاز بكأس العالم لكرة القدم أكثر من غيره؟",
+  "options_ar": [
+   "البرازيل",
+   "إيطاليا",
+   "الأرجنتين",
+   "ألمانيا"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "كل كم سنة تقام الألعاب الأولمبية الصيفية؟",
+  "numeric_answer": 4.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "في أي لعبة يُستخدم مصطلح «كش مات»؟",
+  "options_ar": [
+   "الشطرنج",
+   "البلياردو",
+   "الطاولة",
+   "الدومينو"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "أي نادٍ يُلقّب بـ«الملكي»؟",
+  "options_ar": [
+   "ريال مدريد",
+   "برشلونة",
+   "أتلتيكو مدريد",
+   "فالنسيا"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "كم عدد الحلقات في شعار الألعاب الأولمبية؟",
+  "numeric_answer": 5.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "كم كيلومتراً طول سباق الماراثون؟ (لأقرب عدد صحيح)",
+  "numeric_answer": 42.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "ما اسم بطولة التنس الكبرى التي تُلعب على العشب في لندن؟",
+  "options_ar": [
+   "رولان غاروس",
+   "أمريكا المفتوحة",
+   "أستراليا المفتوحة",
+   "ويمبلدون"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 3,
+  "text_ar": "أي دولة استضافت أول كأس عالم لكرة القدم عام 1930؟",
+  "options_ar": [
+   "إيطاليا",
+   "فرنسا",
+   "البرازيل",
+   "الأوروغواي"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضة",
+  "difficulty": 3,
+  "text_ar": "كم جولة في نزال الملاكمة الاحترافية على لقب عالمي؟",
+  "numeric_answer": 12.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "من اللاعب المصري الملقب بالفرعون في نادي ليفربول؟",
+  "options_ar": [
+   "أحمد حجازي",
+   "محمد صلاح",
+   "محمد النني",
+   "عمر مرموش"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "ما الرياضة التي تُلعب بمضرب وريشة؟",
+  "options_ar": [
+   "التنس",
+   "الاسكواش",
+   "تنس الطاولة",
+   "الريشة الطائرة"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "أي دولة استضافت كأس العالم 2014؟",
+  "options_ar": [
+   "ألمانيا",
+   "جنوب أفريقيا",
+   "البرازيل",
+   "روسيا"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "دين",
+  "difficulty": 1,
+  "text_ar": "من أول مؤذن في الإسلام؟",
+  "options_ar": [
+   "سلمان الفارسي",
+   "بلال بن رباح",
+   "زيد بن حارثة",
+   "عمار بن ياسر"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "دين",
+  "difficulty": 1,
+  "text_ar": "في أي شهر هجري يصوم المسلمون؟",
+  "options_ar": [
+   "شوال",
+   "شعبان",
+   "رمضان",
+   "رجب"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "دين",
+  "difficulty": 2,
+  "text_ar": "ما السورة التي لا تبدأ بالبسملة؟",
+  "options_ar": [
+   "الأنفال",
+   "الفاتحة",
+   "التوبة",
+   "النمل"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "دين",
+  "difficulty": 2,
+  "text_ar": "كم عدد الأنبياء والرسل المذكورين بأسمائهم في القرآن؟",
+  "numeric_answer": 25.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "دين",
+  "difficulty": 1,
+  "text_ar": "ما أول غزوة كبرى في الإسلام؟",
+  "options_ar": [
+   "أحد",
+   "بدر",
+   "الخندق",
+   "حنين"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "دين",
+  "difficulty": 1,
+  "text_ar": "أي سورة تحمل اسم امرأة؟",
+  "options_ar": [
+   "لقمان",
+   "هود",
+   "يوسف",
+   "مريم"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "دين",
+  "difficulty": 1,
+  "text_ar": "من الصحابي الملقب بالفاروق؟",
+  "options_ar": [
+   "أبو بكر الصديق",
+   "خالد بن الوليد",
+   "عمر بن الخطاب",
+   "عثمان بن عفان"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "دين",
+  "difficulty": 1,
+  "text_ar": "كم ركعة في فرض صلاة الفجر؟",
+  "numeric_answer": 2.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "دين",
+  "difficulty": 1,
+  "text_ar": "من أول زوجات النبي ﷺ؟",
+  "options_ar": [
+   "حفصة بنت عمر",
+   "خديجة بنت خويلد",
+   "سودة بنت زمعة",
+   "عائشة بنت أبي بكر"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "دين",
+  "difficulty": 2,
+  "text_ar": "أي سورة تعدل ثلث القرآن؟",
+  "options_ar": [
+   "الفلق",
+   "الإخلاص",
+   "الفاتحة",
+   "الكوثر"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "دين",
+  "difficulty": 1,
+  "text_ar": "أي نبي لُقّب بخليل الله؟",
+  "options_ar": [
+   "عيسى",
+   "نوح",
+   "موسى",
+   "إبراهيم"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "من الشاعر الملقب بأمير الشعراء؟",
+  "options_ar": [
+   "حافظ إبراهيم",
+   "نزار قباني",
+   "المتنبي",
+   "أحمد شوقي"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "ما جمع كلمة «كتاب»؟",
+  "options_ar": [
+   "كُتُب",
+   "كاتبون",
+   "كتابات",
+   "أكتاب"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "من الأديب العربي الحائز على جائزة نوبل للأدب؟",
+  "options_ar": [
+   "أدونيس",
+   "نجيب محفوظ",
+   "محمود درويش",
+   "طه حسين"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 2,
+  "text_ar": "ما مفرد كلمة «أنامل»؟",
+  "options_ar": [
+   "أُنمُلة",
+   "أنمول",
+   "نملة",
+   "منمل"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "كم عدد حروف الهجاء العربية؟",
+  "numeric_answer": 28.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "من الشاعر السوري الملقب بشاعر المرأة؟",
+  "options_ar": [
+   "نزار قباني",
+   "أدونيس",
+   "بدوي الجبل",
+   "عمر أبو ريشة"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "ما ضد كلمة «الشجاعة»؟",
+  "options_ar": [
+   "الكرم",
+   "القوة",
+   "الجُبن",
+   "الصبر"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 2,
+  "text_ar": "من الشاعر الجاهلي الملقب بالملك الضليل؟",
+  "options_ar": [
+   "عنترة بن شداد",
+   "امرؤ القيس",
+   "زهير بن أبي سلمى",
+   "طرفة بن العبد"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 2,
+  "text_ar": "من مؤلف «رسالة الغفران»؟",
+  "options_ar": [
+   "الجاحظ",
+   "المتنبي",
+   "ابن خلدون",
+   "أبو العلاء المعري"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "ما حكم الفاعل في الإعراب؟",
+  "options_ar": [
+   "مجزوم",
+   "مجرور",
+   "مرفوع",
+   "منصوب"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 3,
+  "text_ar": "من يُنسب إليه وضع علم النحو بحسب المشهور؟",
+  "options_ar": [
+   "الخليل بن أحمد",
+   "أبو الأسود الدؤلي",
+   "الكسائي",
+   "سيبويه"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 2,
+  "text_ar": "من واضع علم العروض؟",
+  "options_ar": [
+   "ابن جني",
+   "الخليل بن أحمد الفراهيدي",
+   "الأصمعي",
+   "سيبويه"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "من صاحب «المقدمة» الشهيرة في علم الاجتماع؟",
+  "options_ar": [
+   "الفارابي",
+   "ابن بطوطة",
+   "ابن رشد",
+   "ابن خلدون"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "من الشاعر القائل: «الخيل والليل والبيداء تعرفني»؟",
+  "options_ar": [
+   "أبو فراس الحمداني",
+   "أبو تمام",
+   "المتنبي",
+   "البحتري"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 3,
+  "text_ar": "ما معنى كلمة «السَّغَب»؟",
+  "options_ar": [
+   "الجوع",
+   "التعب",
+   "الخوف",
+   "العطش"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "لغة عربية",
+  "difficulty": 1,
+  "text_ar": "من الراوية في حكايات «ألف ليلة وليلة»؟",
+  "options_ar": [
+   "شهرزاد",
+   "قطر الندى",
+   "دنيازاد",
+   "شهريار"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "من شارك في تأسيس شركة مايكروسوفت؟",
+  "options_ar": [
+   "مارك زوكربيرغ",
+   "بيل غيتس",
+   "ستيف جوبز",
+   "لاري بيج"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "ماذا يعني الاختصار CPU؟",
+  "options_ar": [
+   "وحدة الطاقة",
+   "بطاقة الرسوميات",
+   "وحدة التخزين الرئيسية",
+   "وحدة المعالجة المركزية"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "ما لغة البرمجة المستخدمة في Flutter؟",
+  "options_ar": [
+   "Kotlin",
+   "JavaScript",
+   "Swift",
+   "Dart"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "كم بايت في الكيلوبايت الواحد (بالنظام الثنائي)؟",
+  "numeric_answer": 1024.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "ما الشركة المطورة لنظام أندرويد؟",
+  "options_ar": [
+   "مايكروسوفت",
+   "آبل",
+   "غوغل",
+   "سامسونج"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "ماذا تعني HTML؟",
+  "options_ar": [
+   "نظام إدارة قواعد البيانات",
+   "لغة برمجة الخوادم",
+   "بروتوكول نقل الملفات",
+   "لغة ترميز النص التشعبي"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "من مؤسس فيسبوك؟",
+  "options_ar": [
+   "بيل غيتس",
+   "إيلون ماسك",
+   "مارك زوكربيرغ",
+   "جيف بيزوس"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "ما نظام العدّ الذي يعتمد عليه الحاسوب أساساً؟",
+  "options_ar": [
+   "العشري",
+   "الثنائي",
+   "الستيني",
+   "الثماني"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "من مخترع الشبكة العنكبوتية العالمية (WWW)؟",
+  "options_ar": [
+   "فينت سيرف",
+   "تيم بيرنرز لي",
+   "آلان تورينغ",
+   "ستيف وزنياك"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "من العالم الذي اشتُقت كلمة «خوارزمية» من اسمه؟",
+  "options_ar": [
+   "البيروني",
+   "الخوارزمي",
+   "الكندي",
+   "ابن الهيثم"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "ما امتداد ملفات لغة بايثون؟",
+  "options_ar": [
+   ".pt",
+   ".pyt",
+   ".pn",
+   ".py"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "ماذا يعني الاختصار RAM؟",
+  "options_ar": [
+   "المعالج الرسومي",
+   "ذاكرة الوصول العشوائي",
+   "ذاكرة القراءة فقط",
+   "القرص الصلب"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "في أي عام أُعلن عن أول هاتف آيفون؟",
+  "numeric_answer": 2007.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "كم بت في البايت الواحد؟",
+  "numeric_answer": 8.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "أي بروتوكول يُستخدم لتصفح المواقع بشكل آمن ومشفّر؟",
+  "options_ar": [
+   "SMTP",
+   "HTTP",
+   "HTTPS",
+   "FTP"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "ما أشهر نظام لإدارة نسخ الكود البرمجي؟",
+  "options_ar": [
+   "Linux",
+   "Git",
+   "Docker",
+   "npm"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "ما الشركة المطورة لنظام ويندوز؟",
+  "options_ar": [
+   "غوغل",
+   "آبل",
+   "IBM",
+   "مايكروسوفت"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "ما اسم الاختبار الذي يقيس قدرة الآلة على محاكاة تفكير الإنسان؟",
+  "options_ar": [
+   "اختبار نيوتن",
+   "اختبار مور",
+   "اختبار تورينغ",
+   "اختبار بايثون"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 3,
+  "text_ar": "أي لغة برمجة سُمّيت تيمناً بفرقة كوميدية بريطانية؟",
+  "options_ar": [
+   "C",
+   "Java",
+   "Python",
+   "Ruby"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "أي وحدة من وحدات التخزين هي الأكبر؟",
+  "options_ar": [
+   "البيتابايت",
+   "الميغابايت",
+   "الغيغابايت",
+   "التيرابايت"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 1,
+  "text_ar": "كم ضلعاً للشكل السداسي؟",
+  "numeric_answer": 6.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 1,
+  "text_ar": "كم مجموع زوايا المثلث بالدرجات؟",
+  "numeric_answer": 180.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 1,
+  "text_ar": "ما قيمة العدد π لأقرب منزلتين عشريتين؟",
+  "numeric_answer": 3.14,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "ما العدد الأولي الزوجي الوحيد؟",
+  "numeric_answer": 2.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم ثانية في الساعة الواحدة؟",
+  "numeric_answer": 3600.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم يساوي 15% من 200؟",
+  "numeric_answer": 30.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 1,
+  "text_ar": "كم ضلعاً للشكل الثماني؟",
+  "numeric_answer": 8.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "ما العدد التالي في متتالية فيبوناتشي: 1، 1، 2، 3، 5، 8، ...؟",
+  "numeric_answer": 13.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "عمر أحمد ضعف عمر أخيه البالغ 6 سنوات، كم سيكون عمر أحمد بعد 3 سنوات؟",
+  "numeric_answer": 15.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم دقيقة في اليوم الكامل؟",
+  "numeric_answer": 1440.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 1,
+  "text_ar": "ما مساحة مربع طول ضلعه 9؟",
+  "numeric_answer": 81.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 1,
+  "text_ar": "كم يساوي الرقم الروماني X؟",
+  "numeric_answer": 10.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم يساوي الرقم الروماني L؟",
+  "numeric_answer": 50.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 3,
+  "text_ar": "كم عدداً أولياً يوجد بين 1 و20؟",
+  "numeric_answer": 8.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "ما ناتج مضروب العدد 5 (أي 5!)؟",
+  "numeric_answer": 120.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "قطار يسير بسرعة 60 كم/ساعة، كم كيلومتراً يقطع في ساعتين ونصف؟",
+  "numeric_answer": 150.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "ثقافة عامة",
+  "difficulty": 1,
+  "text_ar": "كم عدد ألوان قوس قزح؟",
+  "numeric_answer": 7.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 1,
+  "text_ar": "من مؤلف مسرحية «روميو وجولييت»؟",
+  "options_ar": [
+   "غوته",
+   "وليام شكسبير",
+   "تشارلز ديكنز",
+   "موليير"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "من مؤلف السيمفونية التاسعة الشهيرة؟",
+  "options_ar": [
+   "موزارت",
+   "تشايكوفسكي",
+   "بيتهوفن",
+   "باخ"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "أي آلة موسيقية تحتوي عادة على 88 مفتاحاً؟",
+  "options_ar": [
+   "القانون",
+   "الأورغ",
+   "الأكورديون",
+   "البيانو"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "ما اللغة الأكثر انتشاراً كلغة أم في العالم؟",
+  "options_ar": [
+   "الهندية",
+   "الإسبانية",
+   "الصينية الماندرينية",
+   "الإنجليزية"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "في أي مدينة يقع المقر الرئيسي للأمم المتحدة؟",
+  "options_ar": [
+   "واشنطن",
+   "نيويورك",
+   "باريس",
+   "جنيف"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "من رسم لوحة «ليلة النجوم»؟",
+  "options_ar": [
+   "فينسنت فان غوخ",
+   "بابلو بيكاسو",
+   "سلفادور دالي",
+   "كلود مونيه"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "أي دولة أهدت تمثال الحرية للولايات المتحدة؟",
+  "options_ar": [
+   "بريطانيا",
+   "فرنسا",
+   "إسبانيا",
+   "إيطاليا"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 1,
+  "text_ar": "في أي دولة يقع تاج محل؟",
+  "options_ar": [
+   "إيران",
+   "باكستان",
+   "الهند",
+   "تركيا"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "أي من عجائب الدنيا السبع القديمة ما زال قائماً حتى اليوم؟",
+  "options_ar": [
+   "منارة الإسكندرية",
+   "تمثال زيوس",
+   "هرم خوفو الأكبر",
+   "حدائق بابل المعلقة"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "ما الآلة الوترية الشرقية الشهيرة ذات الزند القصير بلا دساتين؟",
+  "options_ar": [
+   "الربابة",
+   "العود",
+   "القانون",
+   "الناي"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "ما اللغة الرسمية في البرازيل؟",
+  "options_ar": [
+   "الفرنسية",
+   "الإنجليزية",
+   "البرتغالية",
+   "الإسبانية"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 1,
+  "text_ar": "ما اللون الناتج عن مزج الأزرق والأصفر؟",
+  "options_ar": [
+   "الأخضر",
+   "البنفسجي",
+   "البرتقالي",
+   "البني"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "ثقافة عامة",
+  "difficulty": 2,
+  "text_ar": "من مؤلف رواية «البؤساء»؟",
+  "options_ar": [
+   "ألكسندر دوما",
+   "ليو تولستوي",
+   "تشارلز ديكنز",
+   "فيكتور هوغو"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "ما أكبر حيوان على وجه الأرض؟",
+  "options_ar": [
+   "القرش الأبيض",
+   "الفيل الأفريقي",
+   "الزرافة",
+   "الحوت الأزرق"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 3,
+  "text_ar": "كم قلباً للأخطبوط؟",
+  "numeric_answer": 3.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 2,
+  "text_ar": "ماذا يُسمّى صغير الحصان؟",
+  "options_ar": [
+   "مُهر",
+   "شبل",
+   "حَمَل",
+   "جرو"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "ماذا يُسمّى صغير الأسد؟",
+  "options_ar": [
+   "عجل",
+   "جرو",
+   "حُوار",
+   "شبل"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "ما الحيوان الثديي الوحيد القادر على الطيران؟",
+  "options_ar": [
+   "الخفاش",
+   "السنجاب الطائر",
+   "الليمور",
+   "البومة"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "كم رِجلاً للعنكبوت؟",
+  "numeric_answer": 8.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "numeric",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "كم رِجلاً للحشرة؟",
+  "numeric_answer": 6.0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "ما أكبر طائر في العالم وهو لا يطير؟",
+  "options_ar": [
+   "الإيمو",
+   "النعامة",
+   "البطريق",
+   "الكيوي"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "أي حيوان يحمل صغاره في جراب؟",
+  "options_ar": [
+   "الدب القطبي",
+   "الكنغر",
+   "القرد",
+   "السنجاب"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 2,
+  "text_ar": "على ماذا تتغذى دودة القز؟",
+  "options_ar": [
+   "أوراق الصفصاف",
+   "أوراق العنب",
+   "أوراق التوت",
+   "أوراق الزيتون"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "أي حيوان يُلقّب بسفينة الصحراء؟",
+  "options_ar": [
+   "الماعز",
+   "الجمل",
+   "الحصان",
+   "الحمار"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 3,
+  "text_ar": "ما أطول أنواع الأشجار في العالم؟",
+  "options_ar": [
+   "السيكويا الحمراء",
+   "البلوط",
+   "النخيل",
+   "الأرز"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "ما الحيوان المعروف بقدرته على تغيير لونه؟",
+  "options_ar": [
+   "الأفعى",
+   "السحلية",
+   "الضفدع",
+   "الحرباء"
+  ],
+  "correct_index": 3,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "ما الحيوان الملقب بملك الغابة؟",
+  "options_ar": [
+   "الأسد",
+   "النمر",
+   "الدب",
+   "الفيل"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "ما الطائر الذي يرمز إلى السلام؟",
+  "options_ar": [
+   "الحمامة",
+   "البلبل",
+   "النسر",
+   "الصقر"
+  ],
+  "correct_index": 0,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 1,
+  "text_ar": "في أي جزء من النبات تتم عملية البناء الضوئي بشكل أساسي؟",
+  "options_ar": [
+   "الساق",
+   "الأزهار",
+   "الأوراق",
+   "الجذور"
+  ],
+  "correct_index": 2,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 2,
+  "text_ar": "أي من هذه الحيوانات يستطيع النوم وهو واقف؟",
+  "options_ar": [
+   "الكلب",
+   "الحصان",
+   "القط",
+   "الأرنب"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ },
+ {
+  "type": "mcq",
+  "category": "حيوانات وطبيعة",
+  "difficulty": 2,
+  "text_ar": "أي من هذه الحيوانات ليس من الثدييات؟",
+  "options_ar": [
+   "الحوت",
+   "البطريق",
+   "الدلفين",
+   "الخفاش"
+  ],
+  "correct_index": 1,
+  "unit_ar": "",
+  "source": "owner-bank-v1"
+ }
+]

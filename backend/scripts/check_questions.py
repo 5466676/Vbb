@@ -20,7 +20,8 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from app.models.question import CATEGORIES
-from app.questions.bank import QuestionIn, parse_csv
+from app.questions.bank import SEED_DIR, QuestionIn, parse_csv
+from app.questions.owner_format import convert, is_owner_format
 
 _TASHKEEL = re.compile(r"[ً-ٰٟـ]")
 
@@ -37,6 +38,8 @@ def load(path: Path) -> list[dict]:
     if path.suffix.lower() == ".csv":
         return parse_csv(raw)
     data = json.loads(raw)
+    if is_owner_format(data):
+        return convert(data)
     if not isinstance(data, list):
         raise SystemExit("a JSON file must be an array of questions")
     return data
@@ -55,6 +58,12 @@ def main() -> int:
     first_row = 2 if args.file.suffix.lower() == ".csv" else 1
     good: list[dict] = []
     seen: dict[str, int] = {}
+    in_bank = {
+        norm(q["text_ar"])
+        for f in sorted(SEED_DIR.glob("*.json"))
+        if f.resolve() != args.file.resolve()
+        for q in json.loads(f.read_text(encoding="utf-8"))
+    }
     problems = 0
     for i, row in enumerate(rows):
         n = i + first_row
@@ -73,6 +82,8 @@ def main() -> int:
             print(f"row {n}: same question as row {seen[key]}")
             continue
         seen[key] = n
+        if key in in_bank:
+            print(f"row {n}: already in the built-in bank (skipped on import): {q.text_ar}")
         if len(q.text_ar) > 160:
             print(
                 f"row {n}: long question ({len(q.text_ar)} characters) — hard to read under a timer"

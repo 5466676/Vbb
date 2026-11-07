@@ -3,12 +3,19 @@
 Send questions as **CSV** (Excel / Google Sheets → "Download as CSV, UTF-8") or **JSON**.
 Template: [`questions_template.csv`](questions_template.csv). One question per row.
 
+**The owner's format** (the JSON made by his `build_questions.py`: `{"categories": [...], "questions": [...]}`
+with `type` `choice`/`number` and `answer`) is read as is. Its category ids map to ours:
+geography→جغرافيا, history→تاريخ, science→علوم, sports→رياضة, islamic→دين, arabic→لغة عربية,
+tech→تكنولوجيا, math→رياضيات, culture→ثقافة عامة, nature→حيوانات وطبيعة. `tolerance` is ignored
+(numeric questions are won by the closest answer). The first file is in the bank as
+`backend/app/questions/seed/owner_v1.json`.
+
 ## Columns
 
 | column | required | values |
 |---|---|---|
 | `type` | yes | `mcq` (4 options) or `numeric` (the answer is a number) |
-| `category` | yes | exactly one of: `دين`, `تاريخ`, `جغرافيا`, `علوم`, `رياضيات`, `لغة عربية`, `رياضة`, `ثقافة عامة` |
+| `category` | yes | exactly one of: `دين`, `تاريخ`, `جغرافيا`, `علوم`, `رياضيات`, `لغة عربية`, `رياضة`, `ثقافة عامة`, `تكنولوجيا`, `حيوانات وطبيعة` |
 | `difficulty` | no (default 2) | `1` easy, `2` medium, `3` hard |
 | `text_ar` | yes | the question, 3–500 characters, must be unique in the bank |
 | `option_1` … `option_4` | mcq | four **different** options |
