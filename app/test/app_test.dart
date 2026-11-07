@@ -225,8 +225,8 @@ void main() {
       ),
     );
     await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('مباراة سريعة'), findsOneWidget);
-    final ctx = tester.element(find.text('مباراة سريعة'));
+    expect(find.text('العب ضد البوتات (بلا نت)'), findsOneWidget);
+    final ctx = tester.element(find.text('العب ضد البوتات (بلا نت)'));
     expect(Directionality.of(ctx), TextDirection.rtl);
   });
 }
