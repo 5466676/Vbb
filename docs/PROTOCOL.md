@@ -57,7 +57,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `answer` | `{"question_id": str, "choice": 0–3}` or `{"question_id": str, "value": number}` | only while the question is open; one answer per question |
 | `pick_territory` | `{"territories": [id, …]}` | expansion picks; illegal or taken picks are replaced by auto-picks |
 | `place_base` | `{"territory": id}` | castle placement, your turn only (`phase_changed.placer`); one of `options` |
-| `choose_target` | `{"territory": id}` | your battle turn; must be one of `phase_changed.targets` |
+| `choose_target` | `{"territory": id, "category"?: name}` (`category`: one of `phase_changed.categories`) | your battle turn; must be one of `phase_changed.targets` |
 | `use_powerup` | `{"powerup": "remove_two"\|"hint"\|"shield"\|"double", "territory"?: id}` | `shield` needs one of your territories |
 | `use_ability` | `{"territory"?: id}` | your army's once-per-match ability (`pharaoh` needs a territory) |
 
@@ -117,7 +117,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `base_placement` | `placer`, `options: [id]` (free spots not touching a castle), `deadline_ms` (12 s) |
 | `expansion_question` | `expansion_round` (a `question` follows) |
 | `expansion_picks` | `quota: {seat: picks}`, `ranking`, `deadline_ms` (10 s) |
-| `battle_target` | `attacker`, `round`, `targets: [id]`, `deadline_ms` (20 s) |
+| `battle_target` | `attacker`, `round`, `targets: [id]`, `categories: [3 names]` (the attacker picks the duel's category), `deadline_ms` (20 s) |
 | `battle_duel` | `attacker`, `defender`, `territory` (an MCQ follows for everyone still in; only these two decide the land) |
 | `battle_tiebreak` | `attacker`, `defender`, `territory` (a numeric question follows) |
 | `results` | — (`match_ended` follows) |

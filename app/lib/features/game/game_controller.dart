@@ -180,10 +180,10 @@ class GameController extends Notifier<GameState> {
 
   void placeBase(int territory) => _t.send('place_base', {'territory': territory});
 
-  void chooseTarget(int territory) {
+  void chooseTarget(int territory, {String? category}) {
     final m = state.match;
     if (m == null || !m.myTurn || !m.targets.contains(territory)) return;
-    _t.send('choose_target', {'territory': territory});
+    _t.send('choose_target', {'territory': territory, 'category': ?category});
     sound.play('sword_swing');
   }
 
@@ -418,6 +418,7 @@ class GameController extends Notifier<GameState> {
             if (m.turnsUntilMine() == 1) sound.play('ready'); // you're next
             m.battleRound = (p['round'] ?? m.battleRound) as int;
             m.targets = [for (final t in (p['targets'] as List? ?? [])) t as int];
+            m.offeredCategories = [for (final c in (p['categories'] as List? ?? [])) '$c'];
             m.defender = null;
             m.duelTerritory = null;
             _dropQuestion(m, opens);

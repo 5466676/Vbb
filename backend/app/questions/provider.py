@@ -88,7 +88,11 @@ _NUMERIC = [
 
 class QuestionProvider(Protocol):
     async def next(
-        self, kind: QuestionKind, players: list[str], used_ids: list[str]
+        self,
+        kind: QuestionKind,
+        players: list[str],
+        used_ids: list[str],
+        category: str | None = None,  # the attacker's pick for a duel; best effort
     ) -> Question: ...
 
 
@@ -101,7 +105,13 @@ class SampleProvider:
     def __init__(self, categories: list[str] | None = None, packs: list[str] | None = None) -> None:
         self.rnd = random.Random()
 
-    async def next(self, kind: QuestionKind, players: list[str], used_ids: list[str]) -> Question:
+    async def next(
+        self,
+        kind: QuestionKind,
+        players: list[str],
+        used_ids: list[str],
+        category: str | None = None,
+    ) -> Question:
         pool = _MCQ if kind is QuestionKind.MCQ else _NUMERIC
         prefix = "m" if kind is QuestionKind.MCQ else "n"
         ids = [f"sample-{prefix}{i}" for i in range(len(pool))]

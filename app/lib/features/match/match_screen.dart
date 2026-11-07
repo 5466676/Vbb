@@ -11,7 +11,7 @@ import '../game/game_controller.dart';
 import '../game/game_state.dart';
 import 'duel_splash.dart';
 import 'map_view.dart';
-import 'question_arena.dart';
+import 'question_arena.dart' show QuestionArena, Toon, categoryIcon;
 import 'stage_sign.dart';
 import 'results_view.dart';
 
@@ -27,6 +27,8 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
   MapTemplate? _template;
   String? _loadedFor;
   String? _territoryMode; // 'shield' or 'ability': the next tap on my territory uses it
+  int? _target; // my chosen target while I pick the question category
+  int _targetPhase = -1;
 
   Future<void> _load(String mapId) async {
     if (_loadedFor == mapId) return;
@@ -96,7 +98,16 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     } else if (m.phase == 'expansion_picks') {
       game.togglePick(id);
     } else if (m.myTurn) {
-      game.chooseTarget(id);
+      if (!m.targets.contains(id)) return;
+      if (m.offeredCategories.isEmpty) {
+        game.chooseTarget(id);
+      } else {
+        setState(() {
+          _target = id;
+          _targetPhase = m.phaseId;
+        });
+        game.sound.play('ui_tap');
+      }
     }
   }
 
@@ -150,7 +161,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                               match: m,
                               version: gs.version,
                               highlight: highlight,
-                              selected: m.myPicks.toSet(),
+                              selected: {...m.myPicks, if (_target != null && _targetPhase == m.phaseId) _target!},
                               onTap: (id) => _tap(m, id),
                             ),
                           ),
@@ -208,6 +219,22 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                               ),
                             ),
                           ),
+                          if (m.myTurn && _target != null && _targetPhase == m.phaseId)
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              bottom: 84, // above the power-ups row
+                              child: Center(
+                                child: _CategoryChooser(
+                                  categories: m.offeredCategories,
+                                  onPick: (c) {
+                                    ref.read(gameProvider.notifier).chooseTarget(_target!, category: c);
+                                    setState(() => _target = null);
+                                  },
+                                  onCancel: () => setState(() => _target = null),
+                                ),
+                              ),
+                            ),
                           if (m.banner != null)
                             Positioned.fill(
                               child: StageSign(key: ValueKey('sign${m.bannerId}'), text: m.banner!, sub: m.bannerSub),
@@ -947,6 +974,88 @@ class _CountdownState extends State<_Countdown> {
         child: Text(
           '$left',
           style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, height: 1.1),
+        ),
+      ),
+    );
+  }
+}
+
+/// After tapping a target: pick the duel question's category from three.
+class _CategoryChooser extends StatelessWidget {
+  const _CategoryChooser({required this.categories, required this.onPick, required this.onCancel});
+  final List<String> categories;
+  final void Function(String) onPick;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeOutBack,
+      builder: (context, v, child) => Transform.scale(
+        scale: 0.8 + 0.2 * v,
+        child: Opacity(opacity: v.clamp(0, 1), child: child),
+      ),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 10),
+        decoration: Toon.chunky(Toon.paper, radius: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'شو نوع سؤال الهجوم؟',
+                  style: TextStyle(fontFamily: AppTheme.headingFont, fontSize: 22, color: Toon.ink, height: 1.3),
+                ),
+                const SizedBox(width: 10),
+                Semantics(
+                  button: true,
+                  label: 'رجوع',
+                  child: GestureDetector(
+                    onTap: onCancel,
+                    child: const Icon(Icons.close, color: Toon.ink),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (final c in categories)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    child: Semantics(
+                      button: true,
+                      label: c,
+                      child: GestureDetector(
+                        onTap: () => onPick(c),
+                        child: Container(
+                          width: 120,
+                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
+                          decoration: Toon.chunky(const Color(0xFF6C4AB6), radius: 12),
+                          child: Column(
+                            children: [
+                              Icon(categoryIcon(c), color: Colors.white, size: 28),
+                              const SizedBox(height: 2),
+                              Text(
+                                c,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ),
       ),
     );

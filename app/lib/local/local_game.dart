@@ -54,6 +54,8 @@ class LocalGame implements GameTransport {
   late List<Map<String, dynamic>> _seats; // room_state seats
   final _used = <String>{};
   List<Map<String, dynamic>> _all = [];
+  List<String> _offered = []; // categories offered to the attacker now
+  String? _duelCategory;
   List<Map<String, dynamic>> _pool = [];
   DateTime? _questionSentAt;
   bool _closed = false;
@@ -174,6 +176,7 @@ class LocalGame implements GameTransport {
         case 'place_base':
           _after(_m.placeBase(0, p['territory'] as int));
         case 'choose_target':
+          if (_offered.contains(p['category'])) _duelCategory = p['category'] as String;
           _after(_m.chooseTarget(0, p['territory'] as int));
         case 'use_powerup':
           _after(_m.usePowerup(0, p['powerup'] as String, territory: p['territory'] as int?));
@@ -253,7 +256,14 @@ class LocalGame implements GameTransport {
         final d = {...e.data, 'opens_in_ms': pause};
         if (e.data['phase'] == 'base_placement') d['deadline_ms'] = _m.settings.baseMs;
         if (e.data['phase'] == 'expansion_picks') d['deadline_ms'] = _m.settings.pickMs;
-        if (e.data['phase'] == 'battle_target') d['deadline_ms'] = _m.settings.targetMs;
+        if (e.data['phase'] == 'battle_target') {
+          d['deadline_ms'] = _m.settings.targetMs;
+          // the attacker also picks the duel's category, from three that have questions
+          final cats = {for (final q in _pool) if (q['kind'] == 'mcq') q['category'] as String}.toList()..shuffle(_rnd);
+          _offered = cats.take(3).toList();
+          _duelCategory = null;
+          d['categories'] = _offered;
+        }
         _out('phase_changed', d);
       case 'question':
         final aq = _m.active!;
@@ -282,8 +292,12 @@ class LocalGame implements GameTransport {
   void _provide() {
     final kind = _m.pendingQuestion;
     if (kind == null) return;
-    // the chosen categories may have no question of this kind: then any category will do
-    final pool = _pool.any((x) => x['kind'] == kind) ? _pool : _all;
+    // the attacker's category for a duel, else the match's categories; any category if empty
+    final duel = _m.phase == 'battle_duel' || _m.phase == 'battle_tiebreak';
+    final picked = duel && _duelCategory != null
+        ? [for (final q in _pool) if (q['category'] == _duelCategory && q['kind'] == kind && !_used.contains(q['id'])) q]
+        : const <Map<String, dynamic>>[];
+    final pool = picked.isNotEmpty ? picked : (_pool.any((x) => x['kind'] == kind) ? _pool : _all);
     var q = pool.firstWhere((x) => x['kind'] == kind && !_used.contains(x['id']), orElse: () => {});
     if (q.isEmpty) {
       _used.removeWhere((id) => pool.any((x) => x['id'] == id && x['kind'] == kind)); // ran out: reuse
@@ -360,7 +374,10 @@ class LocalGame implements GameTransport {
       _after(_m.pick(seat, botPicks(_m, seat, _m.pickQuota[seat]!, _rnd)));
     } else if (_m.phase == 'battle_target' && _m.attacker == seat) {
       final t = botTarget(_m, seat, level, _rnd);
-      if (t != null) _after(_m.chooseTarget(seat, t));
+      if (t != null) {
+        if (_offered.isNotEmpty) _duelCategory = _offered[_rnd.nextInt(_offered.length)];
+        _after(_m.chooseTarget(seat, t));
+      }
     }
   }
 

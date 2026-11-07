@@ -116,7 +116,9 @@ round 1 starts with the lowest score, and each later round starts one seat furth
 | R | 19 | 11 | 8 | 7 | 5 | 4 | 4 |
 
 A turn:
-1. **Choose target (8 s):** the attacker picks one enemy territory adjacent to their land.
+1. **Choose target (20 s):** the attacker picks one enemy territory adjacent to their land, and
+   the **category** of the duel question from three offered (from the match's categories).
+   On timeout a random category is used.
    On timeout the server picks one at random. If no target exists the turn is skipped.
 2. **Duel question:** one MCQ to **everyone still in the match**. Only the attacker and the
    defender decide the territory; every other player who answers correctly earns **+50 bonus

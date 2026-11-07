@@ -47,6 +47,7 @@ from app.engine.models import (
     UsePowerUp,
 )
 from app.maps import MapKind, load_template, map_for, template_id
+from app.models.question import CATEGORIES
 from app.questions.provider import ProviderFactory, QuestionProvider, SampleProvider
 from app.rooms import store
 from app.rooms.bus import Bus
@@ -548,6 +549,9 @@ class RoomActor:
         if type_ == "place_base":
             return PlaceBase(seat=seat, territory=int(p.get("territory", -1)))
         if type_ == "choose_target":
+            category = p.get("category")
+            if category in r.offered_categories:
+                r.duel_category = category
             return ChooseTarget(seat=seat, territory=int(p.get("territory", -1)))
         if type_ == "use_powerup":
             try:
@@ -636,6 +640,11 @@ class RoomActor:
                 deadline = r.match.settings.timers.pick_ms
             elif data.get("phase") == Phase.BATTLE_TARGET.value:
                 deadline = r.match.settings.timers.target_ms
+                # the attacker also picks the duel's category from three (§6.2.1)
+                pool = list(r.settings.categories or CATEGORIES)
+                r.offered_categories = self.rnd.sample(pool, min(3, len(pool)))
+                r.duel_category = None
+                data["categories"] = r.offered_categories
             data["opens_in_ms"] = int(pause * self.settings.time_scale)
             if deadline is not None:
                 data["deadline_ms"] = int(deadline * self.settings.time_scale)
@@ -733,7 +742,12 @@ class RoomActor:
         if name == "provide":
             if m.pending_question is None:
                 return
-            q = await self.provider().next(m.pending_question, r.humans(), r.used_questions)
+            category = (
+                r.duel_category if m.phase in (Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK) else None
+            )
+            q = await self.provider().next(
+                m.pending_question, r.humans(), r.used_questions, category
+            )
             r.used_questions.append(q.id)
             await self._apply(ProvideQuestion(question=q))
         elif name.startswith("phase:"):
@@ -803,6 +817,8 @@ class RoomActor:
         elif m.phase is Phase.BATTLE_TARGET and m.attacker == seat:
             choice = bots.target(m, seat, level, self.rnd)
             if choice is not None:
+                if r.offered_categories:
+                    r.duel_category = self.rnd.choice(r.offered_categories)
                 await self._apply(choice)
 
     # ------------------------------------------------------------------ full state

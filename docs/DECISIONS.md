@@ -492,3 +492,12 @@ spot is used, else the legal spot farthest from the other castles (`core.auto_ba
 do). `match_started.bases` is now empty and castles arrive as `base_placed`. The engine keeps
 `MatchSettings.choose_bases = False` by default so rule tests can set castles directly; rooms, the
 offline game and the simulation turn it on.
+
+## The attacker picks the duel's category (2026-11-07)
+
+With 20 s to choose a target, the attacker also picks the duel question's category from three
+offered (`phase_changed.categories` for `battle_target`, `choose_target.category`). The choice is
+kept by the room (not the engine — the engine stays free of question content); providers take an
+optional `category` and fall back to the room's filters when it has no question left. Bots pick
+one at random; on timeout the room's usual filters apply. Offline, the three offered are drawn
+from categories that have questions on the device.

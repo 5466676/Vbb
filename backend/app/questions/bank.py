@@ -236,14 +236,14 @@ class DbProvider:
         self.only_reviewed = only_reviewed
         self.window = timedelta(days=seen_window_days)
 
-    def _filters(self, kind: QuestionKind, used: list[int]) -> list:
+    def _filters(self, kind: QuestionKind, used: list[int], categories: list[str]) -> list:
         f = [
             Question.type == kind.value,
             Question.pack.in_(self.packs),
             Question.deleted.is_(False),
         ]
-        if self.categories:
-            f.append(Question.category.in_(self.categories))
+        if categories:
+            f.append(Question.category.in_(categories))
         if self.only_reviewed:
             f.append(Question.reviewed.is_(True))
         if used:
@@ -251,7 +251,21 @@ class DbProvider:
         return f
 
     async def next(
-        self, kind: QuestionKind, players: list[str], used_ids: list[str]
+        self,
+        kind: QuestionKind,
+        players: list[str],
+        used_ids: list[str],
+        category: str | None = None,
+    ) -> EngineQuestion:
+        if category in CATEGORIES:
+            try:
+                return await self._next(kind, players, used_ids, [category])  # type: ignore[list-item]
+            except NoQuestions:
+                pass  # nothing left in that category: the room's usual filters
+        return await self._next(kind, players, used_ids, self.categories)
+
+    async def _next(
+        self, kind: QuestionKind, players: list[str], used_ids: list[str], categories: list[str]
     ) -> EngineQuestion:
         used = _db_ids(used_ids)
         async with self.sessionmaker() as s:
@@ -274,7 +288,9 @@ class DbProvider:
             q = (
                 await s.execute(
                     select(Question)
-                    .where(*self._filters(kind, used), Question.id.not_in(seen_recently))
+                    .where(
+                        *self._filters(kind, used, categories), Question.id.not_in(seen_recently)
+                    )
                     .order_by(prefer, func.random())
                     .limit(1)
                 )
@@ -290,7 +306,7 @@ class DbProvider:
                 q = (
                     await s.execute(
                         select(Question)
-                        .where(*self._filters(kind, used))
+                        .where(*self._filters(kind, used, categories))
                         .order_by(last_seen.asc().nullsfirst(), func.random())
                         .limit(1)
                     )
@@ -318,10 +334,14 @@ class FallbackProvider:
         self.fallback = fallback
 
     async def next(
-        self, kind: QuestionKind, players: list[str], used_ids: list[str]
+        self,
+        kind: QuestionKind,
+        players: list[str],
+        used_ids: list[str],
+        category: str | None = None,
     ) -> EngineQuestion:
         try:
-            return await self.primary.next(kind, players, used_ids)
+            return await self.primary.next(kind, players, used_ids, category)
         except NoQuestions:
             log.warning("question bank empty for these filters; using the built-in sample")
             return await self.fallback.next(kind, players, used_ids)

@@ -120,6 +120,8 @@ class RoomData(BaseModel):
     )  # seat -> display order of MCQ options
     question_sent_ms: int | None = None
     used_questions: list[str] = Field(default_factory=list)
+    offered_categories: list[str] = Field(default_factory=list)  # the attacker's choices now
+    duel_category: str | None = None  # the attacker's pick for the current duel
     timers: dict[str, Timer] = Field(default_factory=dict)
 
     def seat_of(self, pid: str) -> int | None:

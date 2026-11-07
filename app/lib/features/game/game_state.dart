@@ -196,6 +196,7 @@ class MatchView {
   int? defender;
   int? duelTerritory;
   List<int> targets = const [];
+  List<String> offeredCategories = const []; // the attacker picks the duel's category from these
   Map<int, int> quota = const {};
   List<int> myPicks = [];
   QuestionView? question;
