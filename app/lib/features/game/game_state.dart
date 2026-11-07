@@ -140,9 +140,21 @@ class QuestionView {
 }
 
 class Ticker {
-  Ticker(this.text, this.seat);
+  Ticker(this.text, this.seat, [this.kind = 'info']);
   final String text;
   final int? seat;
+  final String kind; // info | attack | capture | held | tower | out | power | round
+  final DateTime at = DateTime.now();
+}
+
+/// One map animation: `march` (attacker → target), `capture` (flag planted, colour spreads),
+/// `held` (the defender's shield flashes), `tower` (a base tower falls), `claim` (expansion pick).
+class Fx {
+  Fx(this.kind, this.territory, {this.seat, this.value = 0});
+  final String kind;
+  final int territory;
+  final int? seat;
+  final int value;
   final DateTime at = DateTime.now();
 }
 
@@ -182,6 +194,7 @@ class MatchView {
   final List<Ticker> ticker = [];
   int? lastCaptured;
   int? flash; // territory to highlight briefly (claim, capture, hit)
+  final List<Fx> fx = []; // short map animations, drawn by the map's effects layer
 
   // results
   List<Map<String, dynamic>>? standings;
@@ -193,9 +206,14 @@ class MatchView {
 
   Territory terr(int id) => territories.putIfAbsent(id, () => Territory(id: id));
 
-  void log(String text, [int? seat]) {
-    ticker.insert(0, Ticker(text, seat));
+  void log(String text, [int? seat, String kind = 'info']) {
+    ticker.insert(0, Ticker(text, seat, kind));
     if (ticker.length > 30) ticker.removeLast();
+  }
+
+  void effect(Fx f) {
+    fx.add(f);
+    fx.removeWhere((e) => DateTime.now().difference(e.at) > const Duration(seconds: 4));
   }
 }
 

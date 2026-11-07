@@ -34,6 +34,7 @@ abstract final class AppColors {
 
 abstract final class AppTheme {
   static const fontFamily = 'Cairo';
+  static const headingFont = 'Ruqaa'; // Aref Ruqaa, for titles only
 
   static ThemeData dark() {
     final scheme = ColorScheme.fromSeed(seedColor: AppColors.gold, brightness: Brightness.dark).copyWith(
@@ -87,6 +88,14 @@ abstract final class AppTheme {
         ),
       ),
       snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
+      dialogTheme: DialogThemeData(
+        backgroundColor: const Color(0xFF2B1D0F),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+          side: const BorderSide(color: AppColors.gold, width: 2),
+        ),
+        titleTextStyle: const TextStyle(fontFamily: headingFont, fontSize: 28, color: AppColors.gold),
+      ),
     );
   }
 }

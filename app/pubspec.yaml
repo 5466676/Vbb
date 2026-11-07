@@ -48,3 +48,7 @@ flutter:
     - family: Cairo
       fonts:
         - asset: assets/fonts/Cairo-Variable.ttf
+    - family: Ruqaa
+      fonts:
+        - asset: assets/fonts/ArefRuqaa-Bold.ttf
+          weight: 700

@@ -370,3 +370,35 @@ it too when no server was ever reached. Tests: full bot matches for 2–8 player
 Dart engine, a duel rule test, and a whole `LocalGame` match on a fake clock to `match_ended`.
 Checked in the browser build with no server running. Online play (with family) still needs a server:
 the home PC (`home-server.sh`) or Render.
+
+## Game look: UI kit, map, battle effects (2026-11-07)
+
+A screen-by-screen review after a full offline match found the game looked like a plain app:
+outlined Material buttons, white number pills on the map, no movement when land changed hands, a
+question scroll covering a third of the map, tools with no names. Changes, all painted in code
+(gradients and paths, no blur, no new bitmaps) so low-end phones keep up:
+
+- **UI kit** (`app/lib/app/ui_kit.dart`): `WarButton` (red wax seal for the main action, walnut
+  with a brass rim otherwise, presses in), `WoodPanel`, `ParchmentPanel`, `BannerChoice`, and
+  `RuqaaTitle` in **Aref Ruqaa** (OFL, from Google Fonts) for headings only; body text stays Cairo.
+  Home menu and the offline setup ("مجلس الحرب": bot portraits with +/−, banner choices) use it.
+  The home screen no longer shows "server off" as an error: offline play needs no server.
+- **Map** (`map_view.dart`): three layers that repaint separately — ownership (seat wash that is
+  strong at the edge, ink borders; repaints only when an owner changes), highlight (choices get
+  gold marching-ants borders and everything else dims; ticks only while something is selectable)
+  and effects. Values sit on small cloth banners in the owner's colour; bases show one tower and
+  ×N. The painting fills the space around the map, darkened, instead of black bars.
+- **Battle effects**: the controller records short `Fx` items from server events (the server
+  stays authoritative; effects are decoration only): march arrow from the attacker's nearest land
+  plus crossed swords on `target_chosen`, a flag planted with the colour spreading out and
+  "+value" on `territory_captured`, a shield glint on `territory_held`, a tower falling in dust on
+  `tower_hit`, a small flag on `territory_claimed`. A face-to-face splash with both commanders
+  opens every duel (1.7 s, does not block input).
+- **Question**: the map moves up instead of being covered; participants' portraits with a check
+  when each locks in; a brass clock that reddens and beats in the last five seconds; options
+  carry أ ب ج د seals.
+- **Players and tools**: player cards with land value, territory count, a share bar, attacker /
+  defender badges; the log has icons and a heading; tools are named medallions with a count and
+  a lock when not usable now.
+- **Results**: "نصر!" / "هزيمة", a three-step podium, counting scores, and «مباراة ثانية» for
+  offline matches (same bots and map).

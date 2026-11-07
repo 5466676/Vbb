@@ -61,8 +61,17 @@ class GameController extends Notifier<GameState> {
   GameTransport get _t => _local ?? socket;
 
   /// A whole match against bots inside the app (no server). [bots] = difficulty per bot.
+  ({List<String> bots, String mapKind, bool teams})? _lastOffline;
+
+  /// Same bots and map as the last offline match ("مباراة ثانية").
+  Future<void> replayOffline() async {
+    final l = _lastOffline;
+    if (l != null) await startOffline(bots: l.bots, mapKind: l.mapKind, teams: l.teams);
+  }
+
   Future<void> startOffline({required List<String> bots, required String mapKind, bool teams = false}) async {
     await stopOffline();
+    _lastOffline = (bots: bots, mapKind: mapKind, teams: teams);
     final g = LocalGame(name: _settings.name, army: _settings.army, bots: bots, mapKind: mapKind, teams: teams);
     _local = g;
     _localSub = g.messages.listen(_on);
@@ -147,8 +156,7 @@ class GameController extends Notifier<GameState> {
     sound.play('sword_swing');
   }
 
-  void usePowerup(String name, {int? territory}) =>
-      _t.send('use_powerup', {'powerup': name, 'territory': ?territory});
+  void usePowerup(String name, {int? territory}) => _t.send('use_powerup', {'powerup': name, 'territory': ?territory});
   void useAbility({int? territory}) => _t.send('use_ability', {'territory': ?territory});
 
   // ------------------------------------------------------------------ events
@@ -383,14 +391,15 @@ class GameController extends Notifier<GameState> {
           ..owner = p['seat'] as int
           ..value = (p['value'] ?? 200) as int;
         m.flash = t.id;
+        m.effect(Fx('claim', t.id, seat: t.owner));
         sound.play('claim');
       case 'battle_started':
-        m.log('بدأت المعارك! ${p['rounds']} جولات');
+        m.log('بدأت المعارك! ${p['rounds']} جولات', null, 'round');
         sound.play('battle_start');
         _t.send('resync'); // army bonuses change values at the start of battle
       case 'round_started':
         m.battleRound = p['round'] as int;
-        m.log('الجولة ${p['round']}');
+        m.log('الجولة ${p['round']}', null, 'round');
         sound.play('round_start');
       case 'turn_skipped':
         m.log('${_name(m, p['seat'] as int?)} ما عندو هدف', p['seat'] as int?);
@@ -399,32 +408,37 @@ class GameController extends Notifier<GameState> {
         m.defender = p['defender'] as int?;
         m.duelTerritory = p['territory'] as int?;
         m.flash = m.duelTerritory;
-        m.log('${_name(m, m.attacker)} ⚔ ${_name(m, m.defender)}', m.attacker);
+        if (m.duelTerritory != null) m.effect(Fx('march', m.duelTerritory!, seat: m.attacker));
+        m.log('${_name(m, m.attacker)} هاجم ${_name(m, m.defender)}', m.attacker, 'attack');
         sound.play('march');
       case 'shield_blocked':
-        m.log('الدرع صدّ الهجوم', p['defender'] as int?);
+        m.log('الدرع صدّ الهجوم', p['defender'] as int?, 'held');
+        if (m.duelTerritory != null) m.effect(Fx('held', m.duelTerritory!, seat: p['defender'] as int?));
         sound.play('shield');
       case 'tie_won_by_ability':
         m.log('${_name(m, p['seat'] as int?)} ربح التعادل بقدرة جيشو', p['seat'] as int?);
       case 'territory_captured':
         final attacker = p['attacker'] as int;
+        m.effect(Fx('capture', p['territory'] as int, seat: attacker, value: (p['value'] ?? 200) as int));
         m.terr(p['territory'] as int)
           ..owner = attacker
           ..value = (p['value'] ?? 200) as int
           ..shielded = false;
         m.flash = p['territory'] as int;
         m.lastCaptured = m.flash;
-        m.log('${_name(m, attacker)} احتلّ أرض', attacker);
+        m.log('${_name(m, attacker)} احتلّ أرض', attacker, 'capture');
         sound.play('sword_clash');
         sound.capture(m.players[attacker].army);
       case 'territory_held':
         m.terr(p['territory'] as int).value = (p['value'] ?? 200) as int;
-        m.log('${_name(m, p['defender'] as int?)} صمد', p['defender'] as int?);
+        m.effect(Fx('held', p['territory'] as int, seat: p['defender'] as int?));
+        m.log('${_name(m, p['defender'] as int?)} صمد', p['defender'] as int?, 'held');
         sound.play('base_guarded');
       case 'tower_hit':
         m.terr(p['territory'] as int).towers = p['towers'] as int;
         m.flash = p['territory'] as int;
-        m.log('سقط برج!', p['attacker'] as int?);
+        m.effect(Fx('tower', p['territory'] as int, seat: p['attacker'] as int?));
+        m.log('سقط برج!', p['attacker'] as int?, 'tower');
         sound.play('tower_hit');
       case 'base_guarded':
         sound.play('base_guarded');
@@ -438,7 +452,7 @@ class GameController extends Notifier<GameState> {
             ..isBase = false
             ..towers = 0;
         }
-        m.log('${_name(m, seat)} خرج من المعركة', seat);
+        m.log('${_name(m, seat)} خرج من المعركة', seat, 'out');
         sound.play('eliminated');
       case 'extra_turn':
         sound.play('extra_turn');
@@ -450,7 +464,7 @@ class GameController extends Notifier<GameState> {
           pl.powerups = [...pl.powerups]..remove(name);
         }
         pl.powerupCount = (pl.powerupCount - 1).clamp(0, 4);
-        m.log('${pl.name}: ${powerupNames[name] ?? name}', seat);
+        m.log('${pl.name}: ${powerupNames[name] ?? name}', seat, 'power');
         sound.play(name);
       case 'powerup_result':
         final q = m.question;
@@ -466,7 +480,7 @@ class GameController extends Notifier<GameState> {
       case 'ability_used':
         final seat = p['seat'] as int;
         m.players[seat].abilityUsed = true;
-        m.log('${m.players[seat].name}: ${armyOf(p['army'] as String?).abilityName}!', seat);
+        m.log('${m.players[seat].name}: ${armyOf(p['army'] as String?).abilityName}!', seat, 'power');
         sound.play('ability');
         _t.send('resync');
       case 'player_connection':

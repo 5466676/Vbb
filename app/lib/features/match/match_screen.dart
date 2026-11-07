@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -6,6 +8,7 @@ import '../../core/armies.dart';
 import '../../core/map_template.dart';
 import '../game/game_controller.dart';
 import '../game/game_state.dart';
+import 'duel_splash.dart';
 import 'map_view.dart';
 import 'question_panel.dart';
 import 'results_view.dart';
@@ -90,61 +93,90 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
         ? m.targets.toSet()
         : <int>{};
 
+    final q = m.question;
+    final asking = q != null && !m.ended;
     return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
             Row(
               children: [
-                SizedBox(width: 210, child: _SidePanel(match: m)),
+                SizedBox(width: 214, child: _SidePanel(match: m)),
                 Expanded(
-                  child: Stack(
-                    children: [
-                      Positioned.fill(
-                        child: Container(
-                          color: AppColors.surface,
-                          child: MapView(
-                            template: t,
-                            match: m,
-                            highlight: highlight,
-                            selected: m.myPicks.toSet(),
-                            onTap: (id) => _tap(m, id),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 6,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: _PhaseBanner(match: m, mode: _territoryMode),
-                        ),
-                      ),
-                      if (m.question != null && !m.ended)
-                        Positioned(
-                          left: 12,
-                          right: 12,
-                          bottom: 8,
-                          child: Center(
-                            child: QuestionPanel(
-                              match: m,
-                              onChoice: ref.read(gameProvider.notifier).answerChoice,
-                              onValue: ref.read(gameProvider.notifier).answerValue,
-                              onTick: () => ref.read(gameProvider.notifier).sound.play('tick'),
+                  child: LayoutBuilder(
+                    builder: (context, box) {
+                      // the open question takes the lower part; the map moves up instead of being covered
+                      final questionRoom = !asking ? 0.0 : box.maxHeight * (q.kind == 'mcq' ? 0.44 : 0.36);
+                      return Stack(
+                        children: [
+                          // the same painting, darkened, fills the space around the map
+                          Positioned.fill(
+                            child: Image.asset(
+                              t.image,
+                              fit: BoxFit.cover,
+                              color: const Color(0xB0140C05),
+                              colorBlendMode: BlendMode.darken,
                             ),
                           ),
-                        ),
-                      if (!m.ended)
-                        Positioned(
-                          left: 8,
-                          top: 56,
-                          child: _ToolBar(
-                            match: m,
-                            mode: _territoryMode,
-                            onMode: (mode) => setState(() => _territoryMode = _territoryMode == mode ? null : mode),
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 350),
+                            curve: Curves.easeOutCubic,
+                            left: 0,
+                            right: 0,
+                            top: 44,
+                            bottom: questionRoom,
+                            child: MapView(
+                              template: t,
+                              match: m,
+                              version: gs.version,
+                              highlight: highlight,
+                              selected: m.myPicks.toSet(),
+                              onTap: (id) => _tap(m, id),
+                            ),
                           ),
-                        ),
-                    ],
+                          Positioned(
+                            top: 4,
+                            left: 0,
+                            right: 0,
+                            child: Center(
+                              child: _PhaseBanner(match: m, mode: _territoryMode),
+                            ),
+                          ),
+                          if (asking)
+                            Positioned(
+                              left: 70,
+                              right: 12,
+                              bottom: 4,
+                              child: Center(
+                                child: QuestionPanel(
+                                  match: m,
+                                  onChoice: ref.read(gameProvider.notifier).answerChoice,
+                                  onValue: ref.read(gameProvider.notifier).answerValue,
+                                  onTick: () => ref.read(gameProvider.notifier).sound.play('tick'),
+                                ),
+                              ),
+                            ),
+                          if (!m.ended)
+                            Positioned(
+                              left: 6,
+                              top: 52,
+                              child: _ToolBar(
+                                match: m,
+                                mode: _territoryMode,
+                                onMode: (mode) => setState(() => _territoryMode = _territoryMode == mode ? null : mode),
+                              ),
+                            ),
+                          if (m.phase == 'battle_duel' && m.attacker != null && m.defender != null)
+                            Positioned.fill(
+                              child: DuelSplash(
+                                key: ValueKey('duel${m.phaseId}'),
+                                attacker: m.players[m.attacker!],
+                                defender: m.players[m.defender!],
+                              ),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ],
@@ -195,18 +227,81 @@ class _PhaseBanner extends StatelessWidget {
       },
     };
     final round = m.battleRound > 0 ? '  •  جولة المعارك ${m.battleRound}/${m.rounds}' : '';
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.background.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: m.myTurn ? AppColors.gold : AppColors.glassBorder, width: m.myTurn ? 2 : 1),
+    return _Ribbon(
+      highlight: m.myTurn || (m.phase == 'expansion_picks' && (m.quota[m.mySeat] ?? 0) > 0),
+      child: Text(
+        '$text$round',
+        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.ink, height: 1.3),
       ),
-      child: Text('$text$round', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
     );
   }
 }
 
+/// A parchment ribbon with folded ends for the phase line.
+class _Ribbon extends StatelessWidget {
+  const _Ribbon({required this.child, required this.highlight});
+  final Widget child;
+  final bool highlight;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _RibbonPainter(highlight),
+      child: Padding(padding: const EdgeInsets.fromLTRB(34, 6, 34, 8), child: child),
+    );
+  }
+}
+
+class _RibbonPainter extends CustomPainter {
+  _RibbonPainter(this.highlight);
+  final bool highlight;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width, h = size.height, tail = 18.0;
+    final shade = Paint()..color = const Color(0xFF8C6A3A);
+    // folded tails behind
+    for (final left in [true, false]) {
+      final x0 = left ? 0.0 : w, dir = left ? 1.0 : -1.0;
+      canvas.drawPath(
+        Path()
+          ..moveTo(x0 + dir * tail, 6)
+          ..lineTo(x0 - dir * 4, 6)
+          ..lineTo(x0 + dir * 8, h / 2 + 3)
+          ..lineTo(x0 - dir * 4, h)
+          ..lineTo(x0 + dir * tail, h)
+          ..close(),
+        shade,
+      );
+    }
+    final body = RRect.fromRectAndRadius(Rect.fromLTWH(tail - 4, 0, w - 2 * tail + 8, h - 4), const Radius.circular(3));
+    canvas.drawRRect(body.shift(const Offset(0, 2)), Paint()..color = const Color(0x88000000));
+    canvas.drawRRect(
+      body,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: highlight
+              ? const [Color(0xFFFFE7A6), Color(0xFFE2B85A)]
+              : const [Color(0xFFF4E6C6), Color(0xFFD9C29A)],
+        ).createShader(body.outerRect),
+    );
+    canvas.drawRRect(
+      body.deflate(3),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1
+        ..color = const Color(0x884A3418),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_RibbonPainter old) => old.highlight != highlight;
+}
+
+/// Power-ups and the army ability: round brass medallions with a name under each,
+/// a count badge, and a lock when it cannot be used right now.
 class _ToolBar extends ConsumerWidget {
   const _ToolBar({required this.match, required this.mode, required this.onMode});
   final MatchView match;
@@ -221,70 +316,154 @@ class _ToolBar extends ConsumerWidget {
     final q = match.question;
     final inQuestion = q != null && q.participant && !q.answered && !q.resolved;
     final army = armyOf(me.army);
-    Widget tool(String asset, String label, bool enabled, VoidCallback onTap, {bool active = false}) => Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Tooltip(
-        message: label,
-        child: Opacity(
-          opacity: enabled ? 1 : 0.35,
+    Widget tool(
+      String asset,
+      String label, {
+      required bool owned,
+      required bool now,
+      required VoidCallback onTap,
+      bool active = false,
+    }) {
+      final usable = owned && now;
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 4),
+        child: Tooltip(
+          message: label,
           child: InkWell(
-            onTap: enabled ? onTap : null,
-            borderRadius: BorderRadius.circular(28),
-            child: Container(
-              width: 52,
-              height: 52,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.background.withValues(alpha: 0.7),
-                border: Border.all(color: active ? AppColors.gold : AppColors.glassBorder, width: active ? 3 : 1),
+            onTap: usable ? onTap : null,
+            borderRadius: BorderRadius.circular(30),
+            child: SizedBox(
+              width: 58,
+              child: Column(
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: active || usable
+                                ? const [Color(0xFFF0CF7A), Color(0xFF8A5A17)]
+                                : const [Color(0xFF6B5A44), Color(0xFF3A2E20)],
+                          ),
+                          boxShadow: [
+                            if (active) const BoxShadow(color: Color(0xAAFFD36B), blurRadius: 10, spreadRadius: 1),
+                            const BoxShadow(color: Color(0x99000000), blurRadius: 3, offset: Offset(0, 2)),
+                          ],
+                        ),
+                        child: ClipOval(
+                          child: ColorFiltered(
+                            colorFilter: owned
+                                ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
+                                : const ColorFilter.matrix([
+                                    0.3, 0.5, 0.1, 0, 0, //
+                                    0.3, 0.5, 0.1, 0, 0,
+                                    0.3, 0.5, 0.1, 0, 0,
+                                    0, 0, 0, 0.6, 0,
+                                  ]),
+                            child: Image.asset(asset, fit: BoxFit.cover),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: -2,
+                        left: -2,
+                        child: Container(
+                          width: 18,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: owned ? AppColors.seal : const Color(0xFF3A2E20),
+                            border: Border.all(color: AppColors.gold, width: 1),
+                          ),
+                          child: Center(
+                            child: owned && !now
+                                ? const Icon(Icons.lock_clock, size: 11, color: AppColors.textPrimary)
+                                : Text(
+                                    owned ? '1' : '0',
+                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, height: 1.1),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.fade,
+                    softWrap: false,
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      color: usable ? AppColors.textPrimary : AppColors.textSecondary,
+                      shadows: const [Shadow(color: Colors.black, blurRadius: 3)],
+                    ),
+                  ),
+                ],
               ),
-              child: Image.asset(asset),
             ),
           ),
         ),
-      ),
-    );
+      );
+    }
+
     bool has(String p) => me.powerups.contains(p);
     return Column(
       children: [
         tool(
           'assets/ui/powerups/remove_two.webp',
           'حذف جوابين',
-          has('remove_two') && inQuestion && q.kind == 'mcq',
-          () => game.usePowerup('remove_two'),
+          owned: has('remove_two'),
+          now: inQuestion && q.kind == 'mcq',
+          onTap: () => game.usePowerup('remove_two'),
         ),
         tool(
           'assets/ui/powerups/hint.webp',
           'تلميح',
-          has('hint') && inQuestion && q.kind == 'numeric',
-          () => game.usePowerup('hint'),
+          owned: has('hint'),
+          now: inQuestion && q.kind == 'numeric',
+          onTap: () => game.usePowerup('hint'),
         ),
         tool(
           'assets/ui/powerups/double.webp',
           'مضاعفة',
-          has('double') && match.myTurn,
-          () => game.usePowerup('double'),
+          owned: has('double'),
+          now: match.myTurn,
+          onTap: () => game.usePowerup('double'),
         ),
         tool(
           'assets/ui/powerups/shield.webp',
           'درع',
-          has('shield') && match.phase.startsWith('battle'),
-          () => onMode('shield'),
+          owned: has('shield'),
+          now: match.phase.startsWith('battle'),
+          onTap: () => onMode('shield'),
           active: mode == 'shield',
         ),
-        tool(army.abilityIcon, 'قدرة: ${army.abilityName}', !me.abilityUsed, () {
-          if (army.abilityNeedsTerritory) {
-            onMode('ability');
-          } else {
-            game.useAbility();
-          }
-        }, active: mode == 'ability'),
+        tool(
+          army.abilityIcon,
+          army.abilityName,
+          owned: !me.abilityUsed,
+          now: true,
+          onTap: () {
+            if (army.abilityNeedsTerritory) {
+              onMode('ability');
+            } else {
+              game.useAbility();
+            }
+          },
+          active: mode == 'ability',
+        ),
       ],
     );
   }
 }
 
+/// Player cards (portrait, land value, territories, share bar, turn badges) and the war log.
 class _SidePanel extends StatelessWidget {
   const _SidePanel({required this.match});
   final MatchView match;
@@ -293,77 +472,73 @@ class _SidePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final m = match;
     int land(int seat) => m.territories.values.where((t) => t.owner == seat).fold(0, (a, t) => a + t.value);
+    int count(int seat) => m.territories.values.where((t) => t.owner == seat).length;
     final order = [...m.players]..sort((a, b) => land(b.seat).compareTo(land(a.seat)));
-    return Container(
-      color: AppColors.background,
+    final top = order.isEmpty ? 1 : max(1, land(order.first.seat));
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2E1F10), Color(0xFF1B120A)],
+        ),
+        border: Border(left: BorderSide(color: Color(0xFF8A5A17), width: 2)),
+      ),
       child: Column(
         children: [
           Expanded(
             flex: 3,
             child: ListView(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.fromLTRB(6, 6, 6, 0),
               children: [
-                for (final p in order)
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 4),
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: p.seat == m.attacker || p.seat == m.defender
-                          ? AppColors.seat(p.seat).withValues(alpha: 0.35)
-                          : AppColors.surface,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.seat(p.seat), width: p.seat == m.mySeat ? 2.5 : 1),
-                    ),
-                    child: Opacity(
-                      opacity: p.eliminated ? 0.4 : 1,
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(shape: BoxShape.circle, color: AppColors.seat(p.seat)),
-                            child: ClipOval(child: Image.asset(armyOf(p.army).commander, fit: BoxFit.cover)),
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  p.name + (p.bot ? ' 🤖' : '') + (p.connected ? '' : ' ⚠'),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(fontWeight: FontWeight.w700),
-                                ),
-                                Text(
-                                  '${land(p.seat)}${p.eliminated ? ' — خرج' : ''}',
-                                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
-                                ),
-                              ],
-                            ),
-                          ),
-                          if (m.question?.locked.contains(p.seat) ?? false)
-                            const Icon(Icons.check_circle, size: 16, color: AppColors.good),
-                        ],
-                      ),
-                    ),
-                  ),
+                for (var i = 0; i < order.length; i++)
+                  _card(m, order[i], i, land(order[i].seat), count(order[i].seat), top),
               ],
             ),
           ),
-          const Divider(height: 1, color: AppColors.glassBorder),
+          Container(
+            height: 22,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              border: Border(top: BorderSide(color: Color(0xFF8A5A17))),
+            ),
+            child: const Text(
+              'سجلّ المعركة',
+              style: TextStyle(fontFamily: AppTheme.headingFont, color: AppColors.gold, fontSize: 15, height: 1.2),
+            ),
+          ),
           Expanded(
             flex: 2,
             child: ListView(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               children: [
-                for (final t in m.ticker.take(12))
-                  Text(
-                    t.text,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: t.seat == null ? AppColors.textSecondary : AppColors.seat(t.seat),
+                for (final (i, t) in m.ticker.take(14).indexed)
+                  Opacity(
+                    opacity: max(0.35, 1 - i * 0.08),
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 3),
+                      child: Row(
+                        children: [
+                          Icon(
+                            _logIcon(t.kind),
+                            size: 14,
+                            color: t.seat == null ? AppColors.gold : AppColors.seat(t.seat),
+                          ),
+                          const SizedBox(width: 5),
+                          Expanded(
+                            child: Text(
+                              t.text,
+                              maxLines: 2,
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                height: 1.3,
+                                fontWeight: i == 0 ? FontWeight.w800 : FontWeight.w500,
+                                color: AppColors.textPrimary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
               ],
@@ -373,4 +548,140 @@ class _SidePanel extends StatelessWidget {
       ),
     );
   }
+
+  static IconData _logIcon(String kind) => switch (kind) {
+    'attack' => Icons.gps_fixed,
+    'capture' => Icons.flag,
+    'held' => Icons.shield,
+    'tower' => Icons.castle,
+    'out' => Icons.heart_broken,
+    'power' => Icons.auto_awesome,
+    'round' => Icons.hourglass_bottom,
+    _ => Icons.circle,
+  };
+
+  Widget _card(MatchView m, PlayerView p, int rank, int value, int lands, int top) {
+    final c = AppColors.seat(p.seat);
+    final fighting = p.seat == m.attacker || p.seat == m.defender;
+    final answered = m.question?.locked.contains(p.seat) ?? false;
+    return Opacity(
+      opacity: p.eliminated ? 0.4 : 1,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 5),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          gradient: LinearGradient(
+            colors: [
+              c.withValues(alpha: fighting ? 0.55 : 0.28),
+              const Color(0xFF241709),
+            ],
+            begin: Alignment.centerRight,
+            end: Alignment.centerLeft,
+          ),
+          border: Border.all(
+            color: p.seat == m.mySeat ? AppColors.gold : c.withValues(alpha: 0.7),
+            width: p.seat == m.mySeat ? 2 : 1,
+          ),
+        ),
+        padding: const EdgeInsets.fromLTRB(5, 4, 5, 5),
+        child: Row(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: c),
+                  child: ClipOval(child: Image.asset(armyOf(p.army).commander, fit: BoxFit.cover)),
+                ),
+                if (p.seat == m.attacker || p.seat == m.defender)
+                  Positioned(
+                    top: -4,
+                    left: -4,
+                    child: _Badge(icon: p.seat == m.attacker ? Icons.gps_fixed : Icons.shield, color: AppColors.seal),
+                  ),
+                if (answered)
+                  const Positioned(
+                    bottom: -3,
+                    left: -3,
+                    child: _Badge(icon: Icons.check, color: AppColors.good),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          p.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.w800, height: 1.2),
+                        ),
+                      ),
+                      if (p.bot) const Icon(Icons.smart_toy_outlined, size: 13, color: AppColors.textSecondary),
+                      if (!p.connected) const Icon(Icons.wifi_off, size: 13, color: AppColors.bad),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        p.eliminated ? 'خرج' : '$value',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.gold,
+                          fontSize: 13,
+                          height: 1.3,
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(Icons.flag, size: 11, color: AppColors.textSecondary),
+                      Text(
+                        ' $lands',
+                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, height: 1.3),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: LinearProgressIndicator(
+                      value: value / top,
+                      minHeight: 5,
+                      backgroundColor: const Color(0x33000000),
+                      color: c,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  const _Badge({required this.icon, required this.color});
+  final IconData icon;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 18,
+    height: 18,
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: color,
+      border: Border.all(color: AppColors.gold, width: 1),
+    ),
+    child: Icon(icon, size: 11, color: Colors.white),
+  );
 }
