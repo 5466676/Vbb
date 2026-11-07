@@ -130,7 +130,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
   "match": null | {
     "map_id", "map_kind", "phase", "phase_id", "deadline_in_ms",
     "expansion_round", "battle_round", "rounds", "base_towers",
-    "attacker", "placer", "round_order": [seats], "duel": {"attacker", "defender", "territory"} | null,
+    "attacker", "placer", "round_order": [seats], "win_share" (open length; null for fixed rounds), "duel": {"attacker", "defender", "territory"} | null,
     "pick_quota": {seat: n}, "your_seat",
     "territories": [{"id", "owner", "value", "is_base", "towers", "shielded" (own team only)}],
     "players": [{"seat", "name", "army", "team", "score", "eliminated", "connected",

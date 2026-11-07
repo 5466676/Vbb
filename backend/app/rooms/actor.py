@@ -63,6 +63,7 @@ REVEAL_PAUSE_MS = 4000
 CLAIM_PAUSE_MS = 2500
 DUEL_PAUSE_MS = 4500
 BASE_PAUSE_MS = 1800  # a castle lands before the next player places theirs
+MARCH_PAUSE_MS = 3500  # the attacker's troops march to the target before the duel question
 NETWORK_SLACK_MS = 500  # extra wait before a question timeout
 ENDED_TTL_MS = 5 * 60_000
 BOT_NAMES = ["صلاح", "خالد", "طارق", "زنوبيا", "هارون", "بيبرس", "قطز", "سيف"]
@@ -583,6 +584,8 @@ class RoomActor:
             pause = max(pause, CLAIM_PAUSE_MS)
         if "base_placed" in types:
             pause = max(pause, BASE_PAUSE_MS)
+        if "target_chosen" in types:
+            pause = max(pause, MARCH_PAUSE_MS)
         if "battle_result" in types or "shield_blocked" in types:
             pause = max(pause, DUEL_PAUSE_MS)
         if any(e.type == "phase_changed" for e in events):
@@ -895,6 +898,7 @@ class RoomActor:
             "base_towers": m.base_towers,
             "attacker": m.attacker,
             "placer": m.placer,
+            "win_share": round(core.domination_share(m), 2) if m.settings.open_ended else None,
             "round_order": m.round_order,
             "duel": m.duel.model_dump() if m.duel else None,
             "pick_quota": {str(k): v for k, v in m.pick_quota.items()},

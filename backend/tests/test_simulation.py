@@ -18,7 +18,7 @@ CONFIGS = [(n, Mode.FFA) for n in range(2, 9)] + [(n, Mode.TEAMS) for n in (4, 6
 # No fixed match length (owner, 2026-11-07): a match ends when one player/team is left or one
 # dominates the map (GAME_RULES §6.3). Bot matches land around 8-25 minutes on average.
 MEAN_BOUNDS = {2: (4.0, 15.0)}
-DEFAULT_BOUNDS = (8.0, 30.0)
+DEFAULT_BOUNDS = (8.0, 36.0)
 HARD_MAX_MIN = 120.0
 
 

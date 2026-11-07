@@ -59,4 +59,4 @@ def test_bot_matches_on_template(kind: MapKind, players: int):
     mean = statistics.mean(lengths)
     # fixed-rounds matches at the calm pace (DECISIONS: 2026-11-07)
     low = 8.0 if players == 2 else 10.0
-    assert low <= mean <= 18.0, f"{m.id}: mean length {mean:.1f} min"
+    assert low <= mean <= 21.0, f"{m.id}: mean length {mean:.1f} min"

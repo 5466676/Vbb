@@ -16,7 +16,7 @@ const _botNames = ['صلاح', 'خالد', 'طارق', 'قطز', 'بيبرس', '
 const _armies = ['islamic', 'ayyubid', 'crusader', 'roman', 'pharaoh', 'mongol', 'ottoman', 'ww2'];
 
 // pauses for animations before the next window opens (same as the server's room actor)
-const _startPause = 4500, _revealPause = 4000, _claimPause = 2500, _duelPause = 4500, _basePause = 1800;
+const _startPause = 4500, _revealPause = 4000, _claimPause = 2500, _duelPause = 4500, _basePause = 1800, _marchPause = 3500;
 const _networkSlack = 600;
 
 /// A whole match against bots inside the app: no server, no internet.
@@ -204,6 +204,7 @@ class LocalGame implements GameTransport {
     if (types.contains('question_result')) pause = max(pause, _revealPause);
     if (types.contains('territory_claimed')) pause = max(pause, _claimPause);
     if (types.contains('base_placed')) pause = max(pause, _basePause);
+    if (types.contains('target_chosen')) pause = max(pause, _marchPause);
     if (types.contains('battle_result') || types.contains('shield_blocked')) pause = max(pause, _duelPause);
     if (types.contains('phase_changed')) {
       for (final k in _timers.keys.where((k) => k.startsWith('phase:') || k.startsWith('bot:') || k == 'provide').toList()) {
@@ -401,6 +402,7 @@ class LocalGame implements GameTransport {
         'base_towers': _m.baseTowers,
         'attacker': _m.attacker,
         'placer': _m.placer,
+        'win_share': _m.settings.openEnded ? (_m.dominationShare() * 100).round() / 100 : null,
         'duel': _m.duel == null
             ? null
             : {'attacker': _m.duel!.attacker, 'defender': _m.duel!.defender, 'territory': _m.duel!.territory},

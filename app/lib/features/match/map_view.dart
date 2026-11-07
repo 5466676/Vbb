@@ -142,6 +142,7 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       ),
                       ..._bases(size),
                       ..._labels(size),
+                      ..._marches(size),
                       Positioned.fill(
                         child: IgnorePointer(
                           child: _EffectsLayer(template: t, match: widget.match, version: widget.version),
@@ -225,6 +226,24 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
         width: d,
         height: d,
         child: IgnorePointer(child: Image.asset(armyOf(m.players[terr.owner!].army).fort, fit: BoxFit.contain)),
+      );
+    }
+  }
+
+  Iterable<Widget> _marches(Size size) sync* {
+    final m = widget.match;
+    final now = DateTime.now();
+    for (final f in m.fx) {
+      if (f.kind != 'march' || f.seat == null || now.difference(f.at) > const Duration(milliseconds: 3200)) continue;
+      final from = marchFrom(widget.template, m, f, size);
+      if (from == null) continue;
+      final l = widget.template.byId(f.territory).label;
+      yield _MarchingTroops(
+        key: ValueKey('march${f.at.microsecondsSinceEpoch}'),
+        from: from,
+        to: Offset(l.dx * size.width, l.dy * size.height),
+        image: armyOf(m.players[f.seat!].army).soldier,
+        height: size.height * 0.13,
       );
     }
   }
@@ -554,7 +573,7 @@ class _HighlightPainter extends CustomPainter {
 // ---------------------------------------------------------------------------------- effects
 
 const _fxLength = {
-  'march': Duration(milliseconds: 1500),
+  'march': Duration(milliseconds: 2200),
   'capture': Duration(milliseconds: 1800),
   'held': Duration(milliseconds: 1300),
   'tower': Duration(milliseconds: 1300),
@@ -651,21 +670,7 @@ class _EffectsPainter extends CustomPainter {
   }
 
   /// The attacker's closest territory to the target (a neighbour when there is one).
-  Offset? _from(Fx f, Size size) {
-    final seat = f.seat;
-    if (seat == null) return null;
-    final target = template.byId(f.territory);
-    final mine = [
-      for (final e in match.territories.entries)
-        if (e.value.owner == seat && e.key != f.territory) e.key,
-    ];
-    if (mine.isEmpty) return null;
-    final near = mine.where(target.neighbors.contains).toList();
-    final pool = near.isEmpty ? mine : near;
-    final to = _at(f.territory, size);
-    pool.sort((a, b) => (_at(a, size) - to).distance.compareTo((_at(b, size) - to).distance));
-    return _at(pool.first, size);
-  }
+  Offset? _from(Fx f, Size size) => marchFrom(template, match, f, size);
 
   void _march(Canvas canvas, Size size, Fx f, double p, Color color) {
     final from = _from(f, size);
@@ -898,4 +903,83 @@ class _EffectsPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_EffectsPainter old) => true;
+}
+
+/// Where an attack marches from: the attacker's land closest to the target (a neighbour if any).
+Offset? marchFrom(MapTemplate template, MatchView match, Fx f, Size size) {
+  final seat = f.seat;
+  if (seat == null) return null;
+  Offset at(int id) {
+    final l = template.byId(id).label;
+    return Offset(l.dx * size.width, l.dy * size.height);
+  }
+
+  final target = template.byId(f.territory);
+  final mine = [
+    for (final e in match.territories.entries)
+      if (e.value.owner == seat && e.key != f.territory) e.key,
+  ];
+  if (mine.isEmpty) return null;
+  final near = mine.where(target.neighbors.contains).toList();
+  final pool = near.isEmpty ? mine : near;
+  final to = at(f.territory);
+  pool.sort((a, b) => (at(a) - to).distance.compareTo((at(b) - to).distance));
+  return at(pool.first);
+}
+
+/// The attacker's troops walk from their land to the target, bobbing as they go, and stop at
+/// the border (the duel decides the rest). One widget per attack, with its own short animation.
+class _MarchingTroops extends StatefulWidget {
+  const _MarchingTroops({super.key, required this.from, required this.to, required this.image, required this.height});
+  final Offset from;
+  final Offset to;
+  final String image;
+  final double height;
+
+  @override
+  State<_MarchingTroops> createState() => _MarchingTroopsState();
+}
+
+class _MarchingTroopsState extends State<_MarchingTroops> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 3200))
+    ..forward();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) {
+        final t = _c.value;
+        if (t >= 1) return const SizedBox.shrink();
+        final walk = Curves.easeInOut.transform((t / 0.6).clamp(0.0, 1.0)) * 0.8; // stop short of the target
+        final pos = Offset.lerp(widget.from, widget.to, walk)!;
+        final bob = sin(t * 40) * widget.height * 0.04 * (walk < 0.8 ? 1 : 0);
+        final fade = t < 0.85 ? 1.0 : 1 - (t - 0.85) / 0.15;
+        final faceLeft = widget.to.dx < widget.from.dx;
+        final h = widget.height;
+        return Positioned(
+          left: pos.dx - h * 0.55,
+          top: pos.dy - h + bob,
+          width: h * 1.1,
+          height: h,
+          child: IgnorePointer(
+            child: Opacity(
+              opacity: fade,
+              child: Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.diagonal3Values(faceLeft ? -1 : 1, 1, 1),
+                child: Image.asset(widget.image, fit: BoxFit.contain, filterQuality: FilterQuality.medium),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }

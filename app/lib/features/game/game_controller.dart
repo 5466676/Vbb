@@ -331,6 +331,7 @@ class GameController extends Notifier<GameState> {
     match.roundOrder = [for (final s in (mj['round_order'] as List? ?? const [])) s as int];
     match.attacker = mj['attacker'] as int?;
     match.placer = mj['placer'] as int?;
+    match.winShare = (mj['win_share'] as num?)?.toDouble();
     // turns already taken this round: everyone listed before the current attacker
     final at = match.attacker == null ? -1 : match.roundOrder.indexOf(match.attacker!);
     if (at > 0) match.turnDone.addAll(match.roundOrder.take(at));

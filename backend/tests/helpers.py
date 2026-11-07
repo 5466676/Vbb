@@ -182,6 +182,7 @@ CLAIM_ANIM_MS = 2500  # territories appear after picks
 DUEL_ANIM_MS = 4500  # army marches, battle scene
 START_MS = 4500
 BASE_ANIM_MS = 1800  # a castle lands
+MARCH_MS = 3500  # troops march to the target
 
 
 @dataclass
@@ -335,7 +336,7 @@ def play_match(
             else:
                 do(choice)
                 clock += rnd.randint(3000, 8000)
-            clock += DUEL_ANIM_MS
+            clock += MARCH_MS + DUEL_ANIM_MS
             continue
         raise AssertionError(f"stuck in phase {state.phase}")
     else:

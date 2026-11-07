@@ -245,6 +245,13 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                                 key: ValueKey('duel${m.phaseId}'),
                                 attacker: m.players[m.attacker!],
                                 defender: m.players[m.defender!],
+                                // start so it ends as the question arrives (after the march)
+                                delay: () {
+                                  final left =
+                                      (m.opensAt ?? DateTime.now()).difference(DateTime.now()) -
+                                      const Duration(milliseconds: 1700);
+                                  return left.isNegative ? Duration.zero : left;
+                                }(),
                               ),
                             ),
                         ],

@@ -501,3 +501,11 @@ kept by the room (not the engine — the engine stays free of question content);
 optional `category` and fall back to the room's filters when it has no question left. Bots pick
 one at random; on timeout the room's usual filters apply. Offline, the three offered are drawn
 from categories that have questions on the device.
+
+## Marching troops (2026-11-07)
+
+When a target is chosen, the attacker's soldiers walk from their nearest land toward the target
+(their own animation, mirrored to face the way they walk) while the arrow is drawn. Rooms and the
+offline game now pause 3.5 s after `target_chosen` (`MARCH_PAUSE_MS`) before the duel question,
+and the face-to-face splash is timed to end as the question arrives. Simulated lengths at this
+pace: fixed rounds ~13–18 min, open length ~8 (2 players) to ~31 min (8 players).

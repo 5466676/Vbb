@@ -8,17 +8,25 @@ import '../game/game_state.dart';
 /// hold for a moment, then fade away so the duel question is free. Plays once per duel
 /// (keyed by phase id) and never blocks taps.
 class DuelSplash extends StatefulWidget {
-  const DuelSplash({super.key, required this.attacker, required this.defender});
+  const DuelSplash({super.key, required this.attacker, required this.defender, this.delay = Duration.zero});
   final PlayerView attacker;
   final PlayerView defender;
+  final Duration delay; // lets the troops' march play first
 
   @override
   State<DuelSplash> createState() => _DuelSplashState();
 }
 
 class _DuelSplashState extends State<DuelSplash> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1700))
-    ..forward();
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1700));
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(widget.delay, () {
+      if (mounted) _c.forward();
+    });
+  }
 
   @override
   void dispose() {
@@ -33,7 +41,7 @@ class _DuelSplashState extends State<DuelSplash> with SingleTickerProviderStateM
         animation: _c,
         builder: (context, _) {
           final t = _c.value;
-          if (t >= 1) return const SizedBox.shrink();
+          if (t >= 1 || !_c.isAnimating && t == 0) return const SizedBox.shrink();
           final inT = Curves.easeOutBack.transform((t / 0.3).clamp(0.0, 1.0));
           final out = t < 0.75 ? 1.0 : 1 - (t - 0.75) / 0.25;
           final swords = Curves.elasticOut.transform(((t - 0.2) / 0.4).clamp(0.0, 1.0));
