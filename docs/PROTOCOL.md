@@ -50,7 +50,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `set_ready` | `{"ready": bool}` | lobby |
 | `choose_army` | `{"army": Army}` | lobby |
 | `vote_map` | `{"kind": "fantasy"\|"world"}` | lobby; majority wins, ties at random |
-| `update_settings` | `{"mode"?, "max_players"?, "battle_rounds"?, "bots_allowed"?, "categories"?: [str], "packs"?: [str]}` | host, lobby. `categories` ⊂ the 23 categories (`CATEGORIES` in `app/models/question.py`; empty = all); `packs` 1–5 question packs (default `["general"]`, never `solo`) |
+| `update_settings` | `{"mode"?, "max_players"?, "battle_rounds"?, "bots_allowed"?, "categories"?: [str], "packs"?: [str]}` | host, lobby. `length`: `open` (ends by domination / last one standing, default) or `rounds` (fixed rounds); `categories` ⊂ the 23 categories (`CATEGORIES` in `app/models/question.py`; empty = all); `packs` 1–5 question packs (default `["general"]`, never `solo`) |
 | `add_bot` | `{"difficulty": "easy"\|"medium"\|"hard"}` | host, lobby |
 | `remove_bot` | `{"seat": int}` | host, lobby |
 | `start_match` | `{}` | host; needs ≥2 seats, every human ready; teams need 4/6/8 |
@@ -88,8 +88,8 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `question_result` | `{"id", "correct_index" (your order) or "answer", "ranking": [seat], "answers": {seat: {"choice" (your order) \| "value", "elapsed_ms"}}}` |
 | `pick_locked` | `{"seat"}` |
 | `territory_claimed` | `{"seat", "territory", "auto", "value"}` |
-| `battle_started` | `{"rounds"}` |
-| `round_started` | `{"round", "order"}` — `order`: this round's attackers (seats) in turn order; eliminated players and extra turns are not listed |
+| `battle_started` | `{"rounds", "open_ended"}` — open length: `rounds` is only a safety cap |
+| `round_started` | `{"round", "order", "win_share" (null in fixed-rounds matches)}` — `order`: this round's attackers (seats) in turn order; eliminated players and extra turns are not listed. `win_share`: the share of the map (0–1) that wins now (GAME_RULES §6.3) |
 | `turn_skipped` | `{"seat"}` — the attacker had no legal target |
 | `target_chosen` | `{"attacker", "defender", "territory", "auto"}` |
 | `shield_blocked` | `{"territory", "defender"}` — no question; the turn ends |

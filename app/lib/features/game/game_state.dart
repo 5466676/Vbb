@@ -189,6 +189,7 @@ class MatchView {
   int battleRound = 0;
   int? attacker;
   List<int> roundOrder = const []; // this battle round's attackers, in turn order
+  double? winShare; // open length: owning this share of the map wins (eases over time); null = fixed rounds
   final Set<int> turnDone = {}; // seats that already had their turn this round
   int? defender;
   int? duelTerritory;

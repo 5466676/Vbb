@@ -267,7 +267,12 @@ class _PhaseBanner extends StatelessWidget {
         _ => 'استعدّوا…',
       },
     };
-    final round = m.battleRound > 0 ? '  •  جولة المعارك ${m.battleRound}/${m.rounds}' : '';
+    final win = m.winShare;
+    final round = m.battleRound == 0
+        ? ''
+        : win == null
+        ? '  •  جولة المعارك ${m.battleRound}/${m.rounds}'
+        : '  •  الجولة ${m.battleRound}  •  للفوز ${(win * 100).round()}٪ من الخريطة';
     return _Ribbon(
       highlight: m.myTurn || (m.phase == 'expansion_picks' && (m.quota[m.mySeat] ?? 0) > 0),
       child: Text(

@@ -48,7 +48,7 @@ def test_bot_matches_on_template(kind: MapKind, players: int):
     m = map_for(kind, players)
     lengths = []
     for seed in range(40):
-        r = play_match(players, seed, map_def=m)
+        r = play_match(players, seed, map_def=m, open_ended=False)
         assert r.state.phase is Phase.RESULTS
         assert r.state.map_id == m.id
         lengths.append(r.duration_ms / 60_000)
@@ -57,5 +57,6 @@ def test_bot_matches_on_template(kind: MapKind, players: int):
             r = play_match(players, 1000 + seed, mode=Mode.TEAMS, map_def=m)
             assert r.state.phase is Phase.RESULTS
     mean = statistics.mean(lengths)
-    low = 6.0 if players == 2 else 7.5
-    assert low <= mean <= 12.5, f"{m.id}: mean length {mean:.1f} min"
+    # fixed-rounds matches at the calm pace (DECISIONS: 2026-11-07)
+    low = 8.0 if players == 2 else 10.0
+    assert low <= mean <= 18.0, f"{m.id}: mean length {mean:.1f} min"

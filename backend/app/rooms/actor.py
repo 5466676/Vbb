@@ -56,10 +56,10 @@ log = logging.getLogger(__name__)
 ResultsSink = Callable[[str, RoomData], Awaitable[None]]
 
 # pauses after events so the client can animate (game ms)
-START_PAUSE_MS = 3000
-REVEAL_PAUSE_MS = 2500
-CLAIM_PAUSE_MS = 1500
-DUEL_PAUSE_MS = 3500
+START_PAUSE_MS = 4500
+REVEAL_PAUSE_MS = 4000
+CLAIM_PAUSE_MS = 2500
+DUEL_PAUSE_MS = 4500
 NETWORK_SLACK_MS = 500  # extra wait before a question timeout
 ENDED_TTL_MS = 5 * 60_000
 BOT_NAMES = ["صلاح", "خالد", "طارق", "زنوبيا", "هارون", "بيبرس", "قطز", "سيف"]
@@ -455,7 +455,11 @@ class RoomActor:
             map_for(r.map_kind, n),
             setups,
             seed=self.rnd.getrandbits(63),
-            settings=MatchSettings(mode=r.settings.mode, battle_rounds=r.settings.battle_rounds),
+            settings=MatchSettings(
+                mode=r.settings.mode,
+                battle_rounds=r.settings.battle_rounds,
+                open_ended=r.settings.length == "open",
+            ),
         )
         r.status = RoomStatus.PLAYING
         r.match_uid = uuid.uuid4().hex
@@ -755,9 +759,9 @@ class RoomActor:
                 limit = m.active.limits_ms[seat]
                 delay = min(limit - 200, self.rnd.randint(prof.min_ms, prof.max_ms))
             elif m.phase is Phase.EXP_PICKS and seat in m.pick_quota and seat not in m.picks:
-                delay = pause + self.rnd.randint(800, 3000)
+                delay = pause + self.rnd.randint(2500, 6000)
             elif m.phase is Phase.BATTLE_TARGET and m.attacker == seat:
-                delay = pause + self.rnd.randint(1000, 3000)
+                delay = pause + self.rnd.randint(3000, 8000)
             if delay is not None:
                 self._schedule(name, delay, seat=seat, phase_id=m.phase_id)
 

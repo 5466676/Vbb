@@ -176,10 +176,10 @@ def types(events: list[Event]) -> list[str]:
 # Full bot match with a wall-clock model
 # ------------------------------------------------------------------------------------------
 
-REVEAL_MS = 2500  # show the correct answer and ranking
-CLAIM_ANIM_MS = 1500  # territories appear after picks
-DUEL_ANIM_MS = 3500  # army marches, battle scene
-START_MS = 3000
+REVEAL_MS = 4000  # show the correct answer and ranking
+CLAIM_ANIM_MS = 2500  # territories appear after picks
+DUEL_ANIM_MS = 4500  # army marches, battle scene
+START_MS = 4500
 
 
 @dataclass
@@ -217,6 +217,7 @@ def play_match(
     per_player: int = 5,
     towers: int | None = None,
     map_def: MapDef | None = None,
+    open_ended: bool = True,
 ) -> SimResult:
     rnd = random.Random(seed)
     team_size = n_players // 2 if mode is Mode.TEAMS else 0
@@ -228,7 +229,9 @@ def play_match(
         map_def or grid_map(n_players, per_player),
         setups(armies, teams),
         seed=seed,
-        settings=MatchSettings(mode=mode, battle_rounds=rounds, base_towers=towers),
+        settings=MatchSettings(
+            mode=mode, battle_rounds=rounds, base_towers=towers, open_ended=open_ended
+        ),
     )
     qf = QuestionFactory(seed)
     clock = START_MS
@@ -291,7 +294,7 @@ def play_match(
                 if rnd.random() < 0.05:
                     think = timers.pick_ms
                     continue
-                think = max(think, rnd.randint(800, 4000))
+                think = max(think, rnd.randint(2500, 6000))
                 do(bots.picks(state, seat, state.pick_quota.get(seat, count), rnd))
                 if state.phase_id != phase_id:
                     break
@@ -312,7 +315,7 @@ def play_match(
                 clock += timers.target_ms
             else:
                 do(choice)
-                clock += rnd.randint(1000, 4000)
+                clock += rnd.randint(3000, 8000)
             clock += DUEL_ANIM_MS
             continue
         raise AssertionError(f"stuck in phase {state.phase}")

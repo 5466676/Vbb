@@ -16,7 +16,13 @@ from app.engine.armies import Army
 # Settings and map input
 # ------------------------------------------------------------------------------------------
 
-DEFAULT_BATTLE_ROUNDS = {2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4}  # calibrated by simulation
+# Two match lengths, chosen before the match (owner, 2026-11-07):
+# - open: no fixed length; ends when one player/team is left or one owns DOMINATION of the map
+#   (MAX_BATTLE_ROUNDS is only a safety cap);
+# - rounds: DEFAULT_BATTLE_ROUNDS[player count] battle rounds (or the host's number).
+DEFAULT_BATTLE_ROUNDS = {2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4}
+MAX_BATTLE_ROUNDS = 60
+DOMINATION = 2 / 3
 
 
 class Mode(StrEnum):
@@ -29,14 +35,15 @@ class Timers(BaseModel):
 
     mcq_ms: int = 10_000
     numeric_ms: int = 15_000
-    pick_ms: int = 5_000
-    target_ms: int = 8_000
+    pick_ms: int = 10_000
+    target_ms: int = 20_000  # time to think: whom to attack and with which category
     latency_grace_ms: int = 150
 
 
 class MatchSettings(BaseModel):
     mode: Mode = Mode.FFA
-    battle_rounds: int | None = None  # None = DEFAULT_BATTLE_ROUNDS[player count]
+    open_ended: bool = True  # True: ends by domination/last one standing; False: fixed rounds
+    battle_rounds: int | None = None  # None = by player count (fixed) / safety cap (open)
     tie_window_ms: int = 500
     normal_value: int = 200
     base_value: int = 1000

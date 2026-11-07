@@ -78,14 +78,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _offline() async {
-    final choice = await showDialog<({int bots, String level, String map, List<String> categories})>(
+    final choice = await showDialog<({int bots, String level, String map, List<String> categories, bool open})>(
       context: context,
       builder: (c) => const _OfflineDialog(),
     );
     if (choice == null || !mounted) return;
     await ref
         .read(gameProvider.notifier)
-        .startOffline(bots: List.filled(choice.bots, choice.level), mapKind: choice.map, categories: choice.categories);
+        .startOffline(
+          bots: List.filled(choice.bots, choice.level),
+          mapKind: choice.map,
+          categories: choice.categories,
+          openEnded: choice.open,
+        );
     if (mounted) context.push('/play');
   }
 
@@ -275,6 +280,7 @@ class _OfflineDialogState extends State<_OfflineDialog> {
   String _level = 'medium';
   String _map = 'fantasy';
   List<String> _categories = const [];
+  bool _open = true;
 
   @override
   Widget build(BuildContext context) {
@@ -359,6 +365,14 @@ class _OfflineDialogState extends State<_OfflineDialog> {
                 ),
               ),
               row(
+                'المدة',
+                BannerChoice(
+                  options: const [(true, 'مفتوحة'), (false, 'بالجولات')],
+                  value: _open,
+                  onChanged: (v) => setState(() => _open = v),
+                ),
+              ),
+              row(
                 'الخريطة',
                 BannerChoice(
                   options: const [('fantasy', 'خيالية'), ('world', 'العالم')],
@@ -374,8 +388,13 @@ class _OfflineDialogState extends State<_OfflineDialog> {
                     child: WarButton(
                       label: 'للمعركة!',
                       kind: WarButtonKind.seal,
-                      onPressed: () =>
-                          Navigator.pop(context, (bots: _bots, level: _level, map: _map, categories: _categories)),
+                      onPressed: () => Navigator.pop(context, (
+                        bots: _bots,
+                        level: _level,
+                        map: _map,
+                        categories: _categories,
+                        open: _open,
+                      )),
                     ),
                   ),
                   const SizedBox(width: 8),

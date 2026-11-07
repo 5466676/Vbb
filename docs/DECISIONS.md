@@ -464,3 +464,21 @@ the duels. Owner-approved rule changes (GAME_RULES §6.2):
   `{2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4}`; simulated means are back to ~10–11.7 min.
 - With bots captures stay rare because bots often answer wrong; with people who know the answers
   the tiebreak rule should move the map more. Revisit after real family matches.
+
+## Calmer pace; open or fixed match length (2026-11-07)
+
+The owner found matches too fast and abrupt (sudden stage changes, questions back to back, bots
+acting instantly, land handed out by itself). Changes:
+- **Timers:** picks 5 → 10 s; choosing a target 8 → 20 s (time to think).
+- **Pauses after events:** start 3 → 4.5 s, reveal 2.5 → 4 s, claims 1.5 → 2.5 s, duels 3.5 → 4.5 s.
+- **Bots:** picks after 2.5–6 s (was 0.8–3), target after 3–8 s (was 1–3).
+- **Match length chosen before the match** (setup dialog «المدة», lobby «مدة مفتوحة», room setting
+  `length`, `MatchSettings.open_ended`):
+  - *open* (default) — no round count; ends when one player/team is left or one owns enough of the
+    map: 2/3 (4/5 head to head), easing 1.5 points per attack after the first 16, down to
+    1/(left) + 8 points; checked from round 2 (head to head: round 4). `round_started.win_share`
+    tells the client the current bar. Simulated bot matches: ~8 min (2 players) to ~25 min (8).
+  - *rounds* — the previous table `{2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4}`; ~12–15 min at the
+    calmer pace (above the old 8–12 target, by the owner's choice of a calmer game).
+- Next in this series: army choice before an offline match, each player placing their own castle,
+  the attacker choosing the question category, marching troops.

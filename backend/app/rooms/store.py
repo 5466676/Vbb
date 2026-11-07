@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import secrets
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 from redis.asyncio import Redis
@@ -66,6 +67,7 @@ class RoomSettings(BaseModel):
     battle_rounds: int | None = Field(default=None, ge=1, le=30)
     bots_allowed: bool = True
     categories: list[str] = Field(default_factory=list)  # empty = all categories
+    length: Literal["open", "rounds"] = "open"  # open: ends by domination; rounds: fixed rounds
     packs: list[str] = Field(default_factory=lambda: [GENERAL_PACK], min_length=1, max_length=5)
 
     @field_validator("categories")

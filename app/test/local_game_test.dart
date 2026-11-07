@@ -93,9 +93,10 @@ void main() {
         expect(m.phase, 'results', reason: '$n players, seed $seed');
         expect(m.freeTerritories(), isEmpty, reason: 'expansion fills the map');
         expect(events.where((e) => e.type == 'match_ended').length, 1);
-        final rows = m.standings();
+        // the winner heads the final standings (a dominating team wins even if not top on points)
+        final rows = events.firstWhere((e) => e.type == 'match_ended').data['standings'] as List;
         expect(rows.length, n);
-        expect(rows.first['team'], m.winnerTeam);
+        expect((rows.first as Map)['team'], m.winnerTeam);
         // eliminated players own nothing; towers never go negative
         for (final p in m.players.where((p) => p.eliminated)) {
           expect(m.owned(p.seat), isEmpty);

@@ -243,7 +243,7 @@ def test_round_started_carries_the_turn_order():
     duel(s, 3, att_ms=3000, def_ms=1000)  # seat 0's turn
     ev = duel(s, core.legal_targets(s, 1)[0], att_ms=3000, def_ms=1000)  # seat 1 ends round 1
     nxt = [e for e in ev if e.type == "round_started"]
-    assert nxt and nxt[0].data == {"round": 2, "order": [1, 0]}  # rotates one seat
+    assert nxt and nxt[0].data["round"] == 2 and nxt[0].data["order"] == [1, 0]  # rotates one seat
 
 
 def test_both_right_goes_to_the_tiebreak_even_with_a_big_time_gap():

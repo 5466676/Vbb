@@ -24,13 +24,19 @@ const ottomanCaptureGain = 150;
 const pharaohPyramidGain = 300;
 const crusaderSiegeTowers = 2;
 
+// No fixed length: the match ends when one team is left or one dominates the map (GAME_RULES §6.3).
+// Two match lengths, chosen before the match: open (domination / last one standing; 60 rounds
+// only as a safety cap) or fixed rounds by player count.
+const maxBattleRounds = 60;
 const defaultBattleRounds = {2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4};
+const domination = 2 / 3;
 
 class Settings {
+  bool openEnded = true;
   int mcqMs = 10000;
   int numericMs = 15000;
-  int pickMs = 5000;
-  int targetMs = 8000;
+  int pickMs = 10000;
+  int targetMs = 20000;
   int latencyGraceMs = 150;
   int tieWindowMs = 500; // unused since both-right duels always go to the tiebreak
   int normalValue = 200;
@@ -157,9 +163,10 @@ class MatchState {
     required List<int> bases,
     required List<PlayerSetup> setups,
     required bool teams,
+    bool openEnded = true,
     Random? rng,
   }) {
-    final s = Settings();
+    final s = Settings()..openEnded = openEnded;
     final n = setups.length;
     if (n < 2 || n > 8) throw RuleError('a match needs 2-8 players');
     final terr = {for (final id in neighbors.keys) id: TerritoryState(id, s.normalValue)};
@@ -174,7 +181,7 @@ class MatchState {
         ..value = p.army == 'ayyubid' ? ayyubidBaseValue : s.baseValue;
     }
     return MatchState._(s, mapId, {for (final e in neighbors.entries) e.key: (e.value.toSet().toList()..sort())}, terr, players,
-        defaultBattleRounds[n]!, towers, rng ?? Random());
+        openEnded ? maxBattleRounds : defaultBattleRounds[n]!, towers, rng ?? Random());
   }
 
   // ------------------------------------------------------------------ queries
@@ -560,8 +567,33 @@ class MatchState {
     firstSeat = alive.first;
     battleRound = 0;
     turnQueue = [];
-    ev.add(Ev('battle_started', {'rounds': battleRounds}));
+    ev.add(Ev('battle_started', {'rounds': battleRounds, 'open_ended': settings.openEnded}));
     _nextTurn(ev);
+  }
+
+  /// Share of the map that wins: 2/3 (4/5 head to head), easing 1.5 points per attack after the
+  /// first 16 attacks, down to a fair-share floor.
+  double dominationShare() {
+    final alive = _aliveTeams().length;
+    final start = alive > 2 ? domination : 0.8;
+    final floor = 1 / max(alive, 1) + 0.08;
+    final living = players.where((p) => !p.eliminated).length;
+    final attacks = max(0, battleRound - 1) * living;
+    return max(floor, start - 0.015 * max(0, attacks - 16));
+  }
+
+  int? dominantTeam() {
+    if (!settings.openEnded) return null;
+    if (battleRound <= (_aliveTeams().length <= 2 ? 3 : 1)) return null;
+    final count = <int, int>{};
+    for (final t in territories.values) {
+      if (t.owner != null) count.update(players[t.owner!].team, (v) => v + 1, ifAbsent: () => 1);
+    }
+    final need = dominationShare() * territories.length;
+    for (final e in count.entries) {
+      if (e.value >= need) return e.key;
+    }
+    return null;
   }
 
   Set<int> _aliveTeams() => {for (final p in players) if (!p.eliminated) p.team};
@@ -577,7 +609,8 @@ class MatchState {
   void _nextTurn(List<Ev> ev) {
     duel = null;
     while (true) {
-      if (_aliveTeams().length <= 1) return _finish(ev);
+      final dominant = dominantTeam();
+      if (_aliveTeams().length <= 1 || dominant != null) return _finish(ev, firstTeam: dominant);
       int? seat;
       if (extraTurn && attacker != null) {
         extraTurn = false;
@@ -588,7 +621,8 @@ class MatchState {
           battleRound++;
           if (battleRound > battleRounds) return _finish(ev);
           _buildQueue();
-          ev.add(Ev('round_started', {'round': battleRound, 'order': [...roundOrder]}));
+          final win = settings.openEnded ? (dominationShare() * 100).round() / 100 : null;
+          ev.add(Ev('round_started', {'round': battleRound, 'order': [...roundOrder], 'win_share': win}));
           continue;
         }
         seat = turnQueue.removeAt(0);
@@ -733,7 +767,7 @@ class MatchState {
 
   // ------------------------------------------------------------------ end (§6.3)
 
-  List<Map<String, dynamic>> standings() {
+  List<Map<String, dynamic>> standings({int? firstTeam}) {
     double avg(PlayerState p) => p.answered == 0 ? double.infinity : p.totalAnswerMs / p.answered;
     final teams = <int, Map<String, num>>{};
     for (final p in players) {
@@ -747,7 +781,7 @@ class MatchState {
     final teamOrder = teams.keys.toList()
       ..sort((a, b) {
         final ta = teams[a]!, tb = teams[b]!;
-        for (final c in [tb['score']!.compareTo(ta['score']!), tb['correct']!.compareTo(ta['correct']!), tAvg(a).compareTo(tAvg(b)), a.compareTo(b)]) {
+        for (final c in [(a == firstTeam ? 0 : 1).compareTo(b == firstTeam ? 0 : 1), tb['score']!.compareTo(ta['score']!), tb['correct']!.compareTo(ta['correct']!), tAvg(a).compareTo(tAvg(b)), a.compareTo(b)]) {
           if (c != 0) return c;
         }
         return 0;
@@ -779,8 +813,8 @@ class MatchState {
     ];
   }
 
-  void _finish(List<Ev> ev) {
-    final rows = standings();
+  void _finish(List<Ev> ev, {int? firstTeam}) {
+    final rows = standings(firstTeam: firstTeam);
     winnerTeam = rows.first['team'] as int;
     attacker = null;
     duel = null;

@@ -62,12 +62,20 @@ class GameController extends Notifier<GameState> {
   GameTransport get _t => _local ?? socket;
 
   /// A whole match against bots inside the app (no server). [bots] = difficulty per bot.
-  ({List<String> bots, String mapKind, bool teams, List<String> categories})? _lastOffline;
+  ({List<String> bots, String mapKind, bool teams, List<String> categories, bool openEnded})? _lastOffline;
 
   /// Same bots and map as the last offline match ("مباراة ثانية").
   Future<void> replayOffline() async {
     final l = _lastOffline;
-    if (l != null) await startOffline(bots: l.bots, mapKind: l.mapKind, teams: l.teams, categories: l.categories);
+    if (l != null) {
+      await startOffline(
+        bots: l.bots,
+        mapKind: l.mapKind,
+        teams: l.teams,
+        categories: l.categories,
+        openEnded: l.openEnded,
+      );
+    }
   }
 
   Future<void> startOffline({
@@ -75,9 +83,10 @@ class GameController extends Notifier<GameState> {
     required String mapKind,
     bool teams = false,
     List<String> categories = const [],
+    bool openEnded = true,
   }) async {
     await stopOffline();
-    _lastOffline = (bots: bots, mapKind: mapKind, teams: teams, categories: categories);
+    _lastOffline = (bots: bots, mapKind: mapKind, teams: teams, categories: categories, openEnded: openEnded);
     final g = LocalGame(
       name: _settings.name,
       army: _settings.army,
@@ -85,6 +94,7 @@ class GameController extends Notifier<GameState> {
       mapKind: mapKind,
       teams: teams,
       categories: categories,
+      openEnded: openEnded,
     );
     _local = g;
     _localSub = g.messages.listen(_on);
@@ -454,17 +464,29 @@ class GameController extends Notifier<GameState> {
         m.effect(Fx('claim', t.id, seat: t.owner));
         sound.play('claim');
       case 'battle_started':
-        m.log('بدأت المعارك! ${p['rounds']} جولات', null, 'round');
-        m.announce('الحرب!', '${p['rounds']} جولات • كل واحد بيهاجم مرة بالجولة');
+        m.log('بدأت المعارك!', null, 'round');
+        m.announce(
+          'الحرب!',
+          (p['open_ended'] ?? true) == true
+              ? 'كل واحد بيهاجم مرة بالجولة • بيربح اللي بيسيطر عالخريطة أو بيبقى لحالو'
+              : '${p['rounds']} جولات • كل واحد بيهاجم مرة بالجولة',
+        );
         sound.play('battle_start');
         _t.send('resync'); // army bonuses change values at the start of battle
       case 'round_started':
         m.battleRound = p['round'] as int;
         m.roundOrder = [for (final s in (p['order'] as List? ?? const [])) s as int];
+        m.winShare = (p['win_share'] as num?)?.toDouble();
         m.turnDone.clear();
         m.attacker = null;
         m.log('الجولة ${p['round']}', null, 'round');
-        if ((p['round'] as int) > 1) m.announce('الجولة ${p['round']}', 'من ${m.rounds}');
+        if ((p['round'] as int) > 1) {
+          final w = m.winShare;
+          m.announce(
+            'الجولة ${p['round']}',
+            w == null ? 'من ${m.rounds}' : 'للفوز: سيطر على ${(w * 100).round()}٪ من الخريطة',
+          );
+        }
         sound.play('round_start');
       case 'turn_skipped':
         if (p['seat'] is int) m.turnDone.add(p['seat'] as int);

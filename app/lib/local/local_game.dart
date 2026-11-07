@@ -16,7 +16,7 @@ const _botNames = ['صلاح', 'خالد', 'طارق', 'قطز', 'بيبرس', '
 const _armies = ['islamic', 'ayyubid', 'crusader', 'roman', 'pharaoh', 'mongol', 'ottoman', 'ww2'];
 
 // pauses for animations before the next window opens (same as the server's room actor)
-const _startPause = 3000, _revealPause = 2500, _claimPause = 1500, _duelPause = 3500;
+const _startPause = 4500, _revealPause = 4000, _claimPause = 2500, _duelPause = 4500;
 const _networkSlack = 600;
 
 /// A whole match against bots inside the app: no server, no internet.
@@ -29,7 +29,10 @@ class LocalGame implements GameTransport {
     required this.mapKind,
     this.teams = false,
     this.categories = const [],
+    this.openEnded = true,
   });
+
+  final bool openEnded; // open length (domination) or fixed rounds
 
   final List<String> categories; // empty = all
 
@@ -117,6 +120,7 @@ class LocalGame implements GameTransport {
       bases: _template.bases,
       setups: setups,
       teams: teams,
+      openEnded: openEnded,
       rng: _rnd,
     );
     for (final s in _template.seaLinks) {
@@ -315,9 +319,9 @@ class LocalGame implements GameTransport {
       if (aq != null && aq.participants.contains(p.seat) && !aq.answers.containsKey(p.seat)) {
         delay = min(aq.limitsMs[p.seat]! - 200, randInt(_rnd, prof.minMs, prof.maxMs));
       } else if (_m.phase == 'expansion_picks' && _m.pickQuota.containsKey(p.seat) && !_m.picks.containsKey(p.seat)) {
-        delay = pause + randInt(_rnd, 800, 3000);
+        delay = pause + randInt(_rnd, 2500, 6000);
       } else if (_m.phase == 'battle_target' && _m.attacker == p.seat) {
-        delay = pause + randInt(_rnd, 1000, 3000);
+        delay = pause + randInt(_rnd, 3000, 8000);
       }
       if (delay != null) {
         final phaseId = _m.phaseId;

@@ -100,14 +100,14 @@ LOBBY → STARTING → EXPANSION (×N, simultaneous) → BATTLE (×R rounds, tur
 In every round each living player (or team member) gets **one turn**. Turn order rotates:
 round 1 starts with the lowest score, and each later round starts one seat further.
 
-R *(config, draft)* by player count, chosen so a match stays near 8–12 minutes:
+**Match length is chosen before the match** (owner, 2026-11-07):
+- **Open (default):** no fixed number of rounds; the match goes on until it ends by §6.3
+  (60 rounds is only a safety cap).
+- **Rounds:** R battle rounds by player count:
 
 | Players | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|
 | R | 19 | 11 | 8 | 7 | 5 | 4 | 4 |
-
-(Calibrated by the phase-2 simulation. 1v1 matches often end earlier because a base falls;
-see DECISIONS.md.)
 
 A turn:
 1. **Choose target (8 s):** the attacker picks one enemy territory adjacent to their land.
@@ -130,8 +130,13 @@ A turn:
 
 ### 6.3 Score and end of match
 - **Score = sum of owned territory values + bonus points.** In team modes the team score is the sum of its members.
-- The match ends after R battle rounds, or when only one player (or team) remains.
-- Highest score wins. Ties: most correct answers, then lowest average answer time.
+- The match ends when only one player (or team) remains; in a fixed-rounds match also after R
+  rounds; in an open match also when one player (or team) **owns enough of the map**: 2/3 of all territories (4/5 head to head). After the first 16 attacks the
+  bar eases by 1.5 points per attack (counted as full rounds × living players), down to a floor of
+  1/(players or teams left) + 8 points — a clear leader wins sooner, a close match goes on.
+  The check starts after round 1 (head to head: after round 3).
+- In an open match a dominating player (or team) wins. Otherwise the highest score wins. Ties: most correct
+  answers, then lowest average answer time.
 
 ## 7. Elimination and disconnects
 - Eliminated players become spectators and can leave without penalty.

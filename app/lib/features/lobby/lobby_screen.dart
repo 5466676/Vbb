@@ -244,6 +244,12 @@ class _HostBar extends ConsumerWidget {
               selected: teams,
               onSelected: (v) => game.updateSettings({'mode': v ? 'teams' : 'ffa'}),
             ),
+            FilterChip(
+              label: const Text('مدة مفتوحة'),
+              tooltip: 'بتخلص لما حدا يسيطر عالخريطة أو يبقى لحالو؛ بلاها: عدد جولات ثابت',
+              selected: (room.settings['length'] ?? 'open') == 'open',
+              onSelected: (v) => game.updateSettings({'length': v ? 'open' : 'rounds'}),
+            ),
           ],
         ),
         const SizedBox(height: 6),

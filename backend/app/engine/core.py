@@ -15,6 +15,8 @@ from app.engine import armies as A
 from app.engine.armies import Army
 from app.engine.models import (
     DEFAULT_BATTLE_ROUNDS,
+    DOMINATION,
+    MAX_BATTLE_ROUNDS,
     Action,
     ActiveQuestion,
     Answer,
@@ -92,7 +94,9 @@ def create_match(
         base.towers = towers
         base.value = A.AYYUBID_BASE_VALUE if p.army is Army.AYYUBID else settings.base_value
 
-    rounds = settings.battle_rounds or DEFAULT_BATTLE_ROUNDS[n]
+    rounds = settings.battle_rounds or (
+        MAX_BATTLE_ROUNDS if settings.open_ended else DEFAULT_BATTLE_ROUNDS[n]
+    )
     return MatchState(
         match_id=match_id,
         settings=settings,
@@ -614,7 +618,8 @@ def _start_battle(state: MatchState, ev: list[Event], rng: Rng) -> None:
     state.first_seat = min(alive, key=lambda s: (score(state, s), s))
     state.battle_round = 0
     state.turn_queue = []
-    ev.append(Event(type="battle_started", data={"rounds": state.battle_rounds}))
+    data = {"rounds": state.battle_rounds, "open_ended": state.settings.open_ended}
+    ev.append(Event(type="battle_started", data=data))
     _next_turn(state, ev, rng)
 
 
@@ -633,8 +638,9 @@ def _build_queue(state: MatchState) -> None:
 def _next_turn(state: MatchState, ev: list[Event], rng: Rng) -> None:
     state.duel = None
     while True:
-        if len(_alive_teams(state)) <= 1:
-            _finish(state, ev)
+        dominant = dominant_team(state)
+        if len(_alive_teams(state)) <= 1 or dominant is not None:
+            _finish(state, ev, first_team=dominant)
             return
         seat: int | None = None
         if state.extra_turn and state.attacker is not None:
@@ -649,7 +655,8 @@ def _next_turn(state: MatchState, ev: list[Event], rng: Rng) -> None:
                     return
                 _build_queue(state)
                 order = list(state.round_order)
-                data = {"round": state.battle_round, "order": order}
+                win = round(domination_share(state), 2) if state.settings.open_ended else None
+                data = {"round": state.battle_round, "order": order, "win_share": win}
                 ev.append(Event(type="round_started", data=data))
                 continue
             seat = state.turn_queue.pop(0)
@@ -860,7 +867,34 @@ def _finish_turn(state: MatchState, attacker_won: bool, ev: list[Event], rng: Rn
 # ==========================================================================================
 
 
-def standings(state: MatchState) -> list[dict]:
+def domination_share(state: MatchState) -> float:
+    """Share of the map that wins (§6.3): 2/3 (4/5 head to head), easing by 1.5 points every
+    attack after the first 16 attacks, down to a fair-share floor — a clear leader wins sooner,
+    a close match goes on."""
+    alive = len(_alive_teams(state))
+    start = DOMINATION if alive > 2 else 0.8
+    floor = 1 / max(alive, 1) + 0.08
+    players = sum(1 for p in state.players if not p.eliminated)
+    attacks = max(0, state.battle_round - 1) * players  # roughly: full rounds played so far
+    return max(floor, start - 0.015 * max(0, attacks - 16))
+
+
+def dominant_team(state: MatchState) -> int | None:
+    """The team owning at least DOMINATION of the map, if any (§6.3)."""
+    if not state.settings.open_ended:
+        return None
+    count: dict[int, int] = {}
+    for t in state.territories.values():
+        if t.owner is not None:
+            team = state.players[t.owner].team
+            count[team] = count.get(team, 0) + 1
+    if state.battle_round <= (3 if len(_alive_teams(state)) <= 2 else 1):
+        return None  # everyone gets some attacks first (head to head: three rounds)
+    need = domination_share(state) * len(state.territories)
+    return next((team for team, n in count.items() if n >= need), None)
+
+
+def standings(state: MatchState, first_team: int | None = None) -> list[dict]:
     rows = []
     for p in state.players:
         avg = p.total_answer_ms / p.answered if p.answered else float("inf")
@@ -888,7 +922,8 @@ def standings(state: MatchState) -> list[dict]:
     for t in teams.values():
         t["_avg"] = t["ms"] / t["answered"] if t["answered"] else float("inf")
     team_order = sorted(
-        teams.values(), key=lambda t: (-t["score"], -t["correct"], t["_avg"], t["team"])
+        teams.values(),
+        key=lambda t: (t["team"] != first_team, -t["score"], -t["correct"], t["_avg"], t["team"]),
     )
     rank_of = {t["team"]: i for i, t in enumerate(team_order)}
     rows.sort(key=lambda r: (rank_of[r["team"]], -r["score"], -r["correct"], r["_avg"], r["seat"]))
@@ -897,8 +932,8 @@ def standings(state: MatchState) -> list[dict]:
     return rows
 
 
-def _finish(state: MatchState, ev: list[Event]) -> None:
-    rows = standings(state)
+def _finish(state: MatchState, ev: list[Event], first_team: int | None = None) -> None:
+    rows = standings(state, first_team)
     state.winner_team = rows[0]["team"]
     state.attacker = None
     state.duel = None
