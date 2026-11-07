@@ -208,5 +208,45 @@
   "file": "sfx/your_turn.ogg",
   "source": "ElevenLabs: A single short low war horn call",
   "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_ayyubid.ogg",
+  "source": "ElevenLabs: Medieval Saracen army attack: big kettle drums and long brass horns, horses galloping, swords clashing on shields, no voices, no words, short and sharp, two seconds",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_crusader.ogg",
+  "source": "ElevenLabs: Medieval European knights charge: armored horses galloping, chain mail clanking, knights roar a wordless battle cry, a trumpet call",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_islamic.ogg",
+  "source": "ElevenLabs: Early Arab cavalry charge in the desert: horses and camels galloping on sand, swords drawn, war drums pounding, no voices, no words, short and sharp, two seconds",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_mongol.ogg",
+  "source": "ElevenLabs: Mongol horde cavalry war cry: many horses galloping, riders shouting high-pitched wordless ululations, horse neighs, arrows whistling, short and sharp, two seconds",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_ottoman.ogg",
+  "source": "ElevenLabs: Ottoman mehter military band: loud zurna shawm melody over huge kos drums and crashing cymbals, marching army, no voices, epic and cinematic with reverb across a valley",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_pharaoh.ogg",
+  "source": "ElevenLabs: Ancient Egyptian army charge: war chariot wheels rumbling, horses, soldiers shouting a wordless cry, a ram's horn and sistrum rattle",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_roman.ogg",
+  "source": "ElevenLabs: Roman legion: soldiers shout a short unified 'Ha!' together and strike their shields with swords in rhythm, then a Roman cornu horn blast",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_ww2.ogg",
+  "source": "ElevenLabs: World War Two infantry charge: soldiers shouting a wordless 'hurrah!' together as they run, boots on mud, distant artillery booms",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
  }
 ]
