@@ -1,7 +1,7 @@
-# Private audio (not in git)
+# Private audio (personal use)
 
-Files here come from copyrighted sources (film clips) and are for the owner's personal use only,
-so they are ignored by git and never pushed to the public repository. Keep a copy yourself.
+Files here come from copyrighted sources (film clips) and are for the owner's personal, non-commercial
+use only (the game is played privately with family). The owner chose to keep them in this repository.
 
 | file | used for | source |
 |---|---|---|

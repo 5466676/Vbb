@@ -17,6 +17,3 @@ __pycache__/
 # Home server data (SQLite file, secrets, logs)
 backend/data/
 
-# copyrighted audio for personal use only (film clips): never pushed to the public repo
-app/assets/audio/private/*
-!app/assets/audio/private/README.md
