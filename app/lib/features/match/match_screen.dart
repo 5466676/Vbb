@@ -134,7 +134,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
         : <int>{};
 
     // music follows the stage: calm map music, war drums in battle, silence for the results
-    final track = m.ended ? null : (m.phase.startsWith('battle') ? 'battle' : 'map');
+    final track = m.ended ? null : (m.phase.startsWith('battle') ? (m.finalRound ? 'final' : 'battle') : 'map');
     WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(gameProvider.notifier).sound.music(track));
     final q = m.question;
     final asking = q != null && !m.ended;
@@ -333,6 +333,8 @@ class _PhaseBanner extends StatelessWidget {
     final win = m.winShare;
     final round = m.battleRound == 0
         ? ''
+        : m.finalRound
+        ? '  •  الجولة الأخيرة (الاحتلال ×2)'
         : win == null
         ? '  •  جولة المعارك ${m.battleRound}/${m.rounds}'
         : '  •  الجولة ${m.battleRound}  •  للفوز ${(win * 100).round()}٪ من الخريطة';

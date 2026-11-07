@@ -898,6 +898,7 @@ class RoomActor:
             "base_towers": m.base_towers,
             "attacker": m.attacker,
             "placer": m.placer,
+            "treasure": m.treasure,
             "win_share": round(core.domination_share(m), 2) if m.settings.open_ended else None,
             "round_order": m.round_order,
             "duel": m.duel.model_dump() if m.duel else None,

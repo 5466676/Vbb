@@ -402,6 +402,7 @@ class LocalGame implements GameTransport {
         'base_towers': _m.baseTowers,
         'attacker': _m.attacker,
         'placer': _m.placer,
+        'treasure': _m.treasure,
         'win_share': _m.settings.openEnded ? (_m.dominationShare() * 100).round() / 100 : null,
         'duel': _m.duel == null
             ? null

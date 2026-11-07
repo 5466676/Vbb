@@ -28,7 +28,7 @@ const crusaderSiegeTowers = 2;
 // Two match lengths, chosen before the match: open (domination / last one standing; 60 rounds
 // only as a safety cap) or fixed rounds by player count.
 const maxBattleRounds = 60;
-const defaultBattleRounds = {2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4};
+const defaultBattleRounds = {2: 10, 3: 7, 4: 6, 5: 6, 6: 5, 7: 4, 8: 4};
 const domination = 2 / 3;
 
 class Settings {
@@ -588,7 +588,41 @@ class MatchState {
 
   // ------------------------------------------------------------------ expansion (§6.1)
 
+  static const treasurePoints = 300;
+  int? treasure; // the territory with the chest
+
+  /// A chest on the free territory farthest from every castle (a race to reach it).
+  void _placeTreasure(List<Ev> ev) {
+    final free = freeTerritories();
+    final castles = [for (final t in territories.values) if (t.isBase) t.id];
+    if (free.isEmpty || castles.isEmpty) return;
+    final dist = {for (final c in castles) c: _distances(c)};
+    int near(int t) => castles.map((c) => dist[c]![t] ?? 99).reduce(min);
+    var best = free.first;
+    for (final t in free) {
+      if (near(t) > near(best) || (near(t) == near(best) && t < best)) best = t;
+    }
+    treasure = best;
+    ev.add(Ev('treasure_placed', {'territory': best}));
+  }
+
+  void _claimTreasure(int seat, List<Ev> ev) {
+    final p = players[seat];
+    p.bonus += treasurePoints;
+    String? refill;
+    for (final x in const ['remove_two', 'hint', 'shield', 'double']) {
+      if (!p.powerups.contains(x)) {
+        refill = x;
+        break;
+      }
+    }
+    if (refill != null) p.powerups.add(refill);
+    ev.add(Ev('treasure_found', {'seat': seat, 'territory': treasure, 'points': treasurePoints, 'powerup': refill}));
+    treasure = null;
+  }
+
   void _startExpansionRound(List<Ev> ev) {
+    if (expansionRound == 0) _placeTreasure(ev);
     expansionRound++;
     ranking = [];
     pickQuota = {};
@@ -630,6 +664,7 @@ class MatchState {
         final t = territories[tid]!..owner = seat;
         players[seat].firstPickDone = true;
         ev.add(Ev('territory_claimed', {'seat': seat, 'territory': tid, 'auto': auto, 'value': t.value}));
+        if (tid == treasure) _claimTreasure(seat, ev);
       }
     }
     pickQuota = {};
@@ -661,6 +696,8 @@ class MatchState {
 
   /// Share of the map that wins: 2/3 (4/5 head to head), easing 1.5 points per attack after the
   /// first 16 attacks, down to a fair-share floor.
+  bool get isFinalRound => !settings.openEnded && battleRound == battleRounds;
+
   double dominationShare() {
     final alive = _aliveTeams().length;
     final start = alive > 2 ? domination : 0.8;
@@ -710,7 +747,7 @@ class MatchState {
           if (battleRound > battleRounds) return _finish(ev);
           _buildQueue();
           final win = settings.openEnded ? (dominationShare() * 100).round() / 100 : null;
-          ev.add(Ev('round_started', {'round': battleRound, 'order': [...roundOrder], 'win_share': win}));
+          ev.add(Ev('round_started', {'round': battleRound, 'order': [...roundOrder], 'win_share': win, 'final': isFinalRound}));
           continue;
         }
         seat = turnQueue.removeAt(0);
@@ -805,6 +842,7 @@ class MatchState {
           att.doubleArmed = false;
           gain = settings.doubleGain;
         }
+        if (isFinalRound) gain *= 2; // the last round counts double
         t
           ..owner = att.seat
           ..shielded = false

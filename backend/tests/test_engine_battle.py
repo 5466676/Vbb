@@ -271,3 +271,11 @@ def test_everyone_answers_the_duel_and_right_watchers_score_points():
     ev += step(s, Answer(seat=defender, choice=2, elapsed_ms=1200))
     assert s.players[watcher].bonus == before + core.SPECTATOR_POINTS
     assert "bonus_points" in types(ev) and "territory_held" in types(ev)
+
+
+def test_the_last_round_of_a_fixed_match_doubles_captures():
+    s = new_match(line_map(6, [0, 5]), [R, R], open_ended=False, battle_rounds=1)
+    ev = to_battle(s, {1: 0, 2: 0, 3: 1, 4: 1})
+    assert [e.data["final"] for e in ev if e.type == "round_started"] == [True]
+    duel(s, 3, att_ms=3000, def_ms=1000)
+    assert s.territories[3].owner == 0 and s.territories[3].value == 400  # 200 + 2 x 100

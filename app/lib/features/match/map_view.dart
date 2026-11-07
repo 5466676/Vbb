@@ -157,6 +157,7 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                       ),
                       ..._labels(size),
                       ..._marches(size),
+                      ..._treasure(size),
                       Positioned.fill(
                         child: IgnorePointer(
                           child: _EffectsLayer(template: t, match: widget.match, version: widget.version),
@@ -242,6 +243,36 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
         child: IgnorePointer(child: Image.asset(armyOf(m.players[terr.owner!].army).fort, fit: BoxFit.contain)),
       );
     }
+  }
+
+  Iterable<Widget> _treasure(Size size) sync* {
+    final id = widget.match.treasure;
+    if (id == null) return;
+    final l = widget.template.byId(id).label;
+    final d = size.height * 0.075;
+    yield Positioned(
+      left: l.dx * size.width - d / 2,
+      top: l.dy * size.height - d * 0.8,
+      width: d,
+      height: d,
+      child: IgnorePointer(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: const Duration(milliseconds: 700),
+          curve: Curves.elasticOut,
+          builder: (context, v, child) => Transform.scale(scale: v, child: child),
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: const Color(0xFFFFC233),
+              border: Border.all(color: const Color(0xFF3A2414), width: 2),
+              boxShadow: const [BoxShadow(color: Color(0xAAFFE08A), blurRadius: 10, spreadRadius: 2)],
+            ),
+            child: Icon(Icons.inventory_2, size: d * 0.6, color: const Color(0xFF6E3B12)),
+          ),
+        ),
+      ),
+    );
   }
 
   Iterable<Widget> _marches(Size size) sync* {

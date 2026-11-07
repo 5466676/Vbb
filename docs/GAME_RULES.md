@@ -101,6 +101,8 @@ value and towers of §3.
    map) are allowed — players grow outward from their base, never jump across the map.
 6. On timeout (or a lost conflict) the server auto-picks a legal territory.
 7. If fewer free territories remain than picks, they are handed out in rank order.
+8. **Treasure:** when the expansion starts, a chest is placed on the free territory farthest from
+   every castle. Whoever claims it gets **+300 bonus points** and **one used power-up back**.
 
 ### 6.2 BATTLE (الحرب) — turn-based duels, R rounds
 In every round each living player (or team member) gets **one turn**. Turn order rotates:
@@ -113,7 +115,9 @@ round 1 starts with the lowest score, and each later round starts one seat furth
 
 | Players | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|
-| R | 19 | 11 | 8 | 7 | 5 | 4 | 4 |
+| R | 10 | 7 | 6 | 6 | 5 | 4 | 4 |
+
+  The **last round** is announced («الجولة الأخيرة») and every capture in it gains **double**.
 
 A turn:
 1. **Choose target (20 s):** the attacker picks one enemy territory adjacent to their land, and

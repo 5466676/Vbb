@@ -652,7 +652,39 @@ def _resolve_question(state: MatchState, rng: Rng, ev: list[Event]) -> None:
 # ==========================================================================================
 
 
+TREASURE_POINTS = 300
+
+
+def _place_treasure(state: MatchState, ev: list[Event]) -> None:
+    """§6.1.8: a chest on the free territory farthest from every castle (a race to reach it)."""
+    free = free_territories(state)
+    castles = [t.id for t in state.territories.values() if t.is_base]
+    if not free or not castles:
+        return
+    dist = {c: _distances(state, c) for c in castles}
+    state.treasure = max(free, key=lambda t: (min(dist[c].get(t, 99) for c in castles), -t))
+    ev.append(Event(type="treasure_placed", data={"territory": state.treasure}))
+
+
+def _claim_treasure(state: MatchState, seat: int, ev: list[Event]) -> None:
+    p = state.players[seat]
+    p.bonus += TREASURE_POINTS
+    refill = next((x for x in PowerUp if x not in p.powerups), None)
+    if refill is not None:
+        p.powerups.append(refill)
+    data = {
+        "seat": seat,
+        "territory": state.treasure,
+        "points": TREASURE_POINTS,
+        "powerup": refill.value if refill else None,
+    }
+    state.treasure = None
+    ev.append(Event(type="treasure_found", data=data))
+
+
 def _start_expansion_round(state: MatchState, ev: list[Event]) -> None:
+    if state.expansion_round == 0:
+        _place_treasure(state, ev)
     state.expansion_round += 1
     state.ranking = []
     state.pick_quota = {}
@@ -702,6 +734,8 @@ def _resolve_picks(state: MatchState, rng: Rng, ev: list[Event]) -> None:
                     data={"seat": seat, "territory": tid, "auto": auto, "value": t.value},
                 )
             )
+            if tid == state.treasure:
+                _claim_treasure(state, seat, ev)
     state.pick_quota = {}
     state.picks = {}
     if free_territories(state):
@@ -763,7 +797,12 @@ def _next_turn(state: MatchState, ev: list[Event], rng: Rng) -> None:
                 _build_queue(state)
                 order = list(state.round_order)
                 win = round(domination_share(state), 2) if state.settings.open_ended else None
-                data = {"round": state.battle_round, "order": order, "win_share": win}
+                data = {
+                    "round": state.battle_round,
+                    "order": order,
+                    "win_share": win,
+                    "final": is_final_round(state),
+                }
                 ev.append(Event(type="round_started", data=data))
                 continue
             seat = state.turn_queue.pop(0)
@@ -898,6 +937,8 @@ def _apply_duel_outcome(
             if att.double_armed:
                 att.double_armed = False
                 gain = s.double_gain
+            if is_final_round(state):
+                gain *= 2  # the last round counts double (§6.2)
             t.owner = att.seat
             t.shielded = False
             t.value += gain
@@ -972,6 +1013,11 @@ def _finish_turn(state: MatchState, attacker_won: bool, ev: list[Event], rng: Rn
 # ==========================================================================================
 # End of match (§6.3)
 # ==========================================================================================
+
+
+def is_final_round(state: MatchState) -> bool:
+    """The last round of a fixed-rounds match: captures count double (§6.2)."""
+    return not state.settings.open_ended and state.battle_round == state.battle_rounds
 
 
 def domination_share(state: MatchState) -> float:

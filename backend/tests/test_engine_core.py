@@ -10,6 +10,7 @@ from app.engine.models import (
     Phase,
     PickTerritories,
     PlaceBase,
+    PowerUp,
     ProvideQuestion,
     QuestionKind,
     StartMatch,
@@ -231,3 +232,17 @@ def test_players_place_their_castles_in_turn():
     assert placed[0].data["territory"] in (0, 8)
     assert s.phase is Phase.EXP_QUESTION  # everyone has a castle: expansion starts
     assert "phase_changed" in types(ev)
+
+
+def test_the_treasure_goes_to_whoever_claims_it():
+    s = started(line_map(7, [0, 6]), A2)
+    assert s.treasure == 3  # farthest from both castles
+    s.players[0].powerups.remove(PowerUp.HINT)
+    s.territories[1].owner = 0
+    s.territories[2].owner = 0
+    answer_numeric(s, {0: 100, 1: 0})
+    ev = step(s, PickTerritories(seat=0, territories=[3]))
+    found = [e for e in ev if e.type == "treasure_found"]
+    assert found and found[0].data["seat"] == 0 and found[0].data["powerup"] == "hint"
+    assert s.players[0].bonus >= 300 and PowerUp.HINT in s.players[0].powerups
+    assert s.treasure is None

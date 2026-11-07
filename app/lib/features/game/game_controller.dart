@@ -332,6 +332,7 @@ class GameController extends Notifier<GameState> {
     match.roundOrder = [for (final s in (mj['round_order'] as List? ?? const [])) s as int];
     match.attacker = mj['attacker'] as int?;
     match.placer = mj['placer'] as int?;
+    match.treasure = mj['treasure'] as int?;
     match.winShare = (mj['win_share'] as num?)?.toDouble();
     // turns already taken this round: everyone listed before the current attacker
     final at = match.attacker == null ? -1 : match.roundOrder.indexOf(match.attacker!);
@@ -469,6 +470,21 @@ class GameController extends Notifier<GameState> {
             sound.play(q.answered ? (right ? 'correct' : 'wrong') : 'time_up');
           }
         }
+      case 'treasure_placed':
+        m.treasure = p['territory'] as int?;
+        m.log('في كنز مخبّى عالخريطة! يلي بيوصلو أول بياخد +300 وأداة', null, 'power');
+      case 'treasure_found':
+        final seat = p['seat'] as int;
+        m.treasure = null;
+        m.players[seat].bonus += (p['points'] ?? 300) as int;
+        final pu = p['powerup'] as String?;
+        if (seat == m.mySeat && pu != null && !m.players[seat].powerups.contains(pu)) {
+          m.players[seat].powerups = [...m.players[seat].powerups, pu];
+        }
+        if (pu != null) m.players[seat].powerupCount = (m.players[seat].powerupCount + 1).clamp(0, 4);
+        m.effect(Fx('capture', p['territory'] as int, seat: seat, value: (p['points'] ?? 300) as int));
+        m.log(seat == m.mySeat ? 'لقيت الكنز! +300 ورجعتلك أداة' : '${_name(m, seat)} لقى الكنز!', seat, 'power');
+        sound.play('coins');
       case 'base_placed':
         final seat = p['seat'] as int;
         final t = m.terr(p['territory'] as int)
@@ -519,7 +535,11 @@ class GameController extends Notifier<GameState> {
         m.turnDone.clear();
         m.attacker = null;
         m.log('الجولة ${p['round']}', null, 'round');
-        if ((p['round'] as int) > 1) {
+        m.finalRound = (p['final'] ?? false) == true;
+        if (m.finalRound) {
+          m.announce('الجولة الأخيرة', 'كل احتلال بهالجولة بضعف النقاط!');
+          sound.play('tiebreak');
+        } else if ((p['round'] as int) > 1) {
           final w = m.winShare;
           m.announce(
             'الجولة ${p['round']}',

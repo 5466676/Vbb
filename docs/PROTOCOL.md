@@ -89,6 +89,8 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `question_result` | `{"id", "correct_index" (your order) or "answer", "ranking": [seat], "answers": {seat: {"choice" (your order) \| "value", "elapsed_ms"}}}` |
 | `pick_locked` | `{"seat"}` |
 | `base_placed` | `{"seat", "territory", "auto", "towers", "value"}` — a player's castle is built (§6.0) |
+| `treasure_placed` | `{"territory"}` — a chest on the free territory farthest from every castle (start of the expansion) |
+| `treasure_found` | `{"seat", "territory", "points": 300, "powerup"}` — whoever claims it gets +300 bonus and one used power-up back (`null` if none was used) |
 | `territory_claimed` | `{"seat", "territory", "auto", "value"}` |
 | `battle_started` | `{"rounds", "open_ended"}` — open length: `rounds` is only a safety cap |
 | `round_started` | `{"round", "order", "win_share" (null in fixed-rounds matches)}` — `order`: this round's attackers (seats) in turn order; eliminated players and extra turns are not listed. `win_share`: the share of the map (0–1) that wins now (GAME_RULES §6.3) |

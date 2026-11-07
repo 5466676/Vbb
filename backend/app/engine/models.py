@@ -20,7 +20,7 @@ from app.engine.armies import Army
 # - open: no fixed length; ends when one player/team is left or one owns DOMINATION of the map
 #   (MAX_BATTLE_ROUNDS is only a safety cap);
 # - rounds: DEFAULT_BATTLE_ROUNDS[player count] battle rounds (or the host's number).
-DEFAULT_BATTLE_ROUNDS = {2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4}
+DEFAULT_BATTLE_ROUNDS = {2: 10, 3: 7, 4: 6, 5: 6, 6: 5, 7: 4, 8: 4}
 MAX_BATTLE_ROUNDS = 60
 DOMINATION = 2 / 3
 
@@ -196,6 +196,7 @@ class MatchState(BaseModel):
     place_order: list[int] = Field(default_factory=list)  # who still has to place, in order
     placer: int | None = None
     # expansion
+    treasure: int | None = None  # the territory with the chest (§6.1.8)
     expansion_round: int = 0
     ranking: list[int] = Field(default_factory=list)
     pick_quota: dict[int, int] = Field(default_factory=dict)

@@ -189,8 +189,10 @@ class MatchView {
   int battleRound = 0;
   int? attacker;
   int? placer; // castle placement: whose turn it is
+  int? treasure; // the territory with the chest, until someone takes it
   List<int> placeOptions = const [];
   List<int> roundOrder = const []; // this battle round's attackers, in turn order
+  bool finalRound = false; // fixed-rounds matches: the last round, captures count double
   double? winShare; // open length: owning this share of the map wins (eases over time); null = fixed rounds
   final Set<int> turnDone = {}; // seats that already had their turn this round
   int? defender;
