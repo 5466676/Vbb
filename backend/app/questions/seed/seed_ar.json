@@ -1,7 +1,7 @@
 [
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد أركان الإسلام؟",
   "options_ar": [
@@ -15,7 +15,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد أركان الإيمان؟",
   "options_ar": [
@@ -29,7 +29,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "ما أول سورة في ترتيب المصحف الشريف؟",
   "options_ar": [
@@ -43,7 +43,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "ما آخر سورة في ترتيب المصحف الشريف؟",
   "options_ar": [
@@ -57,7 +57,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "ما أطول سورة في القرآن الكريم؟",
   "options_ar": [
@@ -71,7 +71,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 2,
   "text_ar": "ما أقصر سورة في القرآن الكريم؟",
   "options_ar": [
@@ -85,7 +85,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "في أي شهر يصوم المسلمون؟",
   "options_ar": [
@@ -99,7 +99,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "إلى أين يتجه المسلمون في صلاتهم؟",
   "options_ar": [
@@ -113,7 +113,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "في أي مدينة وُلد النبي محمد ﷺ؟",
   "options_ar": [
@@ -127,7 +127,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "إلى أي مدينة هاجر النبي ﷺ؟",
   "options_ar": [
@@ -141,7 +141,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد الصلوات المفروضة في اليوم والليلة؟",
   "options_ar": [
@@ -155,7 +155,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "أي الأنبياء يُلقّب بـ«كليم الله»؟",
   "options_ar": [
@@ -169,7 +169,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "أي الأنبياء يُلقّب بـ«خليل الله»؟",
   "options_ar": [
@@ -183,7 +183,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "من أول الخلفاء الراشدين؟",
   "options_ar": [
@@ -197,7 +197,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "من الخليفة الراشد الثاني؟",
   "options_ar": [
@@ -211,7 +211,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "في أي غار نزل الوحي على النبي ﷺ أول مرة؟",
   "options_ar": [
@@ -225,7 +225,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "ما اسم الليلة التي أُنزل فيها القرآن؟",
   "options_ar": [
@@ -239,7 +239,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد أجزاء القرآن الكريم؟",
   "options_ar": [
@@ -253,7 +253,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 2,
   "text_ar": "ما أول ما نزل من القرآن الكريم؟",
   "options_ar": [
@@ -267,7 +267,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "ما الركن الخامس من أركان الإسلام؟",
   "options_ar": [
@@ -281,7 +281,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "من أولى زوجات النبي ﷺ؟",
   "options_ar": [
@@ -295,7 +295,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "أي نبي التقمه الحوت؟",
   "options_ar": [
@@ -309,7 +309,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "أي نبي صنع السفينة بأمر الله؟",
   "options_ar": [
@@ -323,7 +323,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 2,
   "text_ar": "ما الغزوة التي كانت أول انتصار كبير للمسلمين؟",
   "options_ar": [
@@ -337,7 +337,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 2,
   "text_ar": "ما السورة الوحيدة التي لا تبدأ بالبسملة؟",
   "options_ar": [
@@ -351,7 +351,7 @@
  },
  {
   "type": "mcq",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "ما اسم والد النبي ﷺ؟",
   "options_ar": [
@@ -365,7 +365,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد سور القرآن الكريم؟",
   "numeric_answer": 114,
@@ -374,7 +374,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد آيات سورة الفاتحة؟",
   "numeric_answer": 7,
@@ -383,7 +383,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد ركعات صلاة الفجر؟",
   "numeric_answer": 2,
@@ -392,7 +392,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 2,
   "text_ar": "كم سنة استمرت الدعوة في مكة قبل الهجرة تقريباً؟",
   "numeric_answer": 13,
@@ -401,7 +401,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد ركعات صلاة المغرب؟",
   "numeric_answer": 3,
@@ -410,7 +410,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 2,
   "text_ar": "كم عدد الأنبياء المذكورين بأسمائهم في القرآن الكريم؟",
   "numeric_answer": 25,
@@ -419,7 +419,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 2,
   "text_ar": "في أي عام ميلادي كانت الهجرة النبوية؟",
   "numeric_answer": 622,
@@ -428,7 +428,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 3,
   "text_ar": "كم عدد سور جزء عمّ؟",
   "numeric_answer": 37,
@@ -437,7 +437,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد ركعات صلاة الظهر؟",
   "numeric_answer": 4,
@@ -446,7 +446,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم عدد آيات سورة الإخلاص؟",
   "numeric_answer": 4,
@@ -455,7 +455,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 1,
   "text_ar": "كم كان عمر النبي ﷺ عند البعثة؟",
   "numeric_answer": 40,
@@ -464,7 +464,7 @@
  },
  {
   "type": "numeric",
-  "category": "دين",
+  "category": "دين إسلامي",
   "difficulty": 2,
   "text_ar": "في أي سنة هجرية كانت غزوة بدر؟",
   "numeric_answer": 2,
@@ -2361,7 +2361,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما جمع كلمة «قلعة»؟",
   "options_ar": [
@@ -2375,7 +2375,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما مفرد كلمة «كُتُب»؟",
   "options_ar": [
@@ -2389,7 +2389,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما ضد «الشجاعة»؟",
   "options_ar": [
@@ -2403,7 +2403,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما معنى «الغيث»؟",
   "options_ar": [
@@ -2417,7 +2417,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما معنى «الليث»؟",
   "options_ar": [
@@ -2431,7 +2431,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما حكم الفاعل الإعرابي؟",
   "options_ar": [
@@ -2445,7 +2445,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "أي الكلمات التالية حرف جر؟",
   "options_ar": [
@@ -2459,7 +2459,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 3,
   "text_ar": "ما علامة نصب جمع المؤنث السالم؟",
   "options_ar": [
@@ -2473,7 +2473,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "من الملقب بـ«أمير الشعراء»؟",
   "options_ar": [
@@ -2487,7 +2487,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "لمن البيت «الخيلُ والليلُ والبيداءُ تعرفني»؟",
   "options_ar": [
@@ -2501,7 +2501,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "«قفا نبكِ من ذكرى حبيبٍ ومنزلِ» مطلع معلقة من؟",
   "options_ar": [
@@ -2515,7 +2515,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "من الملقب بـ«شاعر النيل»؟",
   "options_ar": [
@@ -2529,7 +2529,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما ضد «الطويل»؟",
   "options_ar": [
@@ -2543,7 +2543,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "ما نوع «ال» في كلمة «الشمس»؟",
   "options_ar": [
@@ -2557,7 +2557,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما الفعل الماضي من «يكتب»؟",
   "options_ar": [
@@ -2571,7 +2571,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "ما عمل «إنّ» وأخواتها؟",
   "options_ar": [
@@ -2585,7 +2585,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "ما علامة جزم الفعل المضارع الصحيح الآخر؟",
   "options_ar": [
@@ -2599,7 +2599,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "من نقل كتاب «كليلة ودمنة» إلى العربية؟",
   "options_ar": [
@@ -2613,7 +2613,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "من مؤلف كتاب «البخلاء»؟",
   "options_ar": [
@@ -2627,7 +2627,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "أي الكلمات التالية تنتهي بتاء مربوطة؟",
   "options_ar": [
@@ -2641,7 +2641,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 3,
   "text_ar": "ما معنى «السَّغَب»؟",
   "options_ar": [
@@ -2655,7 +2655,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما مفرد «أقلام»؟",
   "options_ar": [
@@ -2669,7 +2669,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "ما ضد «أقبل»؟",
   "options_ar": [
@@ -2683,7 +2683,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "أي هؤلاء من شعراء المهجر؟",
   "options_ar": [
@@ -2697,7 +2697,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "من مؤلف كتاب «الأيام»؟",
   "options_ar": [
@@ -2711,7 +2711,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "من أول أديب عربي نال جائزة نوبل في الأدب؟",
   "options_ar": [
@@ -2725,7 +2725,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما جمع «كتاب»؟",
   "options_ar": [
@@ -2739,7 +2739,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "ما معنى «المهنّد»؟",
   "options_ar": [
@@ -2753,7 +2753,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 3,
   "text_ar": "ما معنى «اليراع»؟",
   "options_ar": [
@@ -2767,7 +2767,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "ما ضد «الظلام»؟",
   "options_ar": [
@@ -2781,7 +2781,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "أي الجمل التالية جملة اسمية؟",
   "options_ar": [
@@ -2795,7 +2795,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "ما الاسم المجرور في جملة «جلستُ على الكرسيِّ»؟",
   "options_ar": [
@@ -2809,7 +2809,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "من الشاعر الملقب بـ«شاعر الرسول ﷺ»؟",
   "options_ar": [
@@ -2823,7 +2823,7 @@
  },
  {
   "type": "mcq",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "من صاحب قصيدة «إرادة الحياة»؟",
   "options_ar": [
@@ -2837,7 +2837,7 @@
  },
  {
   "type": "numeric",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 1,
   "text_ar": "كم عدد حروف اللغة العربية؟",
   "numeric_answer": 28,
@@ -2846,7 +2846,7 @@
  },
  {
   "type": "numeric",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "كم عدد حروف المدّ في اللغة العربية؟",
   "numeric_answer": 3,
@@ -2855,7 +2855,7 @@
  },
  {
   "type": "numeric",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 3,
   "text_ar": "كم عدد الحروف الشمسية؟",
   "numeric_answer": 14,
@@ -2864,7 +2864,7 @@
  },
  {
   "type": "numeric",
-  "category": "لغة عربية",
+  "category": "لغة وأدب",
   "difficulty": 2,
   "text_ar": "في أي عام نال نجيب محفوظ جائزة نوبل في الأدب؟",
   "numeric_answer": 1988,
@@ -3345,7 +3345,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما أكبر محيط على الأرض؟",
   "options_ar": [
@@ -3359,7 +3359,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما عملة اليابان؟",
   "options_ar": [
@@ -3373,7 +3373,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما عملة المملكة المتحدة؟",
   "options_ar": [
@@ -3387,7 +3387,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما الحيوان الملقب بـ«سفينة الصحراء»؟",
   "options_ar": [
@@ -3401,7 +3401,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "ما اللغة التي يتحدثها أكبر عدد من الناس لغةً أماً؟",
   "options_ar": [
@@ -3415,7 +3415,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "من رسم لوحة «الموناليزا»؟",
   "options_ar": [
@@ -3429,7 +3429,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "من شارك بول ألن في تأسيس شركة مايكروسوفت؟",
   "options_ar": [
@@ -3443,7 +3443,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "ما المادة الخام الأساسية لصناعة الزجاج؟",
   "options_ar": [
@@ -3457,7 +3457,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "في أي مدينة يقع برج إيفل؟",
   "options_ar": [
@@ -3471,7 +3471,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما الطائر الذي يُتّخذ رمزاً للسلام؟",
   "options_ar": [
@@ -3485,7 +3485,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "ما الوحدة الأساسية لقياس الزمن في النظام الدولي للوحدات؟",
   "options_ar": [
@@ -3499,7 +3499,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما اسم صغير الأسد؟",
   "options_ar": [
@@ -3513,7 +3513,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "ما اسم صغير الحصان؟",
   "options_ar": [
@@ -3527,7 +3527,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "ما اسم صغير الناقة؟",
   "options_ar": [
@@ -3541,7 +3541,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "في أي دولة تقع مدينة البندقية؟",
   "options_ar": [
@@ -3555,7 +3555,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما الشهر الأقل أياماً في التقويم الميلادي؟",
   "options_ar": [
@@ -3569,7 +3569,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "ما المعدن السائل في درجة حرارة الغرفة والمستخدم قديماً في موازين الحرارة؟",
   "options_ar": [
@@ -3583,7 +3583,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما الأداة التي تُستعمل لتحديد الاتجاهات الجغرافية؟",
   "options_ar": [
@@ -3597,7 +3597,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "أي عالم مسلم ألّف «كتاب المناظر» في علم البصريات؟",
   "options_ar": [
@@ -3611,7 +3611,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "بأي خط تُكتب أغلب المصاحف المطبوعة اليوم؟",
   "options_ar": [
@@ -3625,7 +3625,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما الكتاب الذي يجمع حكايات شهرزاد؟",
   "options_ar": [
@@ -3639,7 +3639,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما أطول حيوان في العالم؟",
   "options_ar": [
@@ -3653,7 +3653,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "ما العملة المشتركة لمعظم دول الاتحاد الأوروبي؟",
   "options_ar": [
@@ -3667,7 +3667,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "ما الاختراع الذي اشتهر به يوهانس غوتنبرغ؟",
   "options_ar": [
@@ -3681,7 +3681,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "في أي دولة تقع مدينة مراكش؟",
   "options_ar": [
@@ -3695,7 +3695,7 @@
  },
  {
   "type": "mcq",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "ما اسم الزخارف النباتية المتشابكة المميزة للفن الإسلامي؟",
   "options_ar": [
@@ -3709,7 +3709,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "كم لوناً في قوس قزح؟",
   "numeric_answer": 7,
@@ -3718,7 +3718,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "كم يوماً في السنة الميلادية العادية؟",
   "numeric_answer": 365,
@@ -3727,7 +3727,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "كم سنة في القرن الواحد؟",
   "numeric_answer": 100,
@@ -3736,7 +3736,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "في أي عام أُطلق أول هاتف آيفون؟",
   "numeric_answer": 2007,
@@ -3745,7 +3745,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 3,
   "text_ar": "كم مفتاحاً في البيانو القياسي؟",
   "numeric_answer": 88,
@@ -3754,7 +3754,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "كم عدد أرجل الحشرة؟",
   "numeric_answer": 6,
@@ -3763,7 +3763,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "في أي عام تأسست منظمة الأمم المتحدة؟",
   "numeric_answer": 1945,
@@ -3772,7 +3772,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "كم حرفاً في الأبجدية الإنجليزية؟",
   "numeric_answer": 26,
@@ -3781,7 +3781,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 2,
   "text_ar": "كم عدد الدول الأعضاء في الاتحاد الأوروبي؟",
   "numeric_answer": 27,
@@ -3790,7 +3790,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 3,
   "text_ar": "كم يبلغ ارتفاع برج إيفل تقريباً؟",
   "numeric_answer": 330,
@@ -3799,7 +3799,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "كم عدد أوجه المكعب؟",
   "numeric_answer": 6,
@@ -3808,7 +3808,7 @@
  },
  {
   "type": "numeric",
-  "category": "ثقافة عامة",
+  "category": "ثقافة وفن",
   "difficulty": 1,
   "text_ar": "كم يوماً في السنة الكبيسة؟",
   "numeric_answer": 366,

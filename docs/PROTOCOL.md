@@ -41,6 +41,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | type | payload | notes |
 |---|---|---|
 | `ping` | `{"t"?: any}` | → `pong` |
+| `resync` | `{}` | in a room: → `full_state` (the client lost track, e.g. after the app was paused) |
 | `create_room` | `{"army"?: Army}` | creates a private room; you are the host → `room_state` |
 | `join_room` | `{"code": "K7Q2MX", "army"?: Army}` | → `room_state` or `error` (`no_room`, `full`, `started`, `already_in_room`) |
 | `leave_room` | `{}` | lobby: frees the seat. Match: a bot keeps your seat, no penalty → `left_room` |
@@ -86,7 +87,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `answer_locked` | `{"seat"}` — someone answered (no content) |
 | `question_result` | `{"id", "correct_index" (your order) or "answer", "ranking": [seat], "answers": {seat: {"choice" (your order) \| "value", "elapsed_ms"}}}` |
 | `pick_locked` | `{"seat"}` |
-| `territory_claimed` | `{"seat", "territory", "auto"}` |
+| `territory_claimed` | `{"seat", "territory", "auto", "value"}` |
 | `battle_started` | `{"rounds"}` |
 | `round_started` | `{"round"}` |
 | `turn_skipped` | `{"seat"}` — the attacker had no legal target |

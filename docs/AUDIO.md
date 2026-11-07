@@ -44,13 +44,29 @@ Chosen in the sound picker (candidates are CC0). `id` is the file name in `app/a
 | `march` | an army moves on the map (looped footsteps) | `target_chosen` animation |
 | `battle_start` | battle phase begins | `battle_started` |
 | `sword_swing`, `sword_clash`, `battle_impact` | duel scene | `battle_duel` / `battle_result` |
-| `capture_cheer` | attacker wins a territory | `territory_captured` |
+| `capture_<army>` | attacker wins a territory: a war cry per army (see below) | `territory_captured` |
 | `base_guarded` | defence holds, shield blocks | `territory_held`, `base_guarded`, `shield_blocked` |
 | `tower_hit` | a base loses a tower | `tower_hit` |
 | `eliminated` | a player is out | `player_eliminated` |
 | `powerup` | power-up or ability used | `powerup_used`, `ability_used` |
 | `coins` | gold / reward | results screen |
 | `victory` / `defeat` | end of match, from my point of view | `match_ended` |
+
+### War cries on capture (owner's decision)
+
+The game is about war across eras, so effects should sound like a battlefield (horns, war drums,
+army shouts, swords), never like arcade or UI chimes.
+
+| army | `capture_<army>` |
+|---|---|
+| islamic, ayyubid, ottoman | `private/takbir.ogg`: four takbirs from «الرسالة» (1976) with the music removed (owner's pick; personal use). **No music under the takbir** (owner): a non-musical battle bed (horses, camels, swords, marching; no drums, horns or instruments) plus a group shouting «الله أكبر» — **recorded by real people** (the owner and 4–5 relatives on a phone; we clean it and layer it to sound like an army). Not AI: a generated takbir sounds wrong and the phrase deserves care |
+| crusader, roman, mongol, pharaoh, ww2 | a wordless army war cry (ElevenLabs candidates). No "Deus vult": it is used by extremists today |
+
+Recording tips: a quiet room, phone 1–2 m away, 3–4 short takes of «الله أكبر» together, plus one
+take with everyone a bit farther away (gives depth when layered).
+
+Sounds that no CC0 pack had (victory, war cries, countdown, your turn, tiebreak, extra turn, defeat)
+were generated with ElevenLabs sound generation (`tools/audio/el_gen.py`, owner's key, personal use only).
 
 ## 3. Music
 
@@ -84,8 +100,11 @@ Send the files as they come out (WAV or MP3); they get trimmed to clean loops, l
 
 ## 4. Commentator (المعلّق)
 
-Modern Standard Arabic (understood everywhere), energetic sports-commentator style, one male
-voice to start. Recorded by a person, or generated with a text-to-speech tool whose terms allow
+Modern Standard Arabic (understood everywhere). **Owner's pick: Gemini TTS voice Enceladus** in two
+styles — *epic* (a deep, dramatic war-movie-trailer narrator) for the big moments (start, battle
+begins, tiebreak, last round, end, winner) and *herald* (a battlefield herald shouting to the army)
+for the action (duel, capture, defence, tower, shield, elimination, army attacks). ElevenLabs voices
+and a sports-commentator style were tried and rejected. Recorded by a person, or generated with a text-to-speech tool whose terms allow
 commercial use (e.g. Google AI Studio speech generation, ElevenLabs paid plan). Each line is a
 separate file `app/assets/audio/voice/<id>.ogg`; several variants of a line are played at random.
 

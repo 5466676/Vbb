@@ -10,12 +10,7 @@ import '../../app/theme.dart';
 /// map, where a live blur is too expensive for low-end phones. Set
 /// [blur] to false to get the same look without the BackdropFilter.
 class GlassPanel extends StatelessWidget {
-  const GlassPanel({
-    super.key,
-    required this.child,
-    this.padding = const EdgeInsets.all(20),
-    this.blur = true,
-  });
+  const GlassPanel({super.key, required this.child, this.padding = const EdgeInsets.all(20), this.blur = true});
 
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -35,10 +30,7 @@ class GlassPanel extends StatelessWidget {
     if (!blur) return panel;
     return ClipRRect(
       borderRadius: radius,
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-        child: panel,
-      ),
+      child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12), child: panel),
     );
   }
 }

@@ -301,3 +301,59 @@ new device had made is detached.
 
 **Still Android only** (owner agreed). **Bug found by the tests:** the lock doubling overflowed
 after hundreds of failures; capped.
+
+## Owner's question bank, two new categories (2026-11-07)
+
+The owner writes questions with his own `build_questions.py` (JSON: `categories` + `questions`,
+`choice`/`number`). The checker and importer read that format directly
+(`app/questions/owner_format.py`), so he keeps his workflow. His categories added two of ours:
+**تكنولوجيا** and **حيوانات وطبيعة** (10 categories now); the other eight map onto the existing ones.
+First file: 200 questions, all valid; 49 were already in the seed (matched ignoring diacritics and
+hamza forms) and were dropped; two were held back because the "right" answer is disputed
+(longest river: Nile vs Amazon; number of continents: 6 or 7 depending on the school system).
+The other 149 are a second built-in seed file (`seed/owner_v1.json`), split like the first:
+every third per category goes to the offline `solo` pack. Bank: 453 questions (305 online, 148 offline).
+
+### Update: the owner's bank becomes the main source (23 categories)
+
+Second file: 1105 questions in 23 categories (a superset of the first). We adopted **his category
+names** everywhere; the three old names that differed were renamed in `seed_ar.json` and by
+migration 0003 (دين → دين إسلامي, لغة عربية → لغة وأدب, ثقافة عامة → ثقافة وفن).
+`scripts/import_owner_bank.py` turns his `questions.json` into `seed/owner_bank.json` (replaces
+`owner_v1.json`): 1025 new, 77 already in the first seed, 3 held back (longest river, number of
+continents, and a Syria question whose answer is the lake's politically loaded former name).
+Bank: 1329 questions, 894 online and 435 offline. Difficulty in his file: 47 % / 41 % / 12 %.
+
+## Phase 6 — Flutter app, first playable version (2026-11-07)
+
+**Built (app/lib):**
+- `core/` — settings (shared_preferences: device UUID, server link, name, token), REST client, game
+  socket (auto-reconnect with backoff; `full_state` on reconnect), map templates (normalised
+  polygons, cached paths, point-in-polygon), sound service (pooled players; the takbir for the three
+  Islamic armies, a war cry per other army), local store (sqflite on the phone, memory on web/tests),
+  sync service.
+- `features/` — home (menu over the 4 painted backgrounds, server check), settings (server link,
+  name, volume, account create/restore), lobby (room code, seats, 8 armies with perks and abilities,
+  map vote, bots, teams, ready/start), match (map with zoom/pan, territory colours and values, base
+  forts and towers, question scroll with timer, picks and targets, power-ups and the army ability,
+  side panel with live land totals and an event log, results with victory/defeat art), offline
+  training, leaderboard.
+- The game state is built only from server events (`features/game/game_controller.dart`).
+
+**Server changes for the client:** `resync` → `full_state` (the app asks after `match_started`,
+`battle_started` and `ability_used`, when values change without a per-territory event);
+`territory_claimed` now carries `value`; optional `HARB_WEB_DIR` serves the web build at `/play`.
+
+**Server link:** no default yet (the owner's Funnel URL is unknown): first launch asks for it in
+Settings, or a `harb://server?url=…` link sets it. Cleartext HTTP is allowed (home network tests).
+
+**Checked:** `flutter analyze` clean; 8 tests (link normalisation, device UUID, sync keeps
+unanswered actions and applies tombstones, server-off sync loses nothing, map hit-testing, the
+controller builds a match from events, home screen RTL). End to end: the web build on the home-mode
+server, driven by Playwright — create room, add 3 bots, ready, start, full match to the results
+screen, no console errors. Found and fixed: the menu overflowed a 900×420 landscape phone; the
+portrait frame hid the commander's face at small sizes. Release APKs built (arm64 35 MB).
+Building needed Google's Maven Central mirror locally (Maven Central rate-limits the shared IP).
+
+**Not yet:** music and the commentator (lines arrive with the Gemini quota), the battle scene
+animation, marching armies, team chat, progression and gold (phase 8).

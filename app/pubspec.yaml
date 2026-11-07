@@ -15,6 +15,13 @@ dependencies:
   flutter_riverpod: ^3.5.0
   go_router: ^18.1.3
   web_socket_channel: ^3.0.3
+  http: ^1.2.2
+  shared_preferences: ^2.3.2
+  sqflite: ^2.4.1
+  path: ^1.9.0
+  uuid: ^4.5.1
+  audioplayers: ^6.1.0
+  app_links: ^6.3.2
 
 dev_dependencies:
   flutter_test:
@@ -23,6 +30,19 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/maps/
+    - assets/maps/templates/
+    - assets/armies/commanders/
+    - assets/armies/forts/
+    - assets/armies/soldiers/
+    - assets/ui/
+    - assets/ui/menu/
+    - assets/ui/lobby/
+    - assets/ui/powerups/
+    - assets/ui/abilities/
+    - assets/audio/sfx/
+    - assets/audio/private/
   fonts:
     - family: Cairo
       fonts:

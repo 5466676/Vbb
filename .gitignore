@@ -16,3 +16,4 @@ __pycache__/
 
 # Home server data (SQLite file, secrets, logs)
 backend/data/
+

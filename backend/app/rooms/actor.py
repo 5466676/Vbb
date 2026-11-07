@@ -302,6 +302,9 @@ class RoomActor:
         seat = r.seat_of(pid)
         if seat is None:
             raise RoomError("not_in_room", "you are not in this room")
+        if type_ == "resync":  # the client lost track: send everything again
+            await self._send([pid], "full_state", self.full_state(pid))
+            return
         if r.status is RoomStatus.LOBBY:
             await self._lobby_message(pid, seat, type_, p)
             return

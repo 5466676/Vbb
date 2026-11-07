@@ -564,7 +564,10 @@ def _resolve_picks(state: MatchState, rng: Rng, ev: list[Event]) -> None:
             t.owner = seat
             state.players[seat].first_pick_done = True
             ev.append(
-                Event(type="territory_claimed", data={"seat": seat, "territory": tid, "auto": auto})
+                Event(
+                    type="territory_claimed",
+                    data={"seat": seat, "territory": tid, "auto": auto, "value": t.value},
+                )
             )
     state.pick_quota = {}
     state.picks = {}

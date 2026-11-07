@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 from collections.abc import AsyncIterator
+from pathlib import Path
 
 from fastapi import FastAPI, WebSocket
 from redis.asyncio import Redis
@@ -90,6 +91,11 @@ def create_app(
     app.include_router(auth_router)
     app.include_router(admin_router)
     app.include_router(sync_router)
+
+    if settings.web_dir and Path(settings.web_dir).is_dir():
+        from fastapi.staticfiles import StaticFiles
+
+        app.mount("/play", StaticFiles(directory=settings.web_dir, html=True), name="web")
 
     @app.websocket("/ws")
     async def ws_endpoint(ws: WebSocket) -> None:

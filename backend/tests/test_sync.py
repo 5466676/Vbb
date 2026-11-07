@@ -68,7 +68,7 @@ async def test_health_and_question_download(api):
     h = (await api.get("/health")).json()
     assert h["status"] == "ok" and h["server_time_ms"] > 0
     qs = await solo_questions(api)
-    assert 90 <= len(qs) <= 110  # a third of the seed is the offline pack
+    assert 400 <= len(qs) <= 470  # a third of the built-in bank is the offline pack
     assert {q["kind"] for q in qs} == {"mcq", "numeric"}
     assert all("text" in q and q["version"] > 0 for q in qs)
     general = (await api.get("/admin/questions?pack=general&limit=1", headers=ADMIN)).json()

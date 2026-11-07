@@ -45,11 +45,6 @@
   "license": "CC0"
  },
  {
-  "file": "sfx/defeat.ogg",
-  "source": "jingleSounds_Kenney/OGG/jingles_NES/jingles_NES11.ogg",
-  "license": "CC0"
- },
- {
   "file": "sfx/eliminated.ogg",
   "source": "single/mystery_sting.ogg",
   "license": "CC0"
@@ -128,5 +123,115 @@
   "file": "sfx/wrong.ogg",
   "source": "kenney_interfaceSounds/Audio/error_005.ogg",
   "license": "CC0"
+ },
+ {
+  "file": "sfx/ability.ogg",
+  "source": "100-CC0-SFX_0/gong_01.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/double.ogg",
+  "source": "jingleSounds_Kenney/OGG/jingles_SAX/jingles_SAX06.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/hint.ogg",
+  "source": "magic/magic_words.wav",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/menu_open.ogg",
+  "source": "book_flips_-_starninjas/book_flip.3.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/player_back.ogg",
+  "source": "kenney_interfaceSounds/Audio/maximize_003.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/player_left.ogg",
+  "source": "ui_ogg/ui_ogg/negative_sound2.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/remove_two.ogg",
+  "source": "swishes/swishes/swish-7.wav",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/round_start.ogg",
+  "source": "100-CC0-SFX_0/gong_02.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/shield.ogg",
+  "source": "impact_-_starninjas/impact.9.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/time_up.ogg",
+  "source": "ui_ogg/ui_ogg/alarm.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/capture_generic.ogg",
+  "source": "ElevenLabs: A large army of soldiers shouting a short battle cry together on a battlefield, deep male voices, no words",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/countdown.ogg",
+  "source": "ElevenLabs: Tense cinematic build: low drums getting faster for three beats, ending with a big impact and horn",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/defeat.ogg",
+  "source": "ElevenLabs: Sad distant war horn over a slow low drum, an army retreating, mournful",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/extra_turn.ogg",
+  "source": "ElevenLabs: Quick sword unsheathing followed by a short battle shout from one warrior",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/tiebreak.ogg",
+  "source": "ElevenLabs: Tense cinematic riser with war drums and a sharp sword unsheathing at the end",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/victory.ogg",
+  "source": "ElevenLabs: Victorious army roar: hundreds of soldiers cheer and bang swords on shields, a war horn sounds at the end",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/your_turn.ogg",
+  "source": "ElevenLabs: A single short low war horn call",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_crusader.ogg",
+  "source": "ElevenLabs: Medieval European knights charge: armored horses galloping, chain mail clanking, knights roar a wordless battle cry, a trumpet call",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_mongol.ogg",
+  "source": "ElevenLabs: Mongol horde cavalry war cry: many horses galloping, riders shouting high-pitched wordless ululations, horse neighs, arrows whistling, short and sharp, two seconds",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_pharaoh.ogg",
+  "source": "ElevenLabs: Ancient Egyptian army charge: war chariot wheels rumbling, horses, soldiers shouting a wordless cry, a ram's horn and sistrum rattle",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_roman.ogg",
+  "source": "ElevenLabs: Roman legion: soldiers shout a short unified 'Ha!' together and strike their shields with swords in rhythm, then a Roman cornu horn blast",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
+ },
+ {
+  "file": "sfx/capture_ww2.ogg",
+  "source": "ElevenLabs: World War Two infantry charge: soldiers shouting a wordless 'hurrah!' together as they run, boots on mud, distant artillery booms",
+  "license": "generated with ElevenLabs (owner's account, personal use)"
  }
 ]

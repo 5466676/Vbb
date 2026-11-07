@@ -1,0 +1,231 @@
+/// Client-side view of the room and the match, built only from server events.
+library;
+
+class Seat {
+  Seat({
+    required this.seat,
+    required this.playerId,
+    required this.name,
+    required this.army,
+    required this.ready,
+    required this.bot,
+    required this.connected,
+  });
+  final int seat;
+  final String? playerId;
+  final String name;
+  final String army;
+  final bool ready;
+  final String? bot;
+  final bool connected;
+
+  factory Seat.fromJson(Map<String, dynamic> j) => Seat(
+    seat: j['seat'] as int,
+    playerId: j['player_id'] as String?,
+    name: (j['name'] ?? '') as String,
+    army: (j['army'] ?? 'islamic') as String,
+    ready: (j['ready'] ?? false) as bool,
+    bot: j['bot'] as String?,
+    connected: (j['connected'] ?? true) as bool,
+  );
+}
+
+class RoomView {
+  RoomView({
+    required this.code,
+    required this.host,
+    required this.status,
+    required this.settings,
+    required this.seats,
+    required this.votes,
+    required this.quick,
+  });
+  final String code;
+  final String? host;
+  final String status; // lobby | playing | ended
+  final Map<String, dynamic> settings;
+  final List<Seat> seats;
+  final Map<String, String> votes;
+  final bool quick;
+
+  factory RoomView.fromJson(Map<String, dynamic> j) => RoomView(
+    code: j['code'] as String,
+    host: j['host'] as String?,
+    status: (j['status'] ?? 'lobby') as String,
+    settings: (j['settings'] as Map?)?.cast<String, dynamic>() ?? {},
+    seats: [for (final s in (j['seats'] as List? ?? [])) Seat.fromJson((s as Map).cast<String, dynamic>())],
+    votes: ((j['votes'] as Map?) ?? {}).map((k, v) => MapEntry('$k', '$v')),
+    quick: (j['quick'] ?? false) as bool,
+  );
+}
+
+class Territory {
+  Territory({
+    required this.id,
+    this.owner,
+    this.value = 200,
+    this.isBase = false,
+    this.towers = 0,
+    this.shielded = false,
+  });
+  final int id;
+  int? owner;
+  int value;
+  bool isBase;
+  int towers;
+  bool shielded;
+}
+
+class PlayerView {
+  PlayerView({
+    required this.seat,
+    required this.name,
+    required this.army,
+    required this.team,
+    required this.bot,
+    this.score = 0,
+    this.eliminated = false,
+    this.connected = true,
+    this.abilityUsed = false,
+    this.powerups = const [],
+    this.powerupCount = 4,
+  });
+  final int seat;
+  final String name;
+  final String army;
+  final int team;
+  final bool bot;
+  int score;
+  bool eliminated;
+  bool connected;
+  bool abilityUsed;
+  List<String> powerups; // only known for me
+  int powerupCount;
+}
+
+class QuestionView {
+  QuestionView({
+    required this.id,
+    required this.kind,
+    required this.text,
+    required this.unit,
+    required this.options,
+    required this.participant,
+    required this.participants,
+    required this.timeMs,
+    required this.receivedAt,
+  });
+  final String id;
+  final String kind; // mcq | numeric
+  final String text;
+  final String unit;
+  final List<String> options;
+  final bool participant;
+  final List<int> participants;
+  final int timeMs;
+  final DateTime receivedAt;
+  int? myChoice;
+  double? myValue;
+  final Set<int> locked = {}; // seats that answered
+  Set<int> removed = {}; // remove_two result
+  double? hintLow, hintHigh;
+
+  // after question_result
+  int? correctIndex;
+  double? answer;
+  List<int> ranking = const [];
+  Map<int, Map<String, dynamic>> answers = const {};
+  bool get resolved => correctIndex != null || answer != null;
+  bool get answered => myChoice != null || myValue != null;
+}
+
+class Ticker {
+  Ticker(this.text, this.seat);
+  final String text;
+  final int? seat;
+  final DateTime at = DateTime.now();
+}
+
+class MatchView {
+  MatchView({
+    required this.mapId,
+    required this.mapKind,
+    required this.mode,
+    required this.rounds,
+    required this.baseTowers,
+    required this.players,
+    required this.bases,
+  });
+  final String mapId;
+  final String mapKind;
+  final String mode;
+  final int rounds;
+  final int baseTowers;
+  final List<PlayerView> players;
+  final List<int> bases;
+  final Map<int, Territory> territories = {};
+  int? mySeat;
+
+  String phase = 'starting';
+  int phaseId = 0;
+  DateTime? opensAt;
+  DateTime? deadline;
+  int expansionRound = 0;
+  int battleRound = 0;
+  int? attacker;
+  int? defender;
+  int? duelTerritory;
+  List<int> targets = const [];
+  Map<int, int> quota = const {};
+  List<int> myPicks = [];
+  QuestionView? question;
+  final List<Ticker> ticker = [];
+  int? lastCaptured;
+  int? flash; // territory to highlight briefly (claim, capture, hit)
+
+  // results
+  List<Map<String, dynamic>>? standings;
+  int? winnerTeam;
+
+  bool get ended => standings != null;
+  PlayerView? get me => mySeat == null ? null : players[mySeat!];
+  bool get myTurn => phase == 'battle_target' && attacker != null && attacker == mySeat;
+
+  Territory terr(int id) => territories.putIfAbsent(id, () => Territory(id: id));
+
+  void log(String text, [int? seat]) {
+    ticker.insert(0, Ticker(text, seat));
+    if (ticker.length > 30) ticker.removeLast();
+  }
+}
+
+class GameState {
+  const GameState({this.online = false, this.room, this.match, this.queued, this.error, this.version = 0});
+  final bool online;
+  final RoomView? room;
+  final MatchView? match;
+  final Map<String, dynamic>? queued; // quick match waiting
+  final String? error;
+  final int version; // bumps on every change (match is mutated in place)
+
+  GameState copy({
+    bool? online,
+    RoomView? room,
+    MatchView? match,
+    Map<String, dynamic>? queued,
+    String? error,
+    bool clearRoom = false,
+    bool clearMatch = false,
+    bool clearQueued = false,
+    bool clearError = false,
+  }) {
+    return GameState(
+      online: online ?? this.online,
+      room: clearRoom ? null : (room ?? this.room),
+      match: clearMatch ? null : (match ?? this.match),
+      queued: clearQueued ? null : (queued ?? this.queued),
+      error: clearError ? null : (error ?? this.error),
+      version: version + 1,
+    );
+  }
+}
