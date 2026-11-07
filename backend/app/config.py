@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     jwt_ttl_days: int = 30
     admin_key: str = "dev-admin-key"
 
+    # question bank: use only questions the owner marked as reviewed
+    only_reviewed_questions: bool = False
+    seen_window_days: int = 30
+
     # identity of this server process (several workers can share Redis)
     worker_id: str = Field(default_factory=lambda: uuid.uuid4().hex[:12])
     # multiply every room-side duration (timers, pauses, bot thinking). Tests use ~0.02.

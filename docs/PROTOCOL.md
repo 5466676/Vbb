@@ -6,7 +6,8 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 ## Connecting
 
 1. `POST /auth/guest` `{"device_id": "<8–128 chars>", "name": "<optional, ≤24>"}`
-   → `{"token", "player_id", "name"}`. The same device always gets the same `player_id`.
+   → `{"token", "player_id", "name"}`. The same device always gets the same `player_id` (stored in
+   PostgreSQL); a login without `name` keeps the stored name.
 2. Open `ws://<host>/ws` with the header `Authorization: Bearer <token>`
    (`?token=<token>` also works but ends up in access logs; avoid it).
    - Close code **4401**: bad or expired token. Close code **4001**: the same player opened a newer connection.
@@ -48,7 +49,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `set_ready` | `{"ready": bool}` | lobby |
 | `choose_army` | `{"army": Army}` | lobby |
 | `vote_map` | `{"kind": "fantasy"\|"world"}` | lobby; majority wins, ties at random |
-| `update_settings` | `{"mode"?, "max_players"?, "battle_rounds"?, "bots_allowed"?, "categories"?}` | host, lobby |
+| `update_settings` | `{"mode"?, "max_players"?, "battle_rounds"?, "bots_allowed"?, "categories"?: [str], "packs"?: [str]}` | host, lobby. `categories` ⊂ the 8 categories (empty = all); `packs` 1–5 question packs (default `["general"]`) |
 | `add_bot` | `{"difficulty": "easy"\|"medium"\|"hard"}` | host, lobby |
 | `remove_bot` | `{"seat": int}` | host, lobby |
 | `start_match` | `{}` | host; needs ≥2 seats, every human ready; teams need 4/6/8 |
@@ -144,6 +145,19 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 `bad_map`, `bad_settings`, `no_bots`, `bad_bot`, `bad_seat`, `bad_queue`, `not_playing`, `left`,
 `no_question`, `bad_answer`, `bad_powerup`, `rule` (the game rules refused the action; `message` says why),
 `internal`.
+
+## Admin REST (question bank)
+
+Not used by the game client. Every call needs the header `X-Admin-Key` (setting `HARB_ADMIN_KEY`).
+
+| call | notes |
+|---|---|
+| `POST /admin/questions/import?pack=&source=&license=&reviewed=` | body: JSON list of questions → `{"inserted", "duplicates", "errors": [{"row", "error"}]}` |
+| `POST /admin/questions/import-file?…` | multipart `file`: `.json` or `.csv` (header `type,category,difficulty,text_ar,option_1..option_4,correct_index,numeric_answer,unit_ar,source`), ≤ 5 MB |
+| `GET /admin/questions?pack=&category=&type=&reviewed=&offset=&limit=` | `{"total", "items"}` |
+| `GET /admin/questions/stats` | counts per pack / category / type / reviewed |
+| `PATCH /admin/questions/{id}` | any question field, or `reviewed`; invalid result → 422 |
+| `DELETE /admin/questions/{id}` | 204 |
 
 ## Names compared with the brief
 

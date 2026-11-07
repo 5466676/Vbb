@@ -226,3 +226,38 @@ bad token. 116 tests in total.
 (api + redis + postgres, time scale 1): full FFA match through a room code in 425 s (7.1 min), 0 errors
 on the clients, no exceptions in the server log. The fake players answer at random and early, so real
 matches will run longer.
+
+## Phase 5 — Question bank (2026-11-07)
+
+**Built:** PostgreSQL models + Alembic migration (`players`, `questions`, `seen_questions`), guest
+login moved from Redis to `players` (same device → same id, stored name kept), the question bank
+(`app/questions/bank.py`), the admin API (`/admin/questions…`, `X-Admin-Key`), CSV/JSON import, and
+a seed of 304 Arabic questions (38 per category, 8 categories, MCQ + numeric, correct option spread
+over all four positions). The Docker image runs `alembic upgrade head` and the seed (idempotent)
+before uvicorn.
+
+**Selection per question:** never a question already used in the match; skip questions any human in
+the room saw in the last 30 days (`seen_window_days`); rotate difficulty 1/2/3 (least used so far);
+if everything was seen, the one these players saw longest ago. Rooms filter by `categories` and
+`packs` (`update_settings`). If the bank has nothing for the filters the room falls back to the
+built-in sample set, so a match never stalls.
+
+**Review:** imported and seed questions are `reviewed=false`. `HARB_ONLY_REVIEWED_QUESTIONS=true`
+serves only reviewed ones (turn it on for production once the bank is reviewed). The seed was written
+by us; the owner should review it in the admin API before launch.
+
+**Packs:** each question has a `pack` (`general` by default) plus `source` and `license`. Curriculum
+packs (e.g. a school grade) plug in through `app/questions/packs.py` (`PackSource` + `sync_pack`).
+
+**Open question sources checked:**
+- EXAMS (Arabic part, ~560 school-exam MCQs) — CC BY-SA 4.0: usable with attribution and the same
+  licence; has OCR errors and religious quotations, so it needs review. Candidate for a separate pack.
+- ArabicMMLU — CC BY-NC-SA: non-commercial, **not usable**.
+- Open Trivia DB — English, CC BY-SA 4.0: would need translation; later maybe.
+- Other Arabic sets found were not trivia or had no clear licence.
+Decision: our own questions first; any CC BY-SA pack gets a credits screen in the app (phase 7).
+
+**Tests:** seed balance, import validation, duplicates, CSV, anti-repeat window, old views expire,
+no repeats in a match, difficulty rotation, category/pack/review filters, admin flow (auth, JSON and
+CSV import, list, review, invalid edit, delete), room setting validation. The rooms tests now run on a
+real temporary PostgreSQL (template DB migrated once, copied per test). 128 tests in total.

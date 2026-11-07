@@ -8,6 +8,7 @@ one match.
 from __future__ import annotations
 
 import random
+from collections.abc import Callable
 from typing import Protocol
 
 from app.engine.models import Question, QuestionKind
@@ -86,24 +87,27 @@ _NUMERIC = [
 
 
 class QuestionProvider(Protocol):
-    def next(self, kind: QuestionKind) -> Question: ...
+    async def next(
+        self, kind: QuestionKind, players: list[str], used_ids: list[str]
+    ) -> Question: ...
+
+
+ProviderFactory = Callable[[list[str], list[str]], QuestionProvider]  # (categories, packs)
 
 
 class SampleProvider:
-    def __init__(self, seed: int | None = None) -> None:
-        self.rnd = random.Random(seed)
-        self.used: set[str] = set()
+    """Built-in questions, used when no database bank is available (and in some tests)."""
 
-    def next(self, kind: QuestionKind) -> Question:
+    def __init__(self, categories: list[str] | None = None, packs: list[str] | None = None) -> None:
+        self.rnd = random.Random()
+
+    async def next(self, kind: QuestionKind, players: list[str], used_ids: list[str]) -> Question:
         pool = _MCQ if kind is QuestionKind.MCQ else _NUMERIC
         prefix = "m" if kind is QuestionKind.MCQ else "n"
         ids = [f"sample-{prefix}{i}" for i in range(len(pool))]
-        fresh = [i for i, qid in enumerate(ids) if qid not in self.used]
-        if not fresh:  # everything asked: start over
-            self.used -= set(ids)
-            fresh = list(range(len(pool)))
+        used = set(used_ids)
+        fresh = [i for i, qid in enumerate(ids) if qid not in used] or list(range(len(pool)))
         i = self.rnd.choice(fresh)
-        self.used.add(ids[i])
         if kind is QuestionKind.MCQ:
             text, *options = pool[i]
             order = list(range(4))

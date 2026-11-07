@@ -1,7 +1,4 @@
-"""Guest accounts: a JWT tied to a device id (brief §2, auth).
-
-The device -> player id mapping lives in Redis for now; phase 5 moves accounts to PostgreSQL.
-"""
+"""Guest accounts: a JWT tied to a device id (brief §2, auth)."""
 
 from __future__ import annotations
 
@@ -9,9 +6,12 @@ import time
 import uuid
 
 import jwt
-from redis.asyncio import Redis
+from sqlalchemy import func
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
+from app.models import Player
 
 ALGORITHM = "HS256"
 
@@ -20,22 +20,26 @@ class AuthError(Exception):
     pass
 
 
-async def guest_player_id(redis: Redis, device_id: str) -> str:
-    """Stable player id for a device (created on first use)."""
-    key = f"device:{device_id}"
-    new = uuid.uuid4().hex
-    await redis.set(key, new, nx=True)
-    return (await redis.get(key)).decode()
+async def guest_player_id(session: AsyncSession, device_id: str, name: str) -> tuple[str, str]:
+    """Stable player for a device (created on first use). Returns (player_id, name)."""
+    stmt = (
+        insert(Player)
+        .values(id=uuid.uuid4().hex, device_id=device_id, name=name)
+        .on_conflict_do_update(
+            index_elements=["device_id"],
+            set_={"last_seen_at": func.now(), **({"name": name} if name else {})},
+        )
+        .returning(Player.id, Player.name)
+    )
+    pid, stored = (await session.execute(stmt)).one()
+    await session.commit()
+    return pid, stored
 
 
 def create_token(settings: Settings, player_id: str, name: str) -> str:
     now = int(time.time())
-    payload = {
-        "sub": player_id,
-        "name": name,
-        "iat": now,
-        "exp": now + settings.jwt_ttl_days * 86400,
-    }
+    exp = now + settings.jwt_ttl_days * 86400
+    payload = {"sub": player_id, "name": name, "iat": now, "exp": exp}
     return jwt.encode(payload, settings.jwt_secret, algorithm=ALGORITHM)
 
 

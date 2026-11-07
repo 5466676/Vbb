@@ -9,13 +9,14 @@ from __future__ import annotations
 import secrets
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from redis.asyncio import Redis
 
 from app.bots.simple import Difficulty
 from app.engine.armies import Army
 from app.engine.models import MatchState, Mode
 from app.maps import MapKind
+from app.models.question import CATEGORIES, GENERAL_PACK
 
 CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"  # no 0/O/1/I/L
 CODE_LEN = 6
@@ -64,7 +65,23 @@ class RoomSettings(BaseModel):
     max_players: int = Field(default=8, ge=2, le=8)
     battle_rounds: int | None = Field(default=None, ge=1, le=30)
     bots_allowed: bool = True
-    categories: list[str] = Field(default_factory=list)  # empty = all (phase 5)
+    categories: list[str] = Field(default_factory=list)  # empty = all categories
+    packs: list[str] = Field(default_factory=lambda: [GENERAL_PACK], min_length=1, max_length=5)
+
+    @field_validator("categories")
+    @classmethod
+    def known_categories(cls, v: list[str]) -> list[str]:
+        unknown = [c for c in v if c not in CATEGORIES]
+        if unknown:
+            raise ValueError(f"unknown categories: {', '.join(unknown)}")
+        return list(dict.fromkeys(v))
+
+    @field_validator("packs")
+    @classmethod
+    def pack_names(cls, v: list[str]) -> list[str]:
+        if any(not (1 <= len(x) <= 40) for x in v):
+            raise ValueError("pack names are 1-40 characters")
+        return list(dict.fromkeys(v))
 
 
 class Seat(BaseModel):

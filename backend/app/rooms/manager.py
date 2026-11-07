@@ -17,7 +17,7 @@ from typing import Any
 from redis.asyncio import Redis
 
 from app.config import Settings
-from app.questions.provider import QuestionProvider, SampleProvider
+from app.questions.provider import ProviderFactory, SampleProvider
 from app.rooms import store
 from app.rooms.actor import RoomActor
 from app.rooms.bus import Bus
@@ -31,7 +31,7 @@ class RoomManager:
         redis: Redis,
         bus: Bus,
         settings: Settings,
-        provider_factory: Callable[[], QuestionProvider] = SampleProvider,
+        provider_factory: ProviderFactory = SampleProvider,
     ) -> None:
         self.redis = redis
         self.bus = bus

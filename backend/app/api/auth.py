@@ -22,6 +22,7 @@ class GuestOut(BaseModel):
 @router.post("/guest", response_model=GuestOut)
 async def guest(body: GuestIn, request: Request) -> GuestOut:
     state = request.app.state
-    pid = await guest_player_id(state.redis, body.device_id)
-    name = body.name.strip() or f"ضيف {pid[:4]}"
+    async with state.sessionmaker() as session:
+        pid, stored = await guest_player_id(session, body.device_id, body.name.strip())
+    name = stored or f"ضيف {pid[:4]}"
     return GuestOut(token=create_token(state.settings, pid, name), player_id=pid, name=name)

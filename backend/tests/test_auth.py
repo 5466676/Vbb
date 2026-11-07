@@ -15,7 +15,8 @@ async def test_same_device_gets_the_same_player(start_server):
         c = (await http.post(f"{url}/auth/guest", json={"device_id": "device-999999"})).json()
         bad = await http.post(f"{url}/auth/guest", json={"device_id": "x"})
     assert a["player_id"] == b["player_id"] != c["player_id"]
-    assert a["name"] == "سامي" and b["name"].startswith("ضيف")
+    assert a["name"] == b["name"] == "سامي"  # the stored name is kept
+    assert c["name"].startswith("ضيف")
     assert bad.status_code == 422
 
 

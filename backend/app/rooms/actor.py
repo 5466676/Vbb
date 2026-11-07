@@ -45,7 +45,7 @@ from app.engine.models import (
     UsePowerUp,
 )
 from app.maps import MapKind, load_template, map_for, template_id
-from app.questions.provider import QuestionProvider, SampleProvider
+from app.questions.provider import ProviderFactory, QuestionProvider, SampleProvider
 from app.rooms import store
 from app.rooms.bus import Bus
 from app.rooms.store import RoomData, RoomStatus, Seat
@@ -79,14 +79,15 @@ class RoomActor:
         redis: Redis,
         bus: Bus,
         settings: Settings,
-        provider_factory: Callable[[], QuestionProvider] = SampleProvider,
+        provider_factory: ProviderFactory = SampleProvider,
         on_stop: Callable[[str], None] | None = None,
     ) -> None:
         self.code = code
         self.redis = redis
         self.bus = bus
         self.settings = settings
-        self.provider = provider_factory()
+        self.provider_factory = provider_factory
+        self._provider: QuestionProvider | None = None
         self.on_stop = on_stop
         self.room: RoomData | None = None
         self.queue: asyncio.Queue[tuple[str, Any]] = asyncio.Queue()
@@ -101,17 +102,19 @@ class RoomActor:
         self.room = await store.load_room(self.redis, self.code)
         if self.room is None:
             raise RoomError("no_room", "room not found")
-        self.provider_used(self.room.used_questions)
         self._sub = await self.bus.subscribe(store.ch_room_in(self.code), self._notify)
         for name, timer in list(self.room.timers.items()):  # recover timers after a takeover
             self._arm(name, max(0, timer.at_ms - now_ms()) / 1000)
         self.task = asyncio.create_task(self._run())
         self.queue.put_nowait(("drain", None))
 
-    def provider_used(self, ids: list[str]) -> None:
-        used = getattr(self.provider, "used", None)
-        if isinstance(used, set):
-            used.update(ids)
+    def provider(self) -> QuestionProvider:
+        assert self.room is not None
+        if self._provider is None:
+            self._provider = self.provider_factory(
+                self.room.settings.categories, self.room.settings.packs
+            )
+        return self._provider
 
     async def stop(self) -> None:
         for h in self.handles.values():
@@ -448,6 +451,7 @@ class RoomActor:
         )
         r.status = RoomStatus.PLAYING
         r.autostart_at_ms = None
+        self._provider = None  # settings are final now
         self._cancel("autostart")
         tpl = load_template(template_id(r.map_kind, n))
         await self._send(
@@ -691,7 +695,7 @@ class RoomActor:
         if name == "provide":
             if m.pending_question is None:
                 return
-            q = self.provider.next(m.pending_question)
+            q = await self.provider().next(m.pending_question, r.humans(), r.used_questions)
             r.used_questions.append(q.id)
             await self._apply(ProvideQuestion(question=q))
         elif name.startswith("phase:"):

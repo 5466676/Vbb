@@ -30,6 +30,10 @@ Target match length 8–12 minutes.
 # backend
 cd backend && pip install -e ".[dev]" && pytest -W error
 ruff check backend
+# database (the Docker image does this on start)
+cd backend && alembic upgrade head && python -m app.questions.seed
+# import a question pack (CSV/JSON); X-Admin-Key = HARB_ADMIN_KEY
+curl -H "X-Admin-Key: $KEY" -F file=@pack.csv "localhost:8000/admin/questions/import-file?pack=general&license=CC0"
 # map templates (offline; needs the maps extra)
 cd backend && pip install -e ".[maps]" && python -m maps.generate --preview /tmp/maps
 # full stack
