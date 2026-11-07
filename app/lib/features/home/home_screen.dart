@@ -9,6 +9,7 @@ import '../../app/ui_kit.dart';
 import '../../core/api.dart';
 import '../../core/armies.dart';
 import '../../core/settings_store.dart';
+import '../../core/sound.dart';
 import '../game/game_controller.dart';
 import 'category_picker.dart';
 
@@ -80,7 +81,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> _offline() async {
     final choice = await showDialog<({int bots, String level, String map, List<String> categories, bool open})>(
       context: context,
-      builder: (c) => const _OfflineDialog(),
+      builder: (c) => _OfflineDialog(
+        army: ref.read(settingsProvider).army,
+        onArmy: (a) {
+          ref.read(settingsProvider).setArmy(a);
+          ref.read(soundProvider).capture(a); // the army's war cry
+        },
+      ),
     );
     if (choice == null || !mounted) return;
     await ref
@@ -269,7 +276,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
 /// Offline match setup: how many bots, how strong, which map.
 class _OfflineDialog extends StatefulWidget {
-  const _OfflineDialog();
+  const _OfflineDialog({required this.army, required this.onArmy});
+  final String army;
+  final void Function(String) onArmy;
 
   @override
   State<_OfflineDialog> createState() => _OfflineDialogState();
@@ -281,6 +290,7 @@ class _OfflineDialogState extends State<_OfflineDialog> {
   String _map = 'fantasy';
   List<String> _categories = const [];
   bool _open = true;
+  late String _army = widget.army;
 
   @override
   Widget build(BuildContext context) {
@@ -305,105 +315,164 @@ class _OfflineDialogState extends State<_OfflineDialog> {
         constraints: const BoxConstraints(maxWidth: 520),
         child: WoodPanel(
           padding: const EdgeInsets.fromLTRB(22, 14, 22, 16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const RuqaaTitle('مجلس الحرب', size: 32),
-              const SizedBox(height: 12),
-              row(
-                'الخصوم',
-                Row(
-                  children: [
-                    _Step(icon: Icons.remove, onTap: _bots > 1 ? () => setState(() => _bots--) : null),
-                    Expanded(
-                      child: SizedBox(
-                        height: 40,
-                        child: Center(
-                          child: Wrap(
-                            spacing: -10,
-                            children: [
-                              for (var i = 0; i < _bots; i++)
-                                CircleAvatar(
-                                  radius: 17,
-                                  backgroundColor: AppColors.seat(i + 1),
-                                  child: CircleAvatar(
-                                    radius: 15,
-                                    backgroundImage: AssetImage(armies[(i * 3 + 1) % armies.length].commander),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const RuqaaTitle('مجلس الحرب', size: 32),
+                const SizedBox(height: 12),
+                // your army: portrait, perk and ability
+                SizedBox(
+                  height: 64,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      for (final a in armies)
+                        Semantics(
+                          button: true,
+                          selected: a.id == _army,
+                          label: a.name,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() => _army = a.id);
+                              widget.onArmy(a.id);
+                            },
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 150),
+                              width: 56,
+                              height: 56,
+                              margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+                              padding: const EdgeInsets.all(2.5),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: a.id == _army ? AppColors.gold : const Color(0xFF3A2414),
+                                boxShadow: [
+                                  if (a.id == _army) const BoxShadow(color: Color(0xAAFFC233), blurRadius: 10),
+                                ],
+                              ),
+                              child: ClipOval(child: Image.asset(a.commander, fit: BoxFit.cover)),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Builder(
+                  builder: (context) {
+                    final a = armyOf(_army);
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Text.rich(
+                        TextSpan(
+                          children: [
+                            TextSpan(
+                              text: '${a.name}  ',
+                              style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w900, fontSize: 16),
+                            ),
+                            TextSpan(text: 'ميزة: ${a.perk}  •  قدرة «${a.abilityName}»: ${a.ability}'),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Color(0xFFE9D6AC), fontSize: 12.5, height: 1.4),
+                      ),
+                    );
+                  },
+                ),
+                row(
+                  'الخصوم',
+                  Row(
+                    children: [
+                      _Step(icon: Icons.remove, onTap: _bots > 1 ? () => setState(() => _bots--) : null),
+                      Expanded(
+                        child: SizedBox(
+                          height: 40,
+                          child: Center(
+                            child: Wrap(
+                              spacing: -10,
+                              children: [
+                                for (var i = 0; i < _bots; i++)
+                                  CircleAvatar(
+                                    radius: 17,
+                                    backgroundColor: AppColors.seat(i + 1),
+                                    child: CircleAvatar(
+                                      radius: 15,
+                                      backgroundImage: AssetImage(armies[(i * 3 + 1) % armies.length].commander),
+                                    ),
                                   ),
-                                ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
+                      _Step(icon: Icons.add, onTap: _bots < 7 ? () => setState(() => _bots++) : null),
+                    ],
+                  ),
+                ),
+                row(
+                  'الصعوبة',
+                  BannerChoice(
+                    options: const [('easy', 'سهل'), ('medium', 'متوسط'), ('hard', 'صعب')],
+                    value: _level,
+                    onChanged: (v) => setState(() => _level = v),
+                  ),
+                ),
+                row(
+                  'الأسئلة',
+                  SizedBox(
+                    height: 40,
+                    child: WarButton(
+                      label: _categories.isEmpty ? 'كل الفئات' : '${_categories.length} فئات مختارة',
+                      icon: Icons.category,
+                      height: 40,
+                      fontSize: 15,
+                      onPressed: () async {
+                        final c = await pickCategories(context, _categories);
+                        if (c != null) setState(() => _categories = c);
+                      },
                     ),
-                    _Step(icon: Icons.add, onTap: _bots < 7 ? () => setState(() => _bots++) : null),
+                  ),
+                ),
+                row(
+                  'المدة',
+                  BannerChoice(
+                    options: const [(true, 'مفتوحة'), (false, 'بالجولات')],
+                    value: _open,
+                    onChanged: (v) => setState(() => _open = v),
+                  ),
+                ),
+                row(
+                  'الخريطة',
+                  BannerChoice(
+                    options: const [('fantasy', 'خيالية'), ('world', 'العالم')],
+                    value: _map,
+                    onChanged: (v) => setState(() => _map = v),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: WarButton(
+                        label: 'للمعركة!',
+                        kind: WarButtonKind.seal,
+                        onPressed: () => Navigator.pop(context, (
+                          bots: _bots,
+                          level: _level,
+                          map: _map,
+                          categories: _categories,
+                          open: _open,
+                        )),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: WarButton(label: 'إلغاء', onPressed: () => Navigator.pop(context)),
+                    ),
                   ],
                 ),
-              ),
-              row(
-                'الصعوبة',
-                BannerChoice(
-                  options: const [('easy', 'سهل'), ('medium', 'متوسط'), ('hard', 'صعب')],
-                  value: _level,
-                  onChanged: (v) => setState(() => _level = v),
-                ),
-              ),
-              row(
-                'الأسئلة',
-                SizedBox(
-                  height: 40,
-                  child: WarButton(
-                    label: _categories.isEmpty ? 'كل الفئات' : '${_categories.length} فئات مختارة',
-                    icon: Icons.category,
-                    height: 40,
-                    fontSize: 15,
-                    onPressed: () async {
-                      final c = await pickCategories(context, _categories);
-                      if (c != null) setState(() => _categories = c);
-                    },
-                  ),
-                ),
-              ),
-              row(
-                'المدة',
-                BannerChoice(
-                  options: const [(true, 'مفتوحة'), (false, 'بالجولات')],
-                  value: _open,
-                  onChanged: (v) => setState(() => _open = v),
-                ),
-              ),
-              row(
-                'الخريطة',
-                BannerChoice(
-                  options: const [('fantasy', 'خيالية'), ('world', 'العالم')],
-                  value: _map,
-                  onChanged: (v) => setState(() => _map = v),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: WarButton(
-                      label: 'للمعركة!',
-                      kind: WarButtonKind.seal,
-                      onPressed: () => Navigator.pop(context, (
-                        bots: _bots,
-                        level: _level,
-                        map: _map,
-                        categories: _categories,
-                        open: _open,
-                      )),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: WarButton(label: 'إلغاء', onPressed: () => Navigator.pop(context)),
-                  ),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

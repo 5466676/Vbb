@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -273,11 +274,18 @@ class _PhaseBanner extends StatelessWidget {
         : win == null
         ? '  •  جولة المعارك ${m.battleRound}/${m.rounds}'
         : '  •  الجولة ${m.battleRound}  •  للفوز ${(win * 100).round()}٪ من الخريطة';
+    final timed = m.phase == 'expansion_picks' || m.phase == 'battle_target';
     return _Ribbon(
       highlight: m.myTurn || (m.phase == 'expansion_picks' && (m.quota[m.mySeat] ?? 0) > 0),
-      child: Text(
-        '$text$round',
-        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.ink, height: 1.3),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            '$text$round',
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: AppColors.ink, height: 1.3),
+          ),
+          if (timed && m.deadline != null) ...[const SizedBox(width: 8), _Countdown(until: m.deadline!)],
+        ],
       ),
     );
   }
@@ -891,6 +899,45 @@ class _NextNote extends StatelessWidget {
       curve: Curves.elasticOut,
       builder: (context, s, child) => Transform.scale(scale: s, child: child),
       child: chip,
+    );
+  }
+}
+
+/// Seconds left in the current stage, as a small seal that turns red at the end.
+class _Countdown extends StatefulWidget {
+  const _Countdown({required this.until});
+  final DateTime until;
+
+  @override
+  State<_Countdown> createState() => _CountdownState();
+}
+
+class _CountdownState extends State<_Countdown> {
+  late final Timer _t = Timer.periodic(const Duration(milliseconds: 250), (_) => setState(() {}));
+
+  @override
+  void dispose() {
+    _t.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final left = (widget.until.difference(DateTime.now()).inMilliseconds / 1000).ceil().clamp(0, 99);
+    return Container(
+      width: 30,
+      height: 30,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: left <= 3 ? AppColors.bad : const Color(0xFF3A2414),
+        border: Border.all(color: const Color(0xFFFFC233), width: 1.5),
+      ),
+      child: Center(
+        child: Text(
+          '$left',
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13, height: 1.1),
+        ),
+      ),
     );
   }
 }

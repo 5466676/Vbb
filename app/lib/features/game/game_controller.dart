@@ -462,6 +462,14 @@ class GameController extends Notifier<GameState> {
           ..value = (p['value'] ?? 200) as int;
         m.flash = t.id;
         m.effect(Fx('claim', t.id, seat: t.owner));
+        final auto = (p['auto'] ?? false) == true;
+        m.log(
+          t.owner == m.mySeat
+              ? (auto ? 'خلص وقتك: أخدنالك أقرب أرض' : 'أخدت أرض جديدة')
+              : '${_name(m, t.owner)} أخد أرض${auto ? ' (تلقائي)' : ''}',
+          t.owner,
+          'capture',
+        );
         sound.play('claim');
       case 'battle_started':
         m.log('بدأت المعارك!', null, 'round');
