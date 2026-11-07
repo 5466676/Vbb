@@ -349,6 +349,7 @@ class BannerChoice<T> extends StatelessWidget {
       children: [
         for (final o in options)
           SizedBox(
+            width: 96,
             height: 40,
             child: WarButton(
               label: o.$2,

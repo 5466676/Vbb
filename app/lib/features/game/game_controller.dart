@@ -61,18 +61,30 @@ class GameController extends Notifier<GameState> {
   GameTransport get _t => _local ?? socket;
 
   /// A whole match against bots inside the app (no server). [bots] = difficulty per bot.
-  ({List<String> bots, String mapKind, bool teams})? _lastOffline;
+  ({List<String> bots, String mapKind, bool teams, List<String> categories})? _lastOffline;
 
   /// Same bots and map as the last offline match ("مباراة ثانية").
   Future<void> replayOffline() async {
     final l = _lastOffline;
-    if (l != null) await startOffline(bots: l.bots, mapKind: l.mapKind, teams: l.teams);
+    if (l != null) await startOffline(bots: l.bots, mapKind: l.mapKind, teams: l.teams, categories: l.categories);
   }
 
-  Future<void> startOffline({required List<String> bots, required String mapKind, bool teams = false}) async {
+  Future<void> startOffline({
+    required List<String> bots,
+    required String mapKind,
+    bool teams = false,
+    List<String> categories = const [],
+  }) async {
     await stopOffline();
-    _lastOffline = (bots: bots, mapKind: mapKind, teams: teams);
-    final g = LocalGame(name: _settings.name, army: _settings.army, bots: bots, mapKind: mapKind, teams: teams);
+    _lastOffline = (bots: bots, mapKind: mapKind, teams: teams, categories: categories);
+    final g = LocalGame(
+      name: _settings.name,
+      army: _settings.army,
+      bots: bots,
+      mapKind: mapKind,
+      teams: teams,
+      categories: categories,
+    );
     _local = g;
     _localSub = g.messages.listen(_on);
     state = state.copy(clearRoom: true, clearMatch: true, online: true);
@@ -91,7 +103,13 @@ class GameController extends Notifier<GameState> {
 
   // ------------------------------------------------------------------ actions
 
-  void createRoom() => _t.send('create_room', {'army': _settings.army});
+  List<String>? _roomCategories; // sent as the room's settings once the new room exists
+
+  void createRoom({List<String> categories = const []}) {
+    _roomCategories = categories.isEmpty ? null : categories;
+    _t.send('create_room', {'army': _settings.army});
+  }
+
   void joinRoom(String code) => _t.send('join_room', {'code': code.trim().toUpperCase(), 'army': _settings.army});
   void quickMatch(String mode, int size) =>
       _t.send('quick_match', {'mode': mode, 'size': size, 'army': _settings.army});
@@ -189,6 +207,11 @@ class GameController extends Notifier<GameState> {
         final before = state.room?.seats.length ?? 0;
         if (room.seats.length > before && before > 0) sound.play('match_found');
         state = state.copy(room: room, clearMatch: room.status == 'lobby' && (m?.ended ?? false));
+        final cats = _roomCategories;
+        if (cats != null && room.host == myId && room.status == 'lobby') {
+          _roomCategories = null;
+          updateSettings({'categories': cats});
+        }
       case 'left_room':
         state = state.copy(clearRoom: true, clearMatch: true);
       case 'full_state':

@@ -50,7 +50,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `set_ready` | `{"ready": bool}` | lobby |
 | `choose_army` | `{"army": Army}` | lobby |
 | `vote_map` | `{"kind": "fantasy"\|"world"}` | lobby; majority wins, ties at random |
-| `update_settings` | `{"mode"?, "max_players"?, "battle_rounds"?, "bots_allowed"?, "categories"?: [str], "packs"?: [str]}` | host, lobby. `categories` ⊂ the 8 categories (empty = all); `packs` 1–5 question packs (default `["general"]`, never `solo`) |
+| `update_settings` | `{"mode"?, "max_players"?, "battle_rounds"?, "bots_allowed"?, "categories"?: [str], "packs"?: [str]}` | host, lobby. `categories` ⊂ the 23 categories (`CATEGORIES` in `app/models/question.py`; empty = all); `packs` 1–5 question packs (default `["general"]`, never `solo`) |
 | `add_bot` | `{"difficulty": "easy"\|"medium"\|"hard"}` | host, lobby |
 | `remove_bot` | `{"seat": int}` | host, lobby |
 | `start_match` | `{}` | host; needs ≥2 seats, every human ready; teams need 4/6/8 |

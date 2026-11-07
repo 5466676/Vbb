@@ -182,7 +182,28 @@ def legal_picks(state: MatchState, seat: int) -> list[int]:
     if p.army is Army.WW2 and not p.first_pick_done:
         return free
     adjacent = [t for t in free if _touches(state, seat, t)]
-    return adjacent or free
+    return adjacent or _nearest_free(state, seat, free)
+
+
+def _nearest_free(state: MatchState, seat: int, free: list[int]) -> list[int]:
+    """The free territories the fewest steps away from the seat's land (BFS over the map)."""
+    frontier = owned(state, seat)
+    if not frontier:
+        return free
+    seen = set(frontier)
+    wanted = set(free)
+    while frontier:
+        hit = sorted(t for t in frontier if t in wanted)
+        if hit:
+            return hit
+        nxt = []
+        for t in frontier:
+            for n in state.neighbors[t]:
+                if n not in seen:
+                    seen.add(n)
+                    nxt.append(n)
+        frontier = nxt
+    return free
 
 
 def legal_targets(state: MatchState, seat: int) -> list[int]:

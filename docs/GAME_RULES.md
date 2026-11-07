@@ -91,7 +91,8 @@ LOBBY → STARTING → EXPANSION (×N, simultaneous) → BATTLE (×R rounds, tur
 4. **Picks are simultaneous** within one **5 s** window. If two players pick the same territory,
    the better-ranked player gets it; the other gets an auto-pick.
 5. A pick must touch the player's own land if any adjacent free territory exists;
-   otherwise any free territory is allowed.
+   otherwise only the free territories **nearest** to the player's land (fewest steps across the
+   map) are allowed — players grow outward from their base, never jump across the map.
 6. On timeout (or a lost conflict) the server auto-picks a legal territory.
 7. If fewer free territories remain than picks, they are handed out in rank order.
 

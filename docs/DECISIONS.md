@@ -433,3 +433,20 @@ look, starting with pace:
 - **Stage signs**: a wooden sign on chains drops for «تقاسم الأرض», «الحرب!», «الجولة N»,
   «تعادل!» and eliminations.
 - Protocol: `question` carries `category` (not secret).
+
+## Owner's map and setup requests (2026-11-07)
+
+- **Picks grow outward (rule change, asked by the owner):** GAME_RULES §6.1.5 — with no free
+  territory next to your land, only the free territories the fewest steps away are legal (BFS over
+  the map), instead of any free territory. Python engine, Dart engine and the client highlight agree.
+- **Fixed full-screen map:** no zoom or pan. The painting is scaled so the whole land fits and the
+  sea covers as much of the screen as possible; its edges fade into a matching sea colour, so there
+  is no visible rectangle. The painting is colour-mapped to the cartoon look (bright blue sea, cream
+  land), owners' colours are stronger, borders thicker, and each territory shows its owner's troops.
+- **Players on a top strip** (the map gets the full width); the war log is a short toast plus a
+  button that opens the whole log.
+- **Power-ups only when usable now:** a small row at the bottom appears on your attack turn or in a
+  question you are answering (shield and army abilities on your turn; فتح during expansion).
+- **Question categories before the match:** a picker with the 23 categories (or all) in the
+  offline setup and before creating an online room (sent as the room's `categories` setting).
+  Offline, a category set without questions of the needed kind falls back to all categories.

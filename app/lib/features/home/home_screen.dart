@@ -10,6 +10,7 @@ import '../../core/api.dart';
 import '../../core/armies.dart';
 import '../../core/settings_store.dart';
 import '../game/game_controller.dart';
+import 'category_picker.dart';
 
 /// Main menu over one of the four painted backgrounds.
 class HomeScreen extends ConsumerStatefulWidget {
@@ -22,6 +23,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   static final _bg = 1 + Random().nextInt(4);
   bool? _serverUp;
+  static List<String> _lastCategories = const [];
 
   @override
   void initState() {
@@ -76,20 +78,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _offline() async {
-    final choice = await showDialog<({int bots, String level, String map})>(
+    final choice = await showDialog<({int bots, String level, String map, List<String> categories})>(
       context: context,
       builder: (c) => const _OfflineDialog(),
     );
     if (choice == null || !mounted) return;
     await ref
         .read(gameProvider.notifier)
-        .startOffline(bots: List.filled(choice.bots, choice.level), mapKind: choice.map);
+        .startOffline(bots: List.filled(choice.bots, choice.level), mapKind: choice.map, categories: choice.categories);
     if (mounted) context.push('/play');
   }
 
   Future<void> _create() async {
     if (!await _ready() || !mounted) return;
-    ref.read(gameProvider.notifier).createRoom();
+    final cats = await pickCategories(context, _lastCategories);
+    if (cats == null || !mounted) return;
+    _lastCategories = cats;
+    ref.read(gameProvider.notifier).createRoom(categories: cats);
     context.push('/play');
   }
 
@@ -269,6 +274,7 @@ class _OfflineDialogState extends State<_OfflineDialog> {
   int _bots = 3;
   String _level = 'medium';
   String _map = 'fantasy';
+  List<String> _categories = const [];
 
   @override
   Widget build(BuildContext context) {
@@ -337,6 +343,22 @@ class _OfflineDialogState extends State<_OfflineDialog> {
                 ),
               ),
               row(
+                'الأسئلة',
+                SizedBox(
+                  height: 40,
+                  child: WarButton(
+                    label: _categories.isEmpty ? 'كل الفئات' : '${_categories.length} فئات مختارة',
+                    icon: Icons.category,
+                    height: 40,
+                    fontSize: 15,
+                    onPressed: () async {
+                      final c = await pickCategories(context, _categories);
+                      if (c != null) setState(() => _categories = c);
+                    },
+                  ),
+                ),
+              ),
+              row(
                 'الخريطة',
                 BannerChoice(
                   options: const [('fantasy', 'خيالية'), ('world', 'العالم')],
@@ -352,7 +374,8 @@ class _OfflineDialogState extends State<_OfflineDialog> {
                     child: WarButton(
                       label: 'للمعركة!',
                       kind: WarButtonKind.seal,
-                      onPressed: () => Navigator.pop(context, (bots: _bots, level: _level, map: _map)),
+                      onPressed: () =>
+                          Navigator.pop(context, (bots: _bots, level: _level, map: _map, categories: _categories)),
                     ),
                   ),
                   const SizedBox(width: 8),

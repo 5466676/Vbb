@@ -56,7 +56,25 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
       for (final l in t.seaLinks)
         if (mine.contains(l.a)) l.b else if (mine.contains(l.b)) l.a,
     }.intersection(free);
-    return near.isEmpty ? free : near;
+    if (near.isNotEmpty) return near;
+    // none adjacent: only the free land the fewest steps away (GAME_RULES §6.1.5)
+    List<int> links(int id) => [
+      ...t.byId(id).neighbors,
+      for (final l in t.seaLinks)
+        if (l.a == id) l.b else if (l.b == id) l.a,
+    ];
+    var frontier = mine.toList();
+    final seen = {...frontier};
+    while (frontier.isNotEmpty) {
+      final hit = frontier.where(free.contains).toSet();
+      if (hit.isNotEmpty) return hit;
+      frontier = [
+        for (final id in frontier)
+          for (final n in links(id))
+            if (seen.add(n)) n,
+      ];
+    }
+    return free;
   }
 
   void _tap(MatchView m, int id) {
@@ -105,30 +123,23 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            Row(
+            Column(
               children: [
-                SizedBox(width: 214, child: _SidePanel(match: m)),
+                _TopBar(match: m),
                 Expanded(
                   child: LayoutBuilder(
                     builder: (context, box) {
-                      // the open question takes the lower part; the map moves up instead of being covered
-                      const questionRoom = 0.0;
                       return Stack(
                         children: [
-                          // the same painting, darkened, fills the space around the map
-                          Positioned.fill(
-                            child: Image.asset(
-                              t.image,
-                              fit: BoxFit.cover,
-                              color: const Color(0xB0140C05),
-                              colorBlendMode: BlendMode.darken,
-                            ),
+                          // open sea around the map
+                          const Positioned.fill(
+                            child: DecoratedBox(decoration: BoxDecoration(color: Color(0xFF77B9C5))),
                           ),
                           Positioned(
                             left: 0,
                             right: 0,
                             top: 44,
-                            bottom: questionRoom,
+                            bottom: 0,
                             child: MapView(
                               template: t,
                               match: m,
@@ -149,18 +160,19 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                           if (m.phase.startsWith('battle') && m.roundOrder.isNotEmpty)
                             Positioned(
                               top: 46,
-                              left: 70,
+                              left: 0,
                               right: 0,
                               child: Center(
                                 child: IgnorePointer(child: TurnStrip(match: m)),
                               ),
                             ),
+                          if (!asking && !m.ended) Positioned(bottom: 8, right: 10, child: _LogToast(match: m)),
                           if (asking)
                             Positioned(
-                              left: 66,
+                              left: 6,
                               right: 6,
                               top: 44,
-                              bottom: 6,
+                              bottom: _ToolBar.usable(m).isEmpty ? 6 : 72,
                               child: AnimatedSwitcher(
                                 duration: const Duration(milliseconds: 250),
                                 transitionBuilder: (child, anim) => FadeTransition(
@@ -179,16 +191,18 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                                 ),
                               ),
                             ),
-                          if (!m.ended)
-                            Positioned(
-                              left: 6,
-                              top: 52,
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            bottom: 6,
+                            child: Center(
                               child: _ToolBar(
                                 match: m,
                                 mode: _territoryMode,
                                 onMode: (mode) => setState(() => _territoryMode = _territoryMode == mode ? null : mode),
                               ),
                             ),
+                          ),
                           if (m.banner != null)
                             Positioned.fill(
                               child: StageSign(key: ValueKey('sign${m.bannerId}'), text: m.banner!, sub: m.bannerSub),
@@ -327,172 +341,131 @@ class _RibbonPainter extends CustomPainter {
   bool shouldRepaint(_RibbonPainter old) => old.highlight != highlight;
 }
 
-/// Power-ups and the army ability: round brass medallions with a name under each,
-/// a count badge, and a lock when it cannot be used right now.
+/// Power-ups and the army ability: a small row at the bottom that appears only when the player
+/// can use something right now (their attack turn, or a question they are answering), so the map
+/// stays clear the rest of the time.
 class _ToolBar extends ConsumerWidget {
   const _ToolBar({required this.match, required this.mode, required this.onMode});
   final MatchView match;
   final String? mode;
   final void Function(String) onMode;
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final me = match.me;
-    if (me == null || me.eliminated) return const SizedBox.shrink();
-    final game = ref.read(gameProvider.notifier);
-    final q = match.question;
+  static List<(String asset, String label, String id)> usable(MatchView m) {
+    final me = m.me;
+    if (me == null || me.eliminated || m.ended) return const [];
+    final q = m.question;
     final inQuestion = q != null && q.participant && !q.answered && !q.resolved;
     final army = armyOf(me.army);
-    Widget tool(
-      String asset,
-      String label, {
-      required bool owned,
-      required bool now,
-      required VoidCallback onTap,
-      bool active = false,
-    }) {
-      final usable = owned && now;
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 4),
-        child: Tooltip(
-          message: label,
-          child: InkWell(
-            onTap: usable ? onTap : null,
-            borderRadius: BorderRadius.circular(30),
-            child: SizedBox(
-              width: 58,
-              child: Column(
-                children: [
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: active || usable
-                                ? const [Color(0xFFF0CF7A), Color(0xFF8A5A17)]
-                                : const [Color(0xFF6B5A44), Color(0xFF3A2E20)],
-                          ),
-                          boxShadow: [
-                            if (active) const BoxShadow(color: Color(0xAAFFD36B), blurRadius: 10, spreadRadius: 1),
-                            const BoxShadow(color: Color(0x99000000), blurRadius: 3, offset: Offset(0, 2)),
-                          ],
-                        ),
-                        child: ClipOval(
-                          child: ColorFiltered(
-                            colorFilter: owned
-                                ? const ColorFilter.mode(Colors.transparent, BlendMode.dst)
-                                : const ColorFilter.matrix([
-                                    0.3, 0.5, 0.1, 0, 0, //
-                                    0.3, 0.5, 0.1, 0, 0,
-                                    0.3, 0.5, 0.1, 0, 0,
-                                    0, 0, 0, 0.6, 0,
-                                  ]),
-                            child: Image.asset(asset, fit: BoxFit.cover),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: -2,
-                        left: -2,
-                        child: Container(
-                          width: 18,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: owned ? AppColors.seal : const Color(0xFF3A2E20),
-                            border: Border.all(color: AppColors.gold, width: 1),
-                          ),
-                          child: Center(
-                            child: owned && !now
-                                ? const Icon(Icons.lock_clock, size: 11, color: AppColors.textPrimary)
-                                : Text(
-                                    owned ? '1' : '0',
-                                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, height: 1.1),
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.fade,
-                    softWrap: false,
-                    style: TextStyle(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w800,
-                      color: usable ? AppColors.textPrimary : AppColors.textSecondary,
-                      shadows: const [Shadow(color: Colors.black, blurRadius: 3)],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
+    bool has(String p) => me.powerups.contains(p);
+    final abilityNow = me.army == 'islamic'
+        ? m.phase.startsWith('expansion') && (inQuestion || (m.quota[m.mySeat] ?? 0) > 0)
+        : m.myTurn;
+    return [
+      if (has('remove_two') && inQuestion && q.kind == 'mcq')
+        ('assets/ui/powerups/remove_two.webp', 'حذف جوابين', 'remove_two'),
+      if (has('hint') && inQuestion && q.kind == 'numeric') ('assets/ui/powerups/hint.webp', 'تلميح', 'hint'),
+      if (has('double') && m.myTurn) ('assets/ui/powerups/double.webp', 'مضاعفة', 'double'),
+      if (has('shield') && m.myTurn) ('assets/ui/powerups/shield.webp', 'درع', 'shield'),
+      if (!me.abilityUsed && abilityNow) (army.abilityIcon, army.abilityName, 'ability'),
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = usable(match);
+    if (items.isEmpty) return const SizedBox.shrink();
+    final game = ref.read(gameProvider.notifier);
+    final army = armyOf(match.me!.army);
+    void use(String id) {
+      switch (id) {
+        case 'shield':
+          onMode('shield');
+        case 'ability':
+          if (army.abilityNeedsTerritory) {
+            onMode('ability');
+          } else {
+            game.useAbility();
+          }
+        default:
+          game.usePowerup(id);
+      }
     }
 
-    bool has(String p) => me.powerups.contains(p);
-    return Column(
-      children: [
-        tool(
-          'assets/ui/powerups/remove_two.webp',
-          'حذف جوابين',
-          owned: has('remove_two'),
-          now: inQuestion && q.kind == 'mcq',
-          onTap: () => game.usePowerup('remove_two'),
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutBack,
+      builder: (context, v, child) => Transform.translate(offset: Offset(0, 30 * (1 - v)), child: child),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(10, 5, 10, 3),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF3D6),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFF3A2414), width: 2.5),
+          boxShadow: const [BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 3))],
         ),
-        tool(
-          'assets/ui/powerups/hint.webp',
-          'تلميح',
-          owned: has('hint'),
-          now: inQuestion && q.kind == 'numeric',
-          onTap: () => game.usePowerup('hint'),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (asset, label, id) in items)
+              Semantics(
+                button: true,
+                label: label,
+                child: GestureDetector(
+                  onTap: () => use(id),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: (id == 'shield' && mode == 'shield') || (id == 'ability' && mode == 'ability')
+                                ? const Color(0xFFFFC233)
+                                : const Color(0xFF3A2414),
+                          ),
+                          child: ClipOval(child: Image.asset(asset, fit: BoxFit.cover)),
+                        ),
+                        Text(
+                          label,
+                          style: const TextStyle(
+                            color: Color(0xFF2B1A0E),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w900,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
-        tool(
-          'assets/ui/powerups/double.webp',
-          'مضاعفة',
-          owned: has('double'),
-          now: match.myTurn,
-          onTap: () => game.usePowerup('double'),
-        ),
-        tool(
-          'assets/ui/powerups/shield.webp',
-          'درع',
-          owned: has('shield'),
-          now: match.phase.startsWith('battle'),
-          onTap: () => onMode('shield'),
-          active: mode == 'shield',
-        ),
-        tool(
-          army.abilityIcon,
-          army.abilityName,
-          owned: !me.abilityUsed,
-          now: true,
-          onTap: () {
-            if (army.abilityNeedsTerritory) {
-              onMode('ability');
-            } else {
-              game.useAbility();
-            }
-          },
-          active: mode == 'ability',
-        ),
-      ],
+      ),
     );
   }
 }
 
-/// Player cards (portrait, land value, territories, share bar, turn badges) and the war log.
-class _SidePanel extends StatelessWidget {
-  const _SidePanel({required this.match});
+IconData _logIcon(String kind) => switch (kind) {
+  'attack' => Icons.gps_fixed,
+  'capture' => Icons.flag,
+  'held' => Icons.shield,
+  'tower' => Icons.castle,
+  'out' => Icons.heart_broken,
+  'power' => Icons.auto_awesome,
+  'round' => Icons.hourglass_bottom,
+  _ => Icons.circle,
+};
+
+/// The players as a strip across the top (the map keeps the full width), richest first,
+/// and a button that opens the whole war log.
+class _TopBar extends StatelessWidget {
+  const _TopBar({required this.match});
   final MatchView match;
 
   @override
@@ -502,193 +475,292 @@ class _SidePanel extends StatelessWidget {
     int count(int seat) => m.territories.values.where((t) => t.owner == seat).length;
     final order = [...m.players]..sort((a, b) => land(b.seat).compareTo(land(a.seat)));
     final top = order.isEmpty ? 1 : max(1, land(order.first.seat));
-    return DecoratedBox(
+    return Container(
+      height: 58,
+      padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFF2E1F10), Color(0xFF1B120A)],
+          colors: [Color(0xFFB57A43), Color(0xFF8A5528)],
         ),
-        border: Border(left: BorderSide(color: Color(0xFF8A5A17), width: 2)),
+        border: Border(bottom: BorderSide(color: Color(0xFF3A2414), width: 3)),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Expanded(
-            flex: 3,
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(6, 6, 6, 0),
-              children: [
-                for (var i = 0; i < order.length; i++)
-                  _card(m, order[i], i, land(order[i].seat), count(order[i].seat), top),
-              ],
+          for (final p in order)
+            Expanded(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 230),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 3),
+                  child: _card(m, p, land(p.seat), count(p.seat), top),
+                ),
+              ),
             ),
-          ),
-          Container(
-            height: 22,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: Color(0xFF8A5A17))),
-            ),
-            child: const Text(
-              'سجلّ المعركة',
-              style: TextStyle(fontFamily: AppTheme.headingFont, color: AppColors.gold, fontSize: 15, height: 1.2),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              children: [
-                for (final (i, t) in m.ticker.take(14).indexed)
-                  Opacity(
-                    opacity: max(0.35, 1 - i * 0.08),
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 3),
-                      child: Row(
-                        children: [
-                          Icon(
-                            _logIcon(t.kind),
-                            size: 14,
-                            color: t.seat == null ? AppColors.gold : AppColors.seat(t.seat),
-                          ),
-                          const SizedBox(width: 5),
-                          Expanded(
-                            child: Text(
-                              t.text,
-                              maxLines: 2,
-                              style: TextStyle(
-                                fontSize: 12.5,
-                                height: 1.3,
-                                fontWeight: i == 0 ? FontWeight.w800 : FontWeight.w500,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
+          const SizedBox(width: 4),
+          _RoundButton(icon: Icons.receipt_long, tooltip: 'سجلّ المعركة', onTap: () => _showLog(context)),
         ],
       ),
     );
   }
 
-  static IconData _logIcon(String kind) => switch (kind) {
-    'attack' => Icons.gps_fixed,
-    'capture' => Icons.flag,
-    'held' => Icons.shield,
-    'tower' => Icons.castle,
-    'out' => Icons.heart_broken,
-    'power' => Icons.auto_awesome,
-    'round' => Icons.hourglass_bottom,
-    _ => Icons.circle,
-  };
-
-  Widget _card(MatchView m, PlayerView p, int rank, int value, int lands, int top) {
-    final c = AppColors.seat(p.seat);
-    final fighting = p.seat == m.attacker || p.seat == m.defender;
-    final answered = m.question?.locked.contains(p.seat) ?? false;
-    return Opacity(
-      opacity: p.eliminated ? 0.4 : 1,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 5),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          gradient: LinearGradient(
-            colors: [
-              c.withValues(alpha: fighting ? 0.55 : 0.28),
-              const Color(0xFF241709),
-            ],
-            begin: Alignment.centerRight,
-            end: Alignment.centerLeft,
-          ),
-          border: Border.all(
-            color: p.seat == m.mySeat ? AppColors.gold : c.withValues(alpha: 0.7),
-            width: p.seat == m.mySeat ? 2 : 1,
-          ),
-        ),
-        padding: const EdgeInsets.fromLTRB(5, 4, 5, 5),
-        child: Row(
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
+  void _showLog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (c) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420, maxHeight: 420),
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFF3D6),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFF3A2414), width: 3),
+            ),
+            child: Column(
               children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: c),
-                  child: ClipOval(child: Image.asset(armyOf(p.army).commander, fit: BoxFit.cover)),
+                const Text(
+                  'سجلّ المعركة',
+                  style: TextStyle(fontFamily: AppTheme.headingFont, fontSize: 26, color: Color(0xFF6E1A12)),
                 ),
-                if (p.seat == m.attacker || p.seat == m.defender)
-                  Positioned(
-                    top: -4,
-                    left: -4,
-                    child: _Badge(icon: p.seat == m.attacker ? Icons.gps_fixed : Icons.shield, color: AppColors.seal),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      for (final t in match.ticker)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Row(
+                            children: [
+                              Icon(
+                                _logIcon(t.kind),
+                                size: 16,
+                                color: t.seat == null ? const Color(0xFF8A5528) : AppColors.seat(t.seat),
+                              ),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  t.text,
+                                  style: const TextStyle(color: Color(0xFF2B1A0E), fontWeight: FontWeight.w700),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
-                if (answered)
-                  const Positioned(
-                    bottom: -3,
-                    left: -3,
-                    child: _Badge(icon: Icons.check, color: AppColors.good),
-                  ),
+                ),
               ],
             ),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _card(MatchView m, PlayerView p, int value, int lands, int top) {
+    final c = AppColors.seat(p.seat);
+    final now = p.seat == m.attacker || p.seat == m.defender;
+    final answered = m.question?.locked.contains(p.seat) ?? false;
+    return Opacity(
+      opacity: p.eliminated ? 0.45 : 1,
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFF3D6),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: p.seat == m.mySeat ? const Color(0xFFFFC233) : const Color(0xFF3A2414),
+            width: p.seat == m.mySeat ? 3 : 2,
+          ),
+          boxShadow: [
+            const BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 2)),
+            if (now) BoxShadow(color: c, blurRadius: 10, spreadRadius: 1),
+          ],
+        ),
+        child: Row(
+          children: [
+            // colour tab with the portrait
+            Container(
+              width: 48,
+              decoration: BoxDecoration(
+                color: c,
+                borderRadius: const BorderRadiusDirectional.horizontal(start: Radius.circular(7))
+                    .resolve(TextDirection.rtl),
+              ),
+              alignment: Alignment.center,
+              child: Stack(
+                clipBehavior: Clip.none,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          p.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.w800, height: 1.2),
-                        ),
-                      ),
-                      if (p.bot) const Icon(Icons.smart_toy_outlined, size: 13, color: AppColors.textSecondary),
-                      if (!p.connected) const Icon(Icons.wifi_off, size: 13, color: AppColors.bad),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        p.eliminated ? 'خرج' : '$value',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.gold,
-                          fontSize: 13,
-                          height: 1.3,
-                        ),
-                      ),
-                      const Spacer(),
-                      const Icon(Icons.flag, size: 11, color: AppColors.textSecondary),
-                      Text(
-                        ' $lands',
-                        style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, height: 1.3),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 2),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(3),
-                    child: LinearProgressIndicator(
-                      value: value / top,
-                      minHeight: 5,
-                      backgroundColor: const Color(0x33000000),
-                      color: c,
+                  Container(
+                    width: 38,
+                    height: 38,
+                    padding: const EdgeInsets.all(1.5),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                      border: Border.all(color: const Color(0xFF3A2414), width: 1.5),
                     ),
+                    child: ClipOval(child: Image.asset(armyOf(p.army).commander, fit: BoxFit.cover)),
                   ),
+                  if (now)
+                    Positioned(
+                      top: -5,
+                      left: -5,
+                      child: _Badge(icon: p.seat == m.attacker ? Icons.gps_fixed : Icons.shield, color: AppColors.seal),
+                    ),
+                  if (answered)
+                    const Positioned(
+                      bottom: -4,
+                      left: -4,
+                      child: _Badge(icon: Icons.check, color: AppColors.good),
+                    ),
                 ],
               ),
             ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsetsDirectional.only(end: 6),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            p.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Color(0xFF2B1A0E),
+                              fontWeight: FontWeight.w900,
+                              height: 1.15,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                        if (p.bot) const Icon(Icons.smart_toy_outlined, size: 12, color: Color(0xFF8A5528)),
+                        if (!p.connected) const Icon(Icons.wifi_off, size: 12, color: AppColors.bad),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          p.eliminated ? 'خرج' : '$value',
+                          style: TextStyle(
+                            color: Color.lerp(c, Colors.black, 0.25),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 14,
+                            height: 1.2,
+                          ),
+                        ),
+                        const Spacer(),
+                        const Icon(Icons.flag, size: 11, color: Color(0xFF8A5528)),
+                        Text(
+                          ' $lands',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF8A5528),
+                            height: 1.2,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(3),
+                      child: LinearProgressIndicator(
+                        value: value / top,
+                        minHeight: 4,
+                        backgroundColor: const Color(0x22000000),
+                        color: c,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RoundButton extends StatelessWidget {
+  const _RoundButton({required this.icon, required this.tooltip, required this.onTap});
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+    message: tooltip,
+    child: Semantics(
+      button: true,
+      label: tooltip,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: const Color(0xFFFFC233),
+            border: Border.all(color: const Color(0xFF3A2414), width: 2.5),
+            boxShadow: const [BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 2))],
+          ),
+          child: Icon(icon, size: 20, color: const Color(0xFF3A2414)),
+        ),
+      ),
+    ),
+  );
+}
+
+/// The latest war-log line, shown briefly in the corner of the map.
+class _LogToast extends StatelessWidget {
+  const _LogToast({required this.match});
+  final MatchView match;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = match.ticker.isEmpty ? null : match.ticker.first;
+    if (t == null || DateTime.now().difference(t.at) > const Duration(seconds: 5)) return const SizedBox.shrink();
+    return IgnorePointer(
+      child: TweenAnimationBuilder<double>(
+        key: ValueKey(t),
+        tween: Tween(begin: 0, end: 1),
+        duration: const Duration(milliseconds: 300),
+        builder: (context, v, child) => Opacity(
+          opacity: v,
+          child: Transform.translate(offset: Offset(0, 12 * (1 - v)), child: child),
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFF3D6),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF3A2414), width: 2),
+            boxShadow: const [BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 2))],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                _logIcon(t.kind),
+                size: 16,
+                color: t.seat == null ? const Color(0xFF8A5528) : AppColors.seat(t.seat),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                t.text,
+                style: const TextStyle(color: Color(0xFF2B1A0E), fontWeight: FontWeight.w900),
+              ),
+            ],
+          ),
         ),
       ),
     );

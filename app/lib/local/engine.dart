@@ -198,7 +198,27 @@ class MatchState {
     final p = players[seat];
     if (p.army == 'ww2' && !p.firstPickDone) return free;
     final adj = free.where((t) => _touches(seat, t)).toList();
-    return adj.isEmpty ? free : adj;
+    return adj.isEmpty ? _nearestFree(seat, free) : adj;
+  }
+
+  /// The free territories the fewest steps away from the seat's land (BFS over the map).
+  List<int> _nearestFree(int seat, List<int> free) {
+    var frontier = [for (final t in territories.values) if (t.owner == seat) t.id];
+    if (frontier.isEmpty) return free;
+    final seen = {...frontier};
+    final wanted = free.toSet();
+    while (frontier.isNotEmpty) {
+      final hit = frontier.where(wanted.contains).toList()..sort();
+      if (hit.isNotEmpty) return hit;
+      final next = <int>[];
+      for (final t in frontier) {
+        for (final n in neighbors[t]!) {
+          if (seen.add(n)) next.add(n);
+        }
+      }
+      frontier = next;
+    }
+    return free;
   }
 
   List<int> legalTargets(int seat) {

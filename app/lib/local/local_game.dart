@@ -22,7 +22,16 @@ const _networkSlack = 600;
 /// A whole match against bots inside the app: no server, no internet.
 /// Speaks the same messages as the server (docs/PROTOCOL.md), so the screens do not change.
 class LocalGame implements GameTransport {
-  LocalGame({required this.name, required this.army, required this.bots, required this.mapKind, this.teams = false});
+  LocalGame({
+    required this.name,
+    required this.army,
+    required this.bots,
+    required this.mapKind,
+    this.teams = false,
+    this.categories = const [],
+  });
+
+  final List<String> categories; // empty = all
 
   final String name;
   final String army;
@@ -41,6 +50,7 @@ class LocalGame implements GameTransport {
   late MapTemplate _template;
   late List<Map<String, dynamic>> _seats; // room_state seats
   final _used = <String>{};
+  List<Map<String, dynamic>> _all = [];
   List<Map<String, dynamic>> _pool = [];
   DateTime? _questionSentAt;
   bool _closed = false;
@@ -64,10 +74,11 @@ class LocalGame implements GameTransport {
 
   /// Loads the map and the bundled questions (the only asynchronous part).
   Future<void> prepare() async {
-    _pool = [
+    _all = [
       for (final q in jsonDecode(await rootBundle.loadString('assets/questions/solo.json')) as List)
         (q as Map).cast<String, dynamic>(),
     ]..shuffle(_rnd);
+    _pool = categories.isEmpty ? _all : [for (final q in _all) if (categories.contains(q['category'])) q];
     final n = bots.length + 1;
     _template = await MapTemplate.load('$mapKind-${n}p');
   }
@@ -259,10 +270,12 @@ class LocalGame implements GameTransport {
   void _provide() {
     final kind = _m.pendingQuestion;
     if (kind == null) return;
-    var q = _pool.firstWhere((x) => x['kind'] == kind && !_used.contains(x['id']), orElse: () => {});
+    // the chosen categories may have no question of this kind: then any category will do
+    final pool = _pool.any((x) => x['kind'] == kind) ? _pool : _all;
+    var q = pool.firstWhere((x) => x['kind'] == kind && !_used.contains(x['id']), orElse: () => {});
     if (q.isEmpty) {
-      _used.removeWhere((id) => _pool.any((x) => x['id'] == id && x['kind'] == kind)); // ran out: reuse
-      q = _pool.firstWhere((x) => x['kind'] == kind);
+      _used.removeWhere((id) => pool.any((x) => x['id'] == id && x['kind'] == kind)); // ran out: reuse
+      q = pool.firstWhere((x) => x['kind'] == kind);
     }
     _used.add(q['id'] as String);
     _after(_m.provideQuestion(Question(

@@ -73,73 +73,131 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
     final t = widget.template;
     return LayoutBuilder(
       builder: (context, box) {
-        // fit the map inside the box, keeping its aspect ratio
-        var w = box.maxWidth, h = w / t.aspect;
-        if (h > box.maxHeight) {
-          h = box.maxHeight;
-          w = h * t.aspect;
-        }
+        // Fixed, no zoom. Scale the painting so the whole land fits the screen and the sea fills
+        // as much of it as possible; whatever the painting does not cover fades into a matching sea.
+        final bw = box.maxWidth, bh = box.maxHeight;
+        final land = _landBox(t);
+        final fitLand = min(bw / (land.width * t.aspect), bh / land.height); // image height that fits the land
+        final cover = max(bw / t.aspect, bh); // image height that covers the box
+        final h = min(fitLand, cover), w = h * t.aspect;
+        // centre the land, but never leave a gap where the painting could still cover
+        var ox = bw / 2 - land.center.dx * w, oy = bh / 2 - land.center.dy * h;
+        ox = w >= bw ? ox.clamp(bw - w, 0.0) : (bw - w) / 2;
+        oy = h >= bh ? oy.clamp(bh - h, 0.0) : (bh - h) / 2;
         final size = Size(w, h);
         final owners = _ownerKey();
-        return Center(
-          child: InteractiveViewer(
-            minScale: 1,
-            maxScale: 4,
-            boundaryMargin: const EdgeInsets.all(40),
-            child: SizedBox(
-              width: w,
-              height: h,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTapUp: (d) {
-                  final n = Offset(d.localPosition.dx / w, d.localPosition.dy / h);
-                  for (final s in t.territories) {
-                    if (s.contains(n)) {
-                      widget.onTap(s.id);
-                      return;
+        return ClipRect(
+          child: Stack(
+            children: [
+              Positioned(
+                left: ox,
+                top: oy,
+                width: w,
+                height: h,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTapUp: (d) {
+                    final n = Offset(d.localPosition.dx / w, d.localPosition.dy / h);
+                    for (final s in t.territories) {
+                      if (s.contains(n)) {
+                        widget.onTap(s.id);
+                        return;
+                      }
                     }
-                  }
-                },
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(t.image, fit: BoxFit.fill, filterQuality: FilterQuality.medium),
-                    RepaintBoundary(
-                      child: CustomPaint(
-                        size: size,
-                        painter: _OwnershipPainter(template: t, match: widget.match, key: owners),
+                  },
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      // brighter and softer than the painting, so the owners' colours read first
+                      ColorFiltered(
+                        // fitted on sample colours: sea → bright cartoon blue, land → warm cream, forest → fresh green
+                        colorFilter: const ColorFilter.matrix([
+                          1.381, 0.242, -0.595, 0, -2.8, //
+                          -0.421, 2.067, -0.599, 0, 6.2,
+                          -0.440, 0.695, 0.835, 0, 13.1,
+                          0, 0, 0, 1, 0,
+                        ]),
+                        child: Image.asset(t.image, fit: BoxFit.fill, filterQuality: FilterQuality.medium),
                       ),
-                    ),
-                    RepaintBoundary(
-                      child: AnimatedBuilder(
-                        animation: _pulse,
-                        builder: (context, _) => CustomPaint(
+                      RepaintBoundary(
+                        child: CustomPaint(
                           size: size,
-                          painter: _HighlightPainter(
-                            template: t,
-                            highlight: widget.highlight,
-                            selected: widget.selected,
-                            duel: widget.match.duelTerritory,
-                            t: _pulse.value,
+                          painter: _OwnershipPainter(template: t, match: widget.match, key: owners),
+                        ),
+                      ),
+                      RepaintBoundary(
+                        child: AnimatedBuilder(
+                          animation: _pulse,
+                          builder: (context, _) => CustomPaint(
+                            size: size,
+                            painter: _HighlightPainter(
+                              template: t,
+                              highlight: widget.highlight,
+                              selected: widget.selected,
+                              duel: widget.match.duelTerritory,
+                              t: _pulse.value,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    ..._bases(size),
-                    ..._labels(size),
-                    Positioned.fill(
-                      child: IgnorePointer(
-                        child: _EffectsLayer(template: t, match: widget.match, version: widget.version),
+                      ..._bases(size),
+                      ..._labels(size),
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: _EffectsLayer(template: t, match: widget.match, version: widget.version),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
+              // soft edges: the painting melts into the sea around it
+              ..._edgeFades(ox, oy, w, h, bw, bh),
+            ],
           ),
         );
       },
     );
+  }
+
+  static const sea = Color(0xFF77B9C5); // the painting's sea after the colour filter
+
+  Rect? _land;
+  String? _landFor;
+
+  /// The land's bounds in the template (0..1), with room for the soldiers and labels.
+  Rect _landBox(MapTemplate t) {
+    if (_landFor == t.id && _land != null) return _land!;
+    var l = 1.0, r = 0.0, top = 1.0, b = 0.0;
+    for (final s in t.territories) {
+      for (final o in s.polygon) {
+        l = min(l, o.dx);
+        r = max(r, o.dx);
+        top = min(top, o.dy);
+        b = max(b, o.dy);
+      }
+    }
+    _landFor = t.id;
+    return _land = Rect.fromLTRB(max(0, l - 0.02), max(0, top - 0.06), min(1, r + 0.02), min(1, b + 0.03));
+  }
+
+  Iterable<Widget> _edgeFades(double ox, double oy, double w, double h, double bw, double bh) sync* {
+    const f = 48.0;
+    Widget fade(Alignment from) => IgnorePointer(
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(begin: from, end: -from, colors: [sea, sea.withValues(alpha: 0)]),
+        ),
+      ),
+    );
+    if (ox > -1) yield Positioned(left: ox, top: oy, width: f, height: h, child: fade(Alignment.centerLeft));
+    if (ox + w < bw + 1) {
+      yield Positioned(left: ox + w - f, top: oy, width: f, height: h, child: fade(Alignment.centerRight));
+    }
+    if (oy > -1) yield Positioned(left: ox, top: oy, width: w, height: f, child: fade(Alignment.topCenter));
+    if (oy + h < bh + 1) {
+      yield Positioned(left: ox, top: oy + h - f, width: w, height: f, child: fade(Alignment.bottomCenter));
+    }
   }
 
   /// Changes only when an owner, value or base changes: the ownership layer repaints then.
@@ -174,17 +232,42 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
   Iterable<Widget> _labels(Size size) sync* {
     final m = widget.match;
     final fs = max(9.0, size.height * 0.026);
+    final soldierH = fs * 3.1;
     for (final shape in widget.template.territories) {
       final terr = m.territories[shape.id];
       if (terr == null || terr.owner == null) continue;
+      final troops = !terr.isBase;
       yield Positioned(
         left: shape.label.dx * size.width - 50,
-        top: shape.label.dy * size.height + (terr.isBase ? fs * 0.2 : -fs * 1.0),
+        top: shape.label.dy * size.height + (terr.isBase ? fs * 0.2 : -soldierH - fs * 0.1),
         width: 100,
         child: IgnorePointer(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // the owner's troops stand on the land, with a soft shadow at their feet
+              if (troops)
+                SizedBox(
+                  height: soldierH,
+                  child: Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      Container(
+                        width: soldierH * 0.9,
+                        height: soldierH * 0.18,
+                        decoration: BoxDecoration(
+                          color: const Color(0x55000000),
+                          borderRadius: BorderRadius.circular(soldierH),
+                        ),
+                      ),
+                      Image.asset(
+                        armyOf(m.players[terr.owner!].army).soldier,
+                        height: soldierH,
+                        filterQuality: FilterQuality.medium,
+                      ),
+                    ],
+                  ),
+                ),
               ValueBanner(value: terr.value, color: AppColors.seat(terr.owner), fontSize: fs, shielded: terr.shielded),
               if (terr.isBase) _Towers(count: terr.towers, size: fs * 1.05),
             ],
@@ -355,13 +438,17 @@ class _OwnershipPainter extends CustomPainter {
     for (final shape in template.territories) {
       final path = shape.path(size);
       final owner = match.territories[shape.id]?.owner;
-      if (owner == null) continue;
+      if (owner == null) {
+        fill.color = const Color(0x40FFF3D6); // free land: a light cream wash, flat and calm
+        canvas.drawPath(path, fill);
+        continue;
+      }
       final c = AppColors.seat(owner);
-      fill.color = c.withValues(alpha: 0.30);
+      fill.color = c.withValues(alpha: 0.46);
       canvas.drawPath(path, fill);
       canvas.save();
       canvas.clipPath(path);
-      edge.color = c.withValues(alpha: 0.55);
+      edge.color = c.withValues(alpha: 0.80);
       canvas.drawPath(path, edge);
       canvas.restore();
     }
@@ -370,8 +457,8 @@ class _OwnershipPainter extends CustomPainter {
       final path = shape.path(size);
       final owner = match.territories[shape.id]?.owner;
       ink
-        ..color = owner == null ? const Color(0x55392A18) : const Color(0xE01A0F06)
-        ..strokeWidth = size.height * (owner == null ? 0.002 : 0.005);
+        ..color = owner == null ? const Color(0x88392A18) : const Color(0xF02B1A0E)
+        ..strokeWidth = size.height * (owner == null ? 0.0035 : 0.0075);
       canvas.drawPath(path, ink);
       if (owner != null) {
         ink

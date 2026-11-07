@@ -140,6 +140,20 @@ void main() {
     expect(m.territories[target]!.value, greaterThan(before));
   });
 
+  test('engine rules: with no free land next door, only the nearest free land may be picked', () {
+    final m = MatchState.create(
+      mapId: 'line',
+      neighbors: {for (var i = 0; i < 6; i++) i: [if (i > 0) i - 1, if (i < 5) i + 1]},
+      bases: [0, 5],
+      setups: [PlayerSetup(0, 'a', 'roman'), PlayerSetup(1, 'b', 'mongol')],
+      teams: false,
+      rng: Random(1),
+    );
+    m.start();
+    m.territories[1]!.owner = 1; // seat 0 is boxed in
+    expect(m.legalPicks(0), [2], reason: '3 and 4 are further away');
+  });
+
   testWidgets('local game: a whole match against bots runs to the results', (tester) async {
     final g = LocalGame(name: 'سامي', army: 'roman', bots: const ['hard', 'easy', 'medium'], mapKind: 'fantasy');
     final types = <String>[];

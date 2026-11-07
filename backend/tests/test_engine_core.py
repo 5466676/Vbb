@@ -175,12 +175,13 @@ def test_illegal_pick_is_replaced_by_a_legal_auto_pick():
     assert all(e.data["auto"] for e in ev if e.type == "territory_claimed" and e.data["seat"] == 0)
 
 
-def test_pick_anywhere_when_no_adjacent_free_land():
+def test_pick_nearest_when_no_adjacent_free_land():
     s = started(line_map(6, [0, 5]), A2)
     s.territories[1].owner = 1  # seat 0 is boxed in
+    assert core.legal_picks(s, 0) == [2]  # two steps away; 3 and 4 are further
     answer_numeric(s, {0: 100, 1: 0})
     step(s, PickTerritories(seat=0, territories=[3]))
-    assert s.territories[3].owner == 0
+    assert s.territories[2].owner == 0  # the far pick was replaced by the nearest one
 
 
 def test_pick_timeout_auto_picks_and_expansion_repeats_until_full():
