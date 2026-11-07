@@ -49,7 +49,8 @@ No present-day armies or current conflicts. No Nazi symbols.
   - **World** — the real world map; real regions are grouped into `players × 5` territories.
 - For every map and player count: every territory is reachable and bases are as far apart as possible.
 - Territory values: normal **200**, base **1000**.
-- Each player starts with one **base** (قلعة) with **3 towers** (lives). The base art follows the player's army.
+- Each player starts with one **base** (قلعة) with **5 towers** (lives) in matches of 2–4 players and **3 towers**
+  with 5–8 players *(config)*. The base art follows the player's army.
 
 ## 4. Question types
 - **MCQ:** 4 options, one correct, **10 s** timer. Options shuffled per player.
@@ -96,9 +97,9 @@ R *(config, draft)* by player count, chosen so a match stays near 8–12 minutes
 
 | Players | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|
-| R | 12 | 12 | 9 | 8 | 6 | 5 | 4 |
+| R | 19 | 13 | 9 | 8 | 6 | 5 | 4 |
 
-(Calibrated by the phase-2 simulation. 2–3 player matches often end earlier because a base falls;
+(Calibrated by the phase-2 simulation. 1v1 matches often end earlier because a base falls;
 see DECISIONS.md.)
 
 A turn:

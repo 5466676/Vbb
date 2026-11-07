@@ -196,7 +196,7 @@ def check_invariants(state: MatchState) -> None:
         assert t.owner is None or t.owner in seats
         assert t.value > 0
         if t.is_base:
-            assert t.owner is not None and 0 < t.towers <= state.settings.base_towers
+            assert t.owner is not None and 0 < t.towers <= state.base_towers
         if t.owner is not None:
             assert not state.players[t.owner].eliminated, "eliminated players own nothing"
     if state.phase in core.BATTLE_PHASES or state.phase is Phase.RESULTS:
@@ -215,7 +215,7 @@ def play_match(
     copy_every: int = 0,
     rounds: int | None = None,
     per_player: int = 5,
-    towers: int = 3,
+    towers: int | None = None,
 ) -> SimResult:
     rnd = random.Random(seed)
     team_size = n_players // 2 if mode is Mode.TEAMS else 0

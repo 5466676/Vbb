@@ -15,9 +15,9 @@ from tests.helpers import play_match
 MATCHES = 500
 CONFIGS = [(n, Mode.FFA) for n in range(2, 9)] + [(n, Mode.TEAMS) for n in (4, 6, 8)]
 
-# Accepted mean length in minutes. 2-3 player matches often end early by elimination
-# (see DECISIONS.md, phase 2); the brief's 8-12 minute target is enforced from 4 players up.
-MEAN_BOUNDS = {2: (3.5, 12.0), 3: (5.5, 12.0)}
+# Accepted mean length in minutes. 1v1 matches often end early by elimination (see
+# DECISIONS.md, phase 2); the brief's 8-12 minute target is enforced from 3 players up.
+MEAN_BOUNDS = {2: (6.0, 12.0)}
 DEFAULT_BOUNDS = (8.0, 12.0)
 HARD_MAX_MIN = 15.0
 

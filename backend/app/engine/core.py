@@ -78,6 +78,7 @@ def create_match(
     territories = {
         t.id: TerritoryState(id=t.id, value=settings.normal_value) for t in map_def.territories
     }
+    towers = settings.base_towers or (5 if n <= 4 else 3)
     player_states: list[PlayerState] = []
     for p in sorted(players, key=lambda p: p.seat):
         team = p.team if settings.mode is Mode.TEAMS and p.team is not None else p.seat
@@ -87,7 +88,7 @@ def create_match(
         base = territories[map_def.bases[p.seat]]
         base.owner = p.seat
         base.is_base = True
-        base.towers = settings.base_towers
+        base.towers = towers
         base.value = A.AYYUBID_BASE_VALUE if p.army is Army.AYYUBID else settings.base_value
 
     rounds = settings.battle_rounds or DEFAULT_BATTLE_ROUNDS[n]
@@ -100,6 +101,7 @@ def create_match(
         players=player_states,
         rng_state=seed,
         battle_rounds=rounds,
+        base_towers=towers,
     )
 
 

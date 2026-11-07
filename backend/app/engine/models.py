@@ -16,7 +16,7 @@ from app.engine.armies import Army
 # Settings and map input
 # ------------------------------------------------------------------------------------------
 
-DEFAULT_BATTLE_ROUNDS = {2: 12, 3: 12, 4: 9, 5: 8, 6: 6, 7: 5, 8: 4}  # calibrated by simulation
+DEFAULT_BATTLE_ROUNDS = {2: 19, 3: 13, 4: 9, 5: 8, 6: 6, 7: 5, 8: 4}  # calibrated by simulation
 
 
 class Mode(StrEnum):
@@ -40,7 +40,7 @@ class MatchSettings(BaseModel):
     tie_window_ms: int = 500
     normal_value: int = 200
     base_value: int = 1000
-    base_towers: int = 3
+    base_towers: int | None = None  # None = 5 for 2-4 players, 3 for 5-8 (GAME_RULES §3)
     capture_gain: int = 100
     hold_gain: int = 100
     double_gain: int = 200
@@ -178,6 +178,7 @@ class MatchState(BaseModel):
     phase_id: int = 0  # increments on every phase change; Timeout must match it
     rng_state: int
     battle_rounds: int
+    base_towers: int
     # expansion
     expansion_round: int = 0
     ranking: list[int] = Field(default_factory=list)

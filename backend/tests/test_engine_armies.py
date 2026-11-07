@@ -28,7 +28,7 @@ def line2(a0, a1, **kw):
 
 
 def base2(a0, a1, **kw):
-    s = new_match(line_map(4, [0, 3]), [a0, a1], battle_rounds=10, **kw)
+    s = new_match(line_map(4, [0, 3]), [a0, a1], battle_rounds=10, base_towers=3, **kw)
     to_battle(s, {1: 0, 2: 0})
     if s.attacker == 1:  # seat 1 (lower score) opens: let it fail
         duel(s, 2, att_ms=None, def_ms=None)

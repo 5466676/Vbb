@@ -121,7 +121,7 @@ def base_line(armies=(R, R), **kw):
 
 
 def test_base_hits_remove_towers_and_fall_eliminates_and_transfers():
-    s = base_line(battle_rounds=10)
+    s = base_line(battle_rounds=10, base_towers=3)
     towers_seen = []
     ev = []
     while s.phase is not Phase.RESULTS:
@@ -225,3 +225,10 @@ def test_score_ties_break_on_correct_answers():
     s.players[1].correct = 5
     rows = core.standings(s)
     assert rows[0]["seat"] == 1  # equal scores, more correct answers
+
+
+def test_default_towers_depend_on_player_count():
+    assert new_match(grid_map(2), [R, R]).base_towers == 5
+    assert new_match(grid_map(4), [R] * 4).territories[0].towers == 5
+    assert new_match(grid_map(5), [R] * 5).base_towers == 3
+    assert new_match(grid_map(8), [R] * 8, base_towers=4).base_towers == 4

@@ -144,3 +144,10 @@ a 1v1 cannot reliably reach 8 min without making bases much harder to take.
 **Army balance (3,000 four-player bot matches, fair = 25%):** ayyubid 26, crusader 29, islamic 23,
 mongol 25, ottoman 25, pharaoh 24, roman 25, ww2 23 (%). Within the test bound (15–37.5%); crusader is
 slightly strong and is the first candidate for tuning once real players exist.
+
+### Update — owner decisions after phase 2 (2026-11-07)
+1. **Confirmed:** the attacker must answer correctly to win a duel.
+2. **Bases have 5 towers in 2–4 player matches** (3 towers with 5–8). Battle rounds re-tuned to
+   **19/13/9/8/6/5/4**. Simulation (200 matches each): 1v1 mean 7.7 min (50% in 8–12 — a 1v1 often
+   ends by elimination, accepted), 3 players 9.6 (90%), 4 players 9.9 (99%), 2v2 9.7 (90%);
+   5–8 players unchanged (95–99%). `MatchSettings.base_towers` overrides the default.
