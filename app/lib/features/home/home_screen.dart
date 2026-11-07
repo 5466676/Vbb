@@ -129,7 +129,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Expanded(
                 child: Center(
-                  child: Padding(padding: const EdgeInsets.all(12), child: Image.asset('assets/ui/logo.webp')),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    // the crest's empty scroll carries the game's name
+                    child: AspectRatio(
+                      aspectRatio: 873 / 845,
+                      child: LayoutBuilder(
+                        builder: (context, box) => Stack(
+                          children: [
+                            Positioned.fill(child: Image.asset('assets/ui/logo.webp')),
+                            Align(
+                              alignment: const Alignment(0, 0.70),
+                              child: RuqaaTitle(
+                                'حرب العقول',
+                                size: box.maxWidth * 0.085,
+                                color: const Color(0xFF6E1A12),
+                                outline: false,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ),
               Padding(

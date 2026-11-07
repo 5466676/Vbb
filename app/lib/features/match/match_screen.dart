@@ -33,7 +33,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     if (!mounted) return;
     setState(() => _template = t);
     // decode the end-of-match art early, so the results never open on a blank frame
-    for (final a in const ['assets/ui/victory.webp', 'assets/ui/defeat.webp']) {
+    for (final a in const ['assets/ui/victory.webp', 'assets/ui/defeat.webp', 'assets/ui/question_card.webp']) {
       precacheImage(AssetImage(a), context);
     }
   }
@@ -111,7 +111,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                   child: LayoutBuilder(
                     builder: (context, box) {
                       // the open question takes the lower part; the map moves up instead of being covered
-                      final questionRoom = !asking ? 0.0 : box.maxHeight * (q.kind == 'mcq' ? 0.44 : 0.36);
+                      final questionRoom = !asking ? 0.0 : box.maxHeight * (q.kind == 'mcq' ? 0.34 : 0.28);
                       return Stack(
                         children: [
                           // the same painting, darkened, fills the space around the map

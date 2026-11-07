@@ -40,7 +40,7 @@ class _DuelSplashState extends State<DuelSplash> with SingleTickerProviderStateM
           return Opacity(
             opacity: out,
             child: Container(
-              color: Colors.black.withValues(alpha: 0.45),
+              color: Colors.black.withValues(alpha: 0.72),
               child: LayoutBuilder(
                 builder: (context, box) {
                   final w = box.maxWidth;
@@ -67,9 +67,7 @@ class _DuelSplashState extends State<DuelSplash> with SingleTickerProviderStateM
                             gradient: RadialGradient(colors: [Color(0xFFC0392B), Color(0xFF5E140D)]),
                             boxShadow: [BoxShadow(color: Color(0xAAFFC864), blurRadius: 18)],
                           ),
-                          child: const Center(
-                            child: Text('⚔', style: TextStyle(fontSize: 38, color: Colors.white, height: 1.1)),
-                          ),
+                          child: CustomPaint(painter: _SwordsPainter()),
                         ),
                       ),
                     ],
@@ -133,4 +131,29 @@ class _Side extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Two crossed swords (drawn, so no emoji font is needed).
+class _SwordsPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final c = size.center(Offset.zero), r = size.width * 0.3;
+    final blade = Paint()
+      ..strokeWidth = r * 0.2
+      ..strokeCap = StrokeCap.round
+      ..color = const Color(0xFFF1F1F1);
+    final hilt = Paint()
+      ..strokeWidth = r * 0.24
+      ..strokeCap = StrokeCap.round
+      ..color = const Color(0xFFE2B85A);
+    for (final s in [1.0, -1.0]) {
+      canvas.drawLine(c + Offset(-r * s, r), c + Offset(r * s, -r), blade);
+      final g = c + Offset(-r * s * 0.55, r * 0.55);
+      canvas.drawLine(g + Offset(-r * 0.32, -r * 0.32 * s), g + Offset(r * 0.32, r * 0.32 * s), hilt);
+      canvas.drawLine(g, c + Offset(-r * s * 1.05, r * 1.05), hilt);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_SwordsPainter old) => false;
 }
