@@ -7,7 +7,9 @@ from faster_whisper import WhisperModel
 src, out = sys.argv[1], sys.argv[2]
 model = WhisperModel(sys.argv[3] if len(sys.argv) > 3 else "base", device="cpu", compute_type="int8", cpu_threads=4)
 t = time.time()
-segments, info = model.transcribe(src, language="ar", word_timestamps=True, vad_filter=True, beam_size=1,
+import soundfile as sf
+audio, _sr = sf.read(src, dtype="float32")
+segments, info = model.transcribe(audio, language="ar", word_timestamps=True, vad_filter=True, beam_size=1,
                                   condition_on_previous_text=False)
 hits, lines = [], []
 for seg in segments:
