@@ -1,0 +1,177 @@
+<title>أصوات حرب العقول</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap">
+<style>
+/* Layout: a field ledger — one row per game event, candidates as numbered seals you play and tick. */
+:root{
+  --paper:#efe6d2; --sheet:#f7f1e3; --ink:#2b2418; --muted:#6f6350; --rule:#d6c8aa;
+  --seal:#8c2f1c; --seal-ink:#fff6ea; --ok:#2f6b3a; --chosen:#e7d5ad;
+  --display:"Reem Kufi","Noto Kufi Arabic",system-ui,sans-serif;
+  --body:"IBM Plex Sans Arabic","Segoe UI",Tahoma,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#17140f; --sheet:#211c15; --ink:#efe4cc; --muted:#a8987a; --rule:#3a3226;
+  --seal:#d0654a; --seal-ink:#1a120c; --ok:#7fbf87; --chosen:#3b2f1f; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#17140f; --sheet:#211c15; --ink:#efe4cc; --muted:#a8987a; --rule:#3a3226;
+  --seal:#d0654a; --seal-ink:#1a120c; --ok:#7fbf87; --chosen:#3b2f1f; color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 64px}
+main{max-width:860px;margin-inline:auto;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-direction:column;gap:8px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,6vw,40px);margin:0;text-wrap:balance}
+header p{margin:0;max-width:62ch;color:var(--muted)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;
+  background:var(--paper);padding-block:10px;border-bottom:1px solid var(--rule)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.progress{font-variant-numeric:tabular-nums;font-weight:600}
+.meter{flex:1 1 160px;height:6px;background:var(--rule);border-radius:3px;overflow:hidden;min-width:120px}
+.meter i{display:block;height:100%;width:0;background:var(--ok);transition:width .3s}
+.status{font-size:13px;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:2px}
+h2{font-family:var(--display);font-weight:500;font-size:22px;margin:0 0 6px;color:var(--seal)}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 16px;align-items:center;padding:12px 14px;background:var(--sheet);border:1px solid var(--rule)}
+.row + .row{border-top:none}
+.row.done{background:linear-gradient(90deg,var(--sheet),var(--sheet) 70%,var(--chosen))}
+.name{display:flex;flex-direction:column;min-width:0}
+.name b{font-weight:600}
+.name code{font-family:var(--mono);font-size:12px;color:var(--muted);direction:ltr;text-align:right}
+.picks{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.c{display:flex;align-items:stretch;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--paper)}
+.c button{font:inherit;border:0;background:transparent;color:var(--ink);cursor:pointer;padding:6px 10px;min-height:38px}
+.c .play{font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px}
+.c .play::before{content:"";width:0;height:0;border-block:6px solid transparent;border-inline-end:9px solid currentColor}
+.c .play.on::before{border:0;width:9px;height:12px;background:linear-gradient(90deg,currentColor 35%,transparent 35% 65%,currentColor 65%)}
+.c .take{border-inline-start:1px solid var(--rule);font-size:13px;color:var(--muted)}
+.c.sel{border-color:var(--seal);background:var(--seal)}
+.c.sel button{color:var(--seal-ink)} .c.sel .take{border-color:transparent}
+.none{font:inherit;font-size:13px;border:1px dashed var(--rule);border-radius:6px;background:transparent;color:var(--muted);padding:6px 10px;cursor:pointer;min-height:38px}
+.none.sel{border-style:solid;border-color:var(--ink);color:var(--ink)}
+.dur{font-size:11px;color:var(--muted)} .c.sel .dur{color:var(--seal-ink);opacity:.8}
+.note{grid-column:1/-1;display:none}
+.row.wants-note .note{display:block}
+.note input{width:100%;font:inherit;font-size:14px;padding:6px 10px;border:1px solid var(--rule);border-radius:6px;background:var(--paper);color:var(--ink)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+footer{color:var(--muted);font-size:13px;max-width:62ch}
+@media (max-width:560px){.row{grid-template-columns:1fr}.picks{justify-content:flex-start}}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+</style>
+
+<main>
+  <header>
+    <h1>أصوات حرب العقول</h1>
+    <p><b>الجولة التانية.</b> الجولة الأولى انحفظت (26 صوت). هون بدائل للهتاف والفوز، وأحداث جديدة: دورك، العدّ التنازلي، خلص الوقت، سؤال الحسم، والأدوات المساعدة. كل سطر حدث باللعبة. اضغط الرقم لتسمع، وبعدين «هاد» لتختارو. إذا ولا واحد مناسب اضغط «ولا واحد» واكتب شو بدك. الاختيارات بتنحفظ لحالها وبوصلّي ياها.</p>
+  </header>
+  <div class="bar" role="status">
+    <span class="progress" id="progress">0 / 0</span>
+    <span class="meter" aria-hidden="true"><i id="meter"></i></span>
+    <span class="status" id="status">عم يتصل…</span>
+  </div>
+  <div id="list"></div>
+  <footer>كل الأصوات برخصة CC0 (ملكية عامة): Kenney، وStarNinjas، وWilliam Hector، وNenad Simic، ومجموعة «100 CC0 SFX». الموسيقى الأساسية وصوت المعلّق بيجوا بمرحلة لحالها.</footer>
+</main>
+
+<script>
+const EVENTS = /*DATA*/[];
+const picks = {};          // event -> {choice, note}
+let db = null;
+const audio = new Audio();
+let playingBtn = null;
+
+function stop(){ audio.pause(); audio.loop=false; if(playingBtn){playingBtn.classList.remove('on'); playingBtn=null;} }
+audio.addEventListener('ended', stop);
+
+function play(btn, url, loop){
+  if (playingBtn === btn){ stop(); return; }
+  stop(); audio.src = url; audio.loop = !!loop; audio.currentTime = 0;
+  audio.play().then(()=>{ btn.classList.add('on'); playingBtn = btn; }).catch(()=>{});
+}
+
+function setStatus(t){ document.getElementById('status').textContent = t; }
+
+function progress(){
+  const done = EVENTS.filter(e => picks[e.id] && picks[e.id].choice !== undefined).length;
+  document.getElementById('progress').textContent = `${done} / ${EVENTS.length}`;
+  document.getElementById('meter').style.width = (100*done/EVENTS.length)+'%';
+}
+
+const saving = {};
+async function save(id){
+  const p = picks[id]; if (!db) { setStatus('ما في حفظ هون: افتح الصفحة من claude.ai وإنت مسجّل دخول'); return; }
+  if (saving[id]) { saving[id].again = true; return; }
+  saving[id] = {again:false};
+  try {
+    await db.doc('picks2/'+id).set({event:id, choice:p.choice ?? null, note:p.note || '', at:new Date().toISOString()});
+    setStatus('انحفظ ✓');
+  } catch(e){ setStatus(e && e.code === 'invalid_argument' ? 'ما عندك صلاحية حفظ على هالصفحة' : 'ما انحفظ، جرّب كمان مرة'); }
+  const again = saving[id].again; delete saving[id];
+  if (again) save(id);
+}
+
+function render(){
+  const list = document.getElementById('list');
+  list.textContent = '';
+  let group = null, sec = null;
+  for (const e of EVENTS){
+    if (e.group !== group){
+      group = e.group; sec = document.createElement('section');
+      const h = document.createElement('h2'); h.textContent = group; sec.append(h); list.append(sec);
+    }
+    const p = picks[e.id] || {};
+    const row = document.createElement('div');
+    row.className = 'row' + (p.choice !== undefined && p.choice !== null ? ' done' : '') + (p.choice === 0 ? ' wants-note done' : '');
+    const name = document.createElement('div'); name.className = 'name';
+    const b = document.createElement('b'); b.textContent = e.label;
+    const code = document.createElement('code'); code.textContent = e.id;
+    name.append(b, code);
+    const box = document.createElement('div'); box.className = 'picks';
+    for (const c of e.c){
+      const wrap = document.createElement('div'); wrap.className = 'c' + (p.choice === c.n ? ' sel' : '');
+      const pl = document.createElement('button'); pl.className = 'play'; pl.type='button';
+      pl.setAttribute('aria-label', `اسمع ${e.label} رقم ${c.n}`);
+      const num = document.createElement('span'); num.textContent = c.n;
+      const d = document.createElement('span'); d.className='dur'; d.textContent = c.d + 'ث';
+      pl.append(num, d);
+      pl.title = c.src;
+      pl.onclick = () => play(pl, c.u, e.id === 'battle_drums');
+      const tk = document.createElement('button'); tk.className='take'; tk.type='button'; tk.textContent = p.choice === c.n ? '✓' : 'هاد';
+      tk.setAttribute('aria-label', `اختار ${e.label} رقم ${c.n}`);
+      tk.onclick = () => { picks[e.id] = {...(picks[e.id]||{}), choice:c.n}; render(); progress(); save(e.id); };
+      wrap.append(pl, tk); box.append(wrap);
+    }
+    const none = document.createElement('button'); none.type='button'; none.className = 'none' + (p.choice === 0 ? ' sel' : '');
+    none.textContent = 'ولا واحد';
+    none.onclick = () => { picks[e.id] = {...(picks[e.id]||{}), choice:0}; render(); progress(); save(e.id);
+      setTimeout(()=>{ const i=document.getElementById('note-'+e.id); if(i) i.focus(); }, 0); };
+    box.append(none);
+    const note = document.createElement('div'); note.className = 'note';
+    const inp = document.createElement('input'); inp.id = 'note-'+e.id; inp.placeholder = 'شو الصوت يلي ببالك؟ (مثلاً: أتقل، أقصر، صوت طبل…)';
+    inp.value = p.note || '';
+    let t; inp.oninput = () => { picks[e.id] = {...(picks[e.id]||{}), note: inp.value}; clearTimeout(t); t = setTimeout(()=>save(e.id), 800); };
+    note.append(inp);
+    row.append(name, box, note); sec.append(row);
+  }
+}
+
+render(); progress();
+
+(async () => {
+  const timer = setTimeout(()=>setStatus('الحفظ مش متاح هلأ، بس فيك تسمع'), 10000);
+  db = window.claude ? await window.claude.use('db') : null;
+  if (!db){ clearTimeout(timer); setStatus('فيك تسمع. الحفظ بيشتغل بس على claude.ai'); return; }
+  db.collection('picks2').onSnapshot(snap => {
+    if (!snap.metadata.fromCache) { clearTimeout(timer); setStatus('جاهز. اختياراتك بتنحفظ'); }
+    let changed = false;
+    for (const d of snap.docs){
+      const v = d.data(); if (!v) continue;
+      const cur = picks[d.id] || {};
+      const active = document.activeElement && document.activeElement.id === 'note-'+d.id;
+      const next = {choice: v.choice ?? undefined, note: active ? cur.note : (v.note || '')};
+      if (next.choice !== cur.choice || next.note !== cur.note){ picks[d.id] = next; changed = true; }
+    }
+    if (changed){ render(); progress(); }
+  }, () => { clearTimeout(timer); setStatus('الحفظ وقف. حدّث الصفحة'); });
+})();
+</script>

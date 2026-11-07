@@ -1,0 +1,53 @@
+# Local development stack: API + Redis + PostgreSQL.
+#   docker compose up --build
+#   curl localhost:8000/health
+services:
+  api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      HARB_ENV: dev
+      HARB_DATABASE_URL: postgresql+asyncpg://harb:harb@postgres:5432/harb
+      HARB_REDIS_URL: redis://redis:6379/0
+      HARB_JWT_SECRET: ${HARB_JWT_SECRET:-dev-only-secret-change-me-in-production-32b}
+      HARB_ADMIN_KEY: ${HARB_ADMIN_KEY:-dev-admin-key}
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: harb
+      POSTGRES_PASSWORD: harb
+      POSTGRES_DB: harb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U harb -d harb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
