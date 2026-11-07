@@ -50,11 +50,11 @@ class _DuelSplashState extends State<DuelSplash> with SingleTickerProviderStateM
                     children: [
                       // attacker on the right (RTL reading starts there), defender on the left
                       Positioned(
-                        right: w * 0.5 + 40 - (1 - inT) * w * 0.5,
+                        left: w * 0.5 + 40 - (1 - inT) * w * 0.5,
                         child: _Side(player: widget.attacker, role: 'المهاجم', size: portrait),
                       ),
                       Positioned(
-                        left: w * 0.5 + 40 - (1 - inT) * w * 0.5,
+                        right: w * 0.5 + 40 - (1 - inT) * w * 0.5,
                         child: _Side(player: widget.defender, role: 'المدافع', size: portrait),
                       ),
                       Transform.scale(
