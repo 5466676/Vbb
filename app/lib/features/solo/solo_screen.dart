@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
@@ -46,7 +48,14 @@ class _SoloScreenState extends ConsumerState<SoloScreen> {
       setState(() => _note = 'عم ننزّل أسئلة التدريب…');
       await ref.read(syncProvider).sync();
     }
-    final all = await store.questions();
+    var all = await store.questions();
+    if (all.isEmpty) {
+      // never reached a server: train on the questions bundled with the app
+      all = [
+        for (final q in jsonDecode(await rootBundle.loadString('assets/questions/solo.json')) as List)
+          (q as Map).cast<String, dynamic>(),
+      ];
+    }
     all.shuffle(Random());
     setState(() {
       _round = all.take(perRound).toList();

@@ -43,6 +43,7 @@ flutter:
     - assets/ui/abilities/
     - assets/audio/sfx/
     - assets/audio/private/
+    - assets/questions/
   fonts:
     - family: Cairo
       fonts:

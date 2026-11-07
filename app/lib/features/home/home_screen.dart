@@ -73,6 +73,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (mounted) context.push('/play');
   }
 
+  Future<void> _offline() async {
+    final choice = await showDialog<({int bots, String level, String map})>(
+      context: context,
+      builder: (c) => const _OfflineDialog(),
+    );
+    if (choice == null || !mounted) return;
+    await ref.read(gameProvider.notifier).startOffline(
+          bots: List.filled(choice.bots, choice.level),
+          mapKind: choice.map,
+        );
+    if (mounted) context.push('/play');
+  }
+
   Future<void> _create() async {
     if (!await _ready() || !mounted) return;
     ref.read(gameProvider.notifier).createRoom();
@@ -139,7 +152,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: AppColors.gold),
                         ),
                         const SizedBox(height: 8),
-                        FilledButton(onPressed: _quick, child: const Text('مباراة سريعة')),
+                        FilledButton(onPressed: _offline, child: const Text('العب ضد البوتات (بلا نت)')),
+                const SizedBox(height: 8),
+                OutlinedButton(onPressed: _quick, child: const Text('مباراة سريعة أونلاين')),
                         const SizedBox(height: 8),
                         Row(
                           children: [
@@ -202,6 +217,62 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+
+/// Offline match setup: how many bots, how strong, which map.
+class _OfflineDialog extends StatefulWidget {
+  const _OfflineDialog();
+
+  @override
+  State<_OfflineDialog> createState() => _OfflineDialogState();
+}
+
+class _OfflineDialogState extends State<_OfflineDialog> {
+  int _bots = 3;
+  String _level = 'medium';
+  String _map = 'fantasy';
+
+  @override
+  Widget build(BuildContext context) {
+    Widget row(String label, Widget child) => Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(children: [SizedBox(width: 90, child: Text(label)), Expanded(child: child)]),
+        );
+    return AlertDialog(
+      title: const Text('ضد البوتات'),
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        row(
+          'عدد البوتات',
+          Wrap(spacing: 4, children: [
+            for (var n = 1; n <= 7; n++)
+              ChoiceChip(label: Text('$n'), selected: _bots == n, onSelected: (_) => setState(() => _bots = n)),
+          ]),
+        ),
+        row(
+          'الصعوبة',
+          Wrap(spacing: 4, children: [
+            for (final l in const [('easy', 'سهل'), ('medium', 'متوسط'), ('hard', 'صعب')])
+              ChoiceChip(label: Text(l.$2), selected: _level == l.$1, onSelected: (_) => setState(() => _level = l.$1)),
+          ]),
+        ),
+        row(
+          'الخريطة',
+          Wrap(spacing: 4, children: [
+            for (final m in const [('fantasy', 'خيالية'), ('world', 'العالم')])
+              ChoiceChip(label: Text(m.$2), selected: _map == m.$1, onSelected: (_) => setState(() => _map = m.$1)),
+          ]),
+        ),
+      ]),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('إلغاء')),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, (bots: _bots, level: _level, map: _map)),
+          child: const Text('ابدأ'),
+        ),
+      ],
     );
   }
 }

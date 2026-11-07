@@ -8,6 +8,7 @@ import '../../core/armies.dart';
 import '../../core/settings_store.dart';
 import '../../core/socket.dart';
 import '../../core/sound.dart';
+import '../../local/local_game.dart';
 import 'game_state.dart';
 
 const _errors = {
@@ -37,50 +38,78 @@ class GameController extends Notifier<GameState> {
     socket = GameSocket(ref.read(apiProvider));
     sound = ref.read(soundProvider);
     _sub = socket.messages.listen(_on);
-    _statusSub = socket.statusStream.listen((s) => state = state.copy(online: s == SocketStatus.online));
+    _statusSub = socket.statusStream.listen((s) {
+      if (_local == null) state = state.copy(online: s == SocketStatus.online);
+    });
     ref.onDispose(() {
       _sub?.cancel();
       _statusSub?.cancel();
       socket.close();
+      stopOffline();
     });
     return const GameState();
   }
 
   SettingsStore get _settings => ref.read(settingsProvider);
-  String? get myId => _settings.playerId;
+  String? get myId => _local != null ? localPlayerId : _settings.playerId;
+
+  // ------------------------------------------------------------------ offline play
+
+  LocalGame? _local;
+  StreamSubscription<ServerMessage>? _localSub;
+  bool get offline => _local != null;
+  GameTransport get _t => _local ?? socket;
+
+  /// A whole match against bots inside the app (no server). [bots] = difficulty per bot.
+  Future<void> startOffline({required List<String> bots, required String mapKind, bool teams = false}) async {
+    await stopOffline();
+    final g = LocalGame(name: _settings.name, army: _settings.army, bots: bots, mapKind: mapKind, teams: teams);
+    _local = g;
+    _localSub = g.messages.listen(_on);
+    state = state.copy(clearRoom: true, clearMatch: true, online: true);
+    await g.connect();
+  }
+
+  Future<void> stopOffline() async {
+    await _localSub?.cancel();
+    _localSub = null;
+    await _local?.close();
+    _local = null;
+  }
 
   Future<void> connect() => socket.connect();
   void clearError() => state = state.copy(clearError: true);
 
   // ------------------------------------------------------------------ actions
 
-  void createRoom() => socket.send('create_room', {'army': _settings.army});
-  void joinRoom(String code) => socket.send('join_room', {'code': code.trim().toUpperCase(), 'army': _settings.army});
+  void createRoom() => _t.send('create_room', {'army': _settings.army});
+  void joinRoom(String code) => _t.send('join_room', {'code': code.trim().toUpperCase(), 'army': _settings.army});
   void quickMatch(String mode, int size) =>
-      socket.send('quick_match', {'mode': mode, 'size': size, 'army': _settings.army});
-  void cancelQuickMatch() => socket.send('cancel_quick_match');
+      _t.send('quick_match', {'mode': mode, 'size': size, 'army': _settings.army});
+  void cancelQuickMatch() => _t.send('cancel_quick_match');
   void leave() {
-    socket.send('leave_room');
-    state = state.copy(clearRoom: true, clearMatch: true);
+    _t.send('leave_room');
+    if (_local != null) stopOffline();
+    state = state.copy(clearRoom: true, clearMatch: true, online: socket.status == SocketStatus.online);
   }
 
-  void setReady(bool ready) => socket.send('set_ready', {'ready': ready});
+  void setReady(bool ready) => _t.send('set_ready', {'ready': ready});
   void chooseArmy(String army) {
     _settings.setArmy(army);
-    socket.send('choose_army', {'army': army});
+    _t.send('choose_army', {'army': army});
   }
 
-  void voteMap(String kind) => socket.send('vote_map', {'kind': kind});
-  void updateSettings(Map<String, dynamic> s) => socket.send('update_settings', s);
-  void addBot(String level) => socket.send('add_bot', {'difficulty': level});
-  void removeBot(int seat) => socket.send('remove_bot', {'seat': seat});
-  void startMatch() => socket.send('start_match');
+  void voteMap(String kind) => _t.send('vote_map', {'kind': kind});
+  void updateSettings(Map<String, dynamic> s) => _t.send('update_settings', s);
+  void addBot(String level) => _t.send('add_bot', {'difficulty': level});
+  void removeBot(int seat) => _t.send('remove_bot', {'seat': seat});
+  void startMatch() => _t.send('start_match');
 
   void answerChoice(int i) {
     final q = state.match?.question;
     if (q == null || q.answered || !q.participant) return;
     q.myChoice = i;
-    socket.send('answer', {'question_id': q.id, 'choice': i});
+    _t.send('answer', {'question_id': q.id, 'choice': i});
     sound.play('answer_locked');
     _bump();
   }
@@ -89,7 +118,7 @@ class GameController extends Notifier<GameState> {
     final q = state.match?.question;
     if (q == null || q.answered || !q.participant) return;
     q.myValue = v;
-    socket.send('answer', {'question_id': q.id, 'value': v});
+    _t.send('answer', {'question_id': q.id, 'value': v});
     sound.play('answer_locked');
     _bump();
   }
@@ -106,7 +135,7 @@ class GameController extends Notifier<GameState> {
     } else if (quota > 0) {
       m.myPicks = [...m.myPicks.skip(1), territory];
     }
-    socket.send('pick_territory', {'territories': m.myPicks});
+    _t.send('pick_territory', {'territories': m.myPicks});
     sound.play('ui_tap');
     _bump();
   }
@@ -114,13 +143,13 @@ class GameController extends Notifier<GameState> {
   void chooseTarget(int territory) {
     final m = state.match;
     if (m == null || !m.myTurn || !m.targets.contains(territory)) return;
-    socket.send('choose_target', {'territory': territory});
+    _t.send('choose_target', {'territory': territory});
     sound.play('sword_swing');
   }
 
   void usePowerup(String name, {int? territory}) =>
-      socket.send('use_powerup', {'powerup': name, 'territory': ?territory});
-  void useAbility({int? territory}) => socket.send('use_ability', {'territory': ?territory});
+      _t.send('use_powerup', {'powerup': name, 'territory': ?territory});
+  void useAbility({int? territory}) => _t.send('use_ability', {'territory': ?territory});
 
   // ------------------------------------------------------------------ events
 
@@ -198,7 +227,7 @@ class GameController extends Notifier<GameState> {
     sound.play('countdown');
     sound.preload();
     state = state.copy(match: match);
-    socket.send('resync'); // exact values, towers and my power-ups
+    _t.send('resync'); // exact values, towers and my power-ups
   }
 
   void _fullState(Map<String, dynamic> p) {
@@ -358,7 +387,7 @@ class GameController extends Notifier<GameState> {
       case 'battle_started':
         m.log('بدأت المعارك! ${p['rounds']} جولات');
         sound.play('battle_start');
-        socket.send('resync'); // army bonuses change values at the start of battle
+        _t.send('resync'); // army bonuses change values at the start of battle
       case 'round_started':
         m.battleRound = p['round'] as int;
         m.log('الجولة ${p['round']}');
@@ -439,7 +468,7 @@ class GameController extends Notifier<GameState> {
         m.players[seat].abilityUsed = true;
         m.log('${m.players[seat].name}: ${armyOf(p['army'] as String?).abilityName}!', seat);
         sound.play('ability');
-        socket.send('resync');
+        _t.send('resync');
       case 'player_connection':
         final seat = p['seat'] as int;
         final up = p['connected'] as bool;

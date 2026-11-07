@@ -357,3 +357,16 @@ Building needed Google's Maven Central mirror locally (Maven Central rate-limits
 
 **Not yet:** music and the commentator (lines arrive with the Gemini quota), the battle scene
 animation, marching armies, team chat, progression and gold (phase 8).
+
+## Offline play against bots (2026-11-07)
+
+Free hosts now ask for a card (Hugging Face Docker Spaces need PRO, Render asks for a card), so the
+app can also play with **no server**: `app/lib/local/` ports the engine (`engine.dart`, rule for rule
+from `core.py`) and the bots (`bots.dart`), and `LocalGame` runs a room inside the app with the same
+timers and pauses as the server's room actor. It implements the same `GameTransport` as the online
+socket and speaks the same messages, so every screen works unchanged. Questions come from the
+offline pack bundled in the app (`assets/questions/solo.json`, 435 questions); offline training uses
+it too when no server was ever reached. Tests: full bot matches for 2–8 players and teams on the
+Dart engine, a duel rule test, and a whole `LocalGame` match on a fake clock to `match_ended`.
+Checked in the browser build with no server running. Online play (with family) still needs a server:
+the home PC (`home-server.sh`) or Render.
