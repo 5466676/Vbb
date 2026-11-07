@@ -128,5 +128,55 @@
   "file": "sfx/wrong.ogg",
   "source": "kenney_interfaceSounds/Audio/error_005.ogg",
   "license": "CC0"
+ },
+ {
+  "file": "sfx/ability.ogg",
+  "source": "100-CC0-SFX_0/gong_01.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/double.ogg",
+  "source": "jingleSounds_Kenney/OGG/jingles_SAX/jingles_SAX06.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/hint.ogg",
+  "source": "magic/magic_words.wav",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/menu_open.ogg",
+  "source": "book_flips_-_starninjas/book_flip.3.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/player_back.ogg",
+  "source": "kenney_interfaceSounds/Audio/maximize_003.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/player_left.ogg",
+  "source": "ui_ogg/ui_ogg/negative_sound2.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/remove_two.ogg",
+  "source": "swishes/swishes/swish-7.wav",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/round_start.ogg",
+  "source": "100-CC0-SFX_0/gong_02.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/shield.ogg",
+  "source": "impact_-_starninjas/impact.9.ogg",
+  "license": "CC0"
+ },
+ {
+  "file": "sfx/time_up.ogg",
+  "source": "ui_ogg/ui_ogg/alarm.ogg",
+  "license": "CC0"
  }
 ]
