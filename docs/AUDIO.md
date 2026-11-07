@@ -100,8 +100,11 @@ Send the files as they come out (WAV or MP3); they get trimmed to clean loops, l
 
 ## 4. Commentator (المعلّق)
 
-Modern Standard Arabic (understood everywhere), energetic sports-commentator style, one male
-voice to start. Recorded by a person, or generated with a text-to-speech tool whose terms allow
+Modern Standard Arabic (understood everywhere). **Owner's pick: Gemini TTS voice Enceladus** in two
+styles — *epic* (a deep, dramatic war-movie-trailer narrator) for the big moments (start, battle
+begins, tiebreak, last round, end, winner) and *herald* (a battlefield herald shouting to the army)
+for the action (duel, capture, defence, tower, shield, elimination, army attacks). ElevenLabs voices
+and a sports-commentator style were tried and rejected. Recorded by a person, or generated with a text-to-speech tool whose terms allow
 commercial use (e.g. Google AI Studio speech generation, ElevenLabs paid plan). Each line is a
 separate file `app/assets/audio/voice/<id>.ogg`; several variants of a line are played at random.
 
