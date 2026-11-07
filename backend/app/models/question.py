@@ -29,18 +29,34 @@ class QuestionType(StrEnum):
     NUMERIC = "numeric"
 
 
+# the owner's categories (his build_questions.py); order = how the app lists them
 CATEGORIES = [
-    "دين",
-    "تاريخ",
     "جغرافيا",
+    "تاريخ",
     "علوم",
-    "رياضيات",
-    "لغة عربية",
     "رياضة",
-    "ثقافة عامة",
+    "دين إسلامي",
+    "لغة وأدب",
     "تكنولوجيا",
+    "رياضيات",
+    "ثقافة وفن",
     "حيوانات وطبيعة",
+    "سوريا وبلاد الشام",
+    "أفلام وكرتون",
+    "أكل وطبخ",
+    "فضاء وفلك",
+    "معلومات عامة",
+    "أمثال",
+    "إنجليزي",
+    "أعلام ودول",
+    "علماء واختراعات",
+    "ألعاب فيديو",
+    "شركات وماركات",
+    "ألغاز وذكاء",
+    "جسم الإنسان",
 ]
+# names used before the owner's bank (renamed by migration 0003)
+OLD_CATEGORY_NAMES = {"دين": "دين إسلامي", "لغة عربية": "لغة وأدب", "ثقافة عامة": "ثقافة وفن"}
 GENERAL_PACK = "general"
 # questions in this pack are downloaded to devices for offline solo play (answers included);
 # online rooms never use it, so cached answers cannot help in online matches

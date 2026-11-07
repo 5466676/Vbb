@@ -313,3 +313,13 @@ hamza forms) and were dropped; two were held back because the "right" answer is 
 (longest river: Nile vs Amazon; number of continents: 6 or 7 depending on the school system).
 The other 149 are a second built-in seed file (`seed/owner_v1.json`), split like the first:
 every third per category goes to the offline `solo` pack. Bank: 453 questions (305 online, 148 offline).
+
+### Update: the owner's bank becomes the main source (23 categories)
+
+Second file: 1105 questions in 23 categories (a superset of the first). We adopted **his category
+names** everywhere; the three old names that differed were renamed in `seed_ar.json` and by
+migration 0003 (دين → دين إسلامي, لغة عربية → لغة وأدب, ثقافة عامة → ثقافة وفن).
+`scripts/import_owner_bank.py` turns his `questions.json` into `seed/owner_bank.json` (replaces
+`owner_v1.json`): 1025 new, 77 already in the first seed, 3 held back (longest river, number of
+continents, and a Syria question whose answer is the lake's politically loaded former name).
+Bank: 1329 questions, 894 online and 435 offline. Difficulty in his file: 47 % / 41 % / 12 %.
