@@ -12,6 +12,10 @@ Decisions that clarified or changed the original brief are logged in `DECISIONS.
 - **Teams:** 2v2, 3v3, 4v4. Teammates share a colour family, cannot attack each other, and score as a team.
 - Empty seats can be filled with bots (host option, three difficulties: easy / medium / hard).
 - The game is played in **landscape** orientation.
+- **Solo training (offline):** one player answers rounds of questions from the downloaded `solo`
+  pack, with or without internet. It gives personal stats only (answered, correct, points: 10 per
+  right answer, 5 for a numeric answer within 10 %). It never counts for the leaderboard, which is
+  built from online matches with at least two humans.
 
 ## 2. Armies (الجيوش)
 - Before a match every player picks an **army**. Two players may pick the same army;

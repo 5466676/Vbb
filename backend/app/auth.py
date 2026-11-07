@@ -7,10 +7,10 @@ import uuid
 
 import jwt
 from sqlalchemy import func
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
+from app.db import upsert
 from app.models import Player
 
 ALGORITHM = "HS256"
@@ -23,7 +23,7 @@ class AuthError(Exception):
 async def guest_player_id(session: AsyncSession, device_id: str, name: str) -> tuple[str, str]:
     """Stable player for a device (created on first use). Returns (player_id, name)."""
     stmt = (
-        insert(Player)
+        upsert(session, Player)
         .values(id=uuid.uuid4().hex, device_id=device_id, name=name)
         .on_conflict_do_update(
             index_elements=["device_id"],

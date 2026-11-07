@@ -261,3 +261,43 @@ Decision: our own questions first; any CC BY-SA pack gets a credits screen in th
 no repeats in a match, difficulty rotation, category/pack/review filters, admin flow (auth, JSON and
 CSV import, list, review, invalid edit, delete), room setting validation. The rooms tests now run on a
 real temporary PostgreSQL (template DB migrated once, copied per test). 128 tests in total.
+
+## Home server and offline-first (2026-11-07)
+
+**Owner request:** run the server on the owner's own computer for free, exposed with Tailscale Funnel
+(fixed `https://<machine>.<tailnet>.ts.net`, public ports 443/8443/10000), switched on only to play;
+offline-first app with a solo mode, sync, leaderboard, account restore.
+
+**Kept Python, not a Dart rewrite (owner agreed):** a rewrite would redo the engine, bots and rooms
+(phases 1–5). Instead a *home mode*: `HARB_DATABASE_URL=sqlite+aiosqlite:///…` and
+`HARB_REDIS_URL=memory://` (fakeredis inside the process), one uvicorn worker, `./home-server.sh
+start|stop|status|logs` (venv + install on first start, migrate, seed, uvicorn on 127.0.0.1:8080,
+`tailscale funnel --bg --https=443 http://localhost:8080`). Docker/PostgreSQL/Redis still work the same.
+All SQL is portable (`app.db.upsert` picks the dialect; migrations use batch mode on SQLite).
+Tests run the new features on both databases.
+
+**Offline questions are a separate pack (`solo`).** A device needs the answers to play offline, so
+anything downloaded can be read. Every third seed question per category went to `solo` (≈100);
+rooms refuse it, so cached answers never help online. Questions carry a `version` (global counter,
+bumped on insert/edit/delete); deletions are tombstones, so `GET /questions?since=` is a clean
+incremental download.
+
+**Sync (`POST /sync`):** actions carry a device UUID (primary key → a repeated or parallel sync
+counts nothing twice; another player's id is `id_conflict`). The player comes from the token, not
+from the body. The server grades answers itself and ignores any score from the client. It rejects
+future/old timestamps, answers under 400 ms or over 120 s, two answers under 400 ms apart, a question
+repeated in a session, non-solo questions, and more than 2,000 answers a day. Rejected actions are
+stored too and every action gets a status, so the device can always empty its queue; one malformed
+action never blocks the others. Honest limit: timing on a device can be faked, which is why…
+
+**Leaderboard = online only** (owner agreed): finished matches are saved per human
+(`match_results`, unique per match + player, written by the room actor); only matches with ≥ 2
+humans count, so wins against bots cannot be farmed. Offline gives personal stats.
+
+**Account restore:** optional username (3–20, case-insensitive) + 4–8 digit PIN, stored as salted
+scrypt. 5 wrong PINs lock the name for 15 min, each further 5 double the lock (max a day): guessing
+a 4-digit PIN takes years. Restoring moves the account to the new device; the guest player that the
+new device had made is detached.
+
+**Still Android only** (owner agreed). **Bug found by the tests:** the lock doubling overflowed
+after hundreds of failures; capped.

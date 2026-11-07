@@ -49,7 +49,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `set_ready` | `{"ready": bool}` | lobby |
 | `choose_army` | `{"army": Army}` | lobby |
 | `vote_map` | `{"kind": "fantasy"\|"world"}` | lobby; majority wins, ties at random |
-| `update_settings` | `{"mode"?, "max_players"?, "battle_rounds"?, "bots_allowed"?, "categories"?: [str], "packs"?: [str]}` | host, lobby. `categories` ⊂ the 8 categories (empty = all); `packs` 1–5 question packs (default `["general"]`) |
+| `update_settings` | `{"mode"?, "max_players"?, "battle_rounds"?, "bots_allowed"?, "categories"?: [str], "packs"?: [str]}` | host, lobby. `categories` ⊂ the 8 categories (empty = all); `packs` 1–5 question packs (default `["general"]`, never `solo`) |
 | `add_bot` | `{"difficulty": "easy"\|"medium"\|"hard"}` | host, lobby |
 | `remove_bot` | `{"seat": int}` | host, lobby |
 | `start_match` | `{}` | host; needs ≥2 seats, every human ready; teams need 4/6/8 |
@@ -146,6 +146,51 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 `no_question`, `bad_answer`, `bad_powerup`, `rule` (the game rules refused the action; `message` says why),
 `internal`.
 
+## Offline-first REST (home server and Docker)
+
+Auth: `Authorization: Bearer <token>` from `POST /auth/guest` (the device sends its own UUID v4 as
+`device_id`). The player is **always** taken from the token, never from the body.
+
+| call | auth | body / query → response |
+|---|---|---|
+| `GET /health` | – | `{"status": "ok", "version", "server_time_ms"}` — cheap "is the server on?" check |
+| `GET /questions?since=<version>&limit=≤1000` | – | `{"version", "more", "items": [question]}` — offline (solo-pack) questions changed after `since`, in version order. Keep the returned `version`; repeat while `more`. |
+| `POST /sync` | token | `{"actions": [action, ≤500], "questions_since"?: int}` → `{"results": [{"id", "status", "reason"?, "correct"?, "points"?}], "stats", "server_time", "questions"? }` |
+| `GET /me/stats` | token | `stats` |
+| `GET /leaderboard?period=all\|week&limit=≤200` | optional token | `{"period", "rows": [{"rank", "player", "name", "matches", "wins", "score"}], "me"?}` |
+| `POST /auth/account` | token | `{"username": 3–20 letters/digits/_, "pin": 4–8 digits}` → `{"username"}` (lower-cased). 409 `username_taken` |
+| `POST /auth/restore` | – | `{"username", "pin", "device_id"}` → `{"token", "player_id", "name"}`; this device now owns the account. 401 `bad_login`, 429 `locked` |
+
+**question** = `{"id": "q12", "version", "deleted": false, "kind": "mcq"|"numeric", "category",
+"difficulty", "text", "options" (MCQ, stored order), "correct_index" (MCQ), "answer" (numeric), "unit"}`,
+or a tombstone `{"id", "version", "deleted": true}` — remove it from the device.
+These questions are offline-only: rooms never use the solo pack, so knowing them does not help online.
+
+**action** (stored on the device first, in `pending_actions`):
+
+```json
+{"id": "<uuid v4>", "type": "answer", "ts": "2026-11-07T18:03:12.512+03:00",
+ "session_id": "<uuid v4 of the solo round>", "question_id": "q12",
+ "choice": 2,            // MCQ, index in the stored option order
+ "value": 1453,          // numeric
+ "elapsed_ms": 5230}
+{"id": "<uuid>", "type": "session_end", "ts": "…", "session_id": "<uuid>"}
+```
+
+Any other field (a score, "correct"…) is ignored: the server grades answers itself
+(10 points for a right answer; numeric within 10 % gives 5).
+
+**result status:** `ok` (stored now), `duplicate` (this id was already stored — a repeated sync),
+`rejected` with `reason`: `invalid` (does not parse), `future_ts` (> 5 min ahead), `too_old` (> 60 days),
+`unknown_question` (not an offline question), `too_fast` (< 400 ms), `bad_elapsed` (> 120 s),
+`too_frequent` (< 400 ms after another answer), `repeat_in_session`, `daily_cap` (2,000 answers/day),
+`bad_choice`, `bad_value`, `id_conflict` (another player owns this id).
+**The device deletes every action that comes back with any status**; only a failed request is retried.
+
+**stats** = `{"solo": {"answered", "correct", "points", "sessions", "accuracy"},
+"online": {"matches", "wins", "score"}}`. The leaderboard counts online matches with ≥ 2 humans only
+(offline answers can be faked on a device; bots can be farmed).
+
 ## Admin REST (question bank)
 
 Not used by the game client. Every call needs the header `X-Admin-Key` (setting `HARB_ADMIN_KEY`).
@@ -157,7 +202,7 @@ Not used by the game client. Every call needs the header `X-Admin-Key` (setting 
 | `GET /admin/questions?pack=&category=&type=&reviewed=&offset=&limit=` | `{"total", "items"}` |
 | `GET /admin/questions/stats` | counts per pack / category / type / reviewed |
 | `PATCH /admin/questions/{id}` | any question field, or `reviewed`; invalid result → 422 |
-| `DELETE /admin/questions/{id}` | 204 |
+| `DELETE /admin/questions/{id}` | 204 — kept as a tombstone so devices drop it on their next download |
 
 ## Names compared with the brief
 

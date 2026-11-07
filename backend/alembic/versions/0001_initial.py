@@ -16,6 +16,8 @@ depends_on = None
 
 
 def upgrade() -> None:
+    pg = op.get_bind().dialect.name == "postgresql"
+    size = "cardinality(options_ar) = 4" if pg else "json_array_length(options_ar) = 4"
     op.create_table(
         "players",
         sa.Column("id", sa.String(32), primary_key=True),
@@ -36,7 +38,7 @@ def upgrade() -> None:
         sa.Column("category", sa.String(40), nullable=False),
         sa.Column("difficulty", sa.SmallInteger, nullable=False, server_default="2"),
         sa.Column("text_ar", sa.Text, nullable=False, unique=True),
-        sa.Column("options_ar", postgresql.ARRAY(sa.Text), nullable=True),
+        sa.Column("options_ar", postgresql.ARRAY(sa.Text) if pg else sa.JSON, nullable=True),
         sa.Column("correct_index", sa.SmallInteger, nullable=True),
         sa.Column("numeric_answer", sa.Float, nullable=True),
         sa.Column("unit_ar", sa.String(40), nullable=False, server_default=""),
@@ -52,7 +54,7 @@ def upgrade() -> None:
         ),
         sa.CheckConstraint("difficulty BETWEEN 1 AND 3", name="difficulty_range"),
         sa.CheckConstraint(
-            "(type = 'mcq' AND correct_index BETWEEN 0 AND 3 AND cardinality(options_ar) = 4)"
+            f"(type = 'mcq' AND correct_index BETWEEN 0 AND 3 AND {size})"
             " OR (type = 'numeric' AND numeric_answer IS NOT NULL)",
             name="shape_by_type",
         ),

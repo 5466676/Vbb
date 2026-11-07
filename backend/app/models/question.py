@@ -6,6 +6,7 @@ from datetime import datetime
 from enum import StrEnum
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     CheckConstraint,
     DateTime,
@@ -30,6 +31,9 @@ class QuestionType(StrEnum):
 
 CATEGORIES = ["دين", "تاريخ", "جغرافيا", "علوم", "رياضيات", "لغة عربية", "رياضة", "ثقافة عامة"]
 GENERAL_PACK = "general"
+# questions in this pack are downloaded to devices for offline solo play (answers included);
+# online rooms never use it, so cached answers cannot help in online matches
+SOLO_PACK = "solo"
 
 
 class Question(Base):
@@ -48,7 +52,9 @@ class Question(Base):
     category: Mapped[str] = mapped_column(String(40), index=True)
     difficulty: Mapped[int] = mapped_column(SmallInteger, default=2)
     text_ar: Mapped[str] = mapped_column(Text, unique=True)
-    options_ar: Mapped[list[str] | None] = mapped_column(ARRAY(Text), nullable=True)
+    options_ar: Mapped[list[str] | None] = mapped_column(
+        ARRAY(Text).with_variant(JSON(), "sqlite"), nullable=True
+    )
     correct_index: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)
     numeric_answer: Mapped[float | None] = mapped_column(Float, nullable=True)
     unit_ar: Mapped[str] = mapped_column(String(40), default="")
@@ -57,6 +63,10 @@ class Question(Base):
     # curriculum packs (e.g. "sy-g9-science") live next to the general bank
     pack: Mapped[str] = mapped_column(String(60), default=GENERAL_PACK, index=True)
     reviewed: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
+    # offline sync: every change gets the next value of the "questions" counter;
+    # deleted questions stay as tombstones so devices can drop them
+    version: Mapped[int] = mapped_column(Integer, default=0, index=True)
+    deleted: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

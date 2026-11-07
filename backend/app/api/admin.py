@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Question
 from app.models.question import GENERAL_PACK
-from app.questions.bank import ImportResult, QuestionIn, import_questions, parse_csv
+from app.questions.bank import ImportResult, QuestionIn, import_questions, next_version, parse_csv
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 MAX_UPLOAD = 5 * 1024 * 1024
@@ -110,7 +110,7 @@ async def list_questions(
     offset: int = Query(0, ge=0),
     s: AsyncSession = Depends(session),
 ) -> dict:
-    q = select(Question)
+    q = select(Question).where(Question.deleted.is_(False))
     if reviewed is not None:
         q = q.where(Question.reviewed.is_(reviewed))
     if category:
@@ -127,9 +127,9 @@ async def list_questions(
 @router.get("/questions/stats", dependencies=[Depends(require_admin)])
 async def stats(s: AsyncSession = Depends(session)) -> dict:
     rows = await s.execute(
-        select(
-            Question.pack, Question.category, Question.type, Question.reviewed, func.count()
-        ).group_by(Question.pack, Question.category, Question.type, Question.reviewed)
+        select(Question.pack, Question.category, Question.type, Question.reviewed, func.count())
+        .where(Question.deleted.is_(False))
+        .group_by(Question.pack, Question.category, Question.type, Question.reviewed)
     )
     out = [
         {"pack": p, "category": c, "type": t, "reviewed": r, "count": n} for p, c, t, r, n in rows
@@ -153,7 +153,7 @@ async def update_question(
     qid: int, patch: QuestionPatch, s: AsyncSession = Depends(session)
 ) -> dict:
     q = await s.get(Question, qid)
-    if q is None:
+    if q is None or q.deleted:
         raise HTTPException(status_code=404, detail="no such question")
     merged = _out(q) | patch.model_dump(exclude_unset=True)
     try:
@@ -162,6 +162,7 @@ async def update_question(
         raise HTTPException(status_code=422, detail=str(e)) from e
     for k, v in patch.model_dump(exclude_unset=True).items():
         setattr(q, k, v)
+    q.version = await next_version(s)
     await s.commit()
     await s.refresh(q)
     return _out(q)
@@ -170,7 +171,9 @@ async def update_question(
 @router.delete("/questions/{qid}", dependencies=[Depends(require_admin)], status_code=204)
 async def delete_question(qid: int, s: AsyncSession = Depends(session)) -> None:
     q = await s.get(Question, qid)
-    if q is None:
+    if q is None or q.deleted:
         raise HTTPException(status_code=404, detail="no such question")
-    await s.delete(q)
+    # kept as a tombstone so offline devices learn about the deletion on their next sync
+    q.deleted = True
+    q.version = await next_version(s)
     await s.commit()

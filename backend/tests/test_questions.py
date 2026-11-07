@@ -121,9 +121,18 @@ async def test_selection_avoids_questions_the_players_saw(sm):
             .scalars()
             .all()
         )
-    assert seen == [int(q1.id[1:])]
-    # 12 numeric maths questions: player a (with b) never gets q1 again while others remain
-    for _ in range(11):
+        n = (
+            await s.execute(
+                select(func.count()).where(
+                    Question.category == "رياضيات",
+                    Question.type == "numeric",
+                    Question.pack == "general",
+                )
+            )
+        ).scalar_one()
+    assert seen == [int(q1.id[1:])] and n >= 5
+    # player a (with b) never gets q1 again while other questions remain
+    for _ in range(n - 1):
         q = await p.next(QuestionKind.NUMERIC, ["a", "b"], [])
         assert q.id != q1.id
     # now everything was seen: the one seen longest ago (q1) comes back

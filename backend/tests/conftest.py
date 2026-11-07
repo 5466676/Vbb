@@ -194,3 +194,40 @@ async def start_server(redis_url: str, db_url: str) -> AsyncIterator[Servers]:
     servers = Servers(redis_url, db_url)
     yield servers
     await servers.stop_all()
+
+
+@pytest.fixture(scope="session")
+def sqlite_template(tmp_path_factory) -> Path:
+    """A migrated + seeded SQLite file, copied for each test."""
+    path = tmp_path_factory.mktemp("sqlite") / "template.db"
+    url = f"sqlite+aiosqlite:///{path}"
+    subprocess.run(
+        [sys.executable, "-m", "alembic", "-x", f"url={url}", "upgrade", "head"],
+        cwd=BACKEND,
+        check=True,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    asyncio.run(_seed(url))
+    return path
+
+
+@pytest.fixture
+def sqlite_url(sqlite_template: Path, tmp_path: Path) -> str:
+    path = tmp_path / "harb.db"
+    shutil.copy(sqlite_template, path)
+    return f"sqlite+aiosqlite:///{path}"
+
+
+@pytest.fixture(params=["sqlite", "postgres"])
+def any_db_url(request) -> str:
+    """Run the test on both databases."""
+    return request.getfixturevalue("sqlite_url" if request.param == "sqlite" else "db_url")
+
+
+@pytest.fixture
+async def home_server(any_db_url: str) -> AsyncIterator[Servers]:
+    """Home mode: in-process Redis (``memory://``), SQLite or PostgreSQL."""
+    servers = Servers("memory://", any_db_url)
+    yield servers
+    await servers.stop_all()

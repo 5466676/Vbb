@@ -13,3 +13,6 @@ __pycache__/
 .idea/
 .vscode/
 .DS_Store
+
+# Home server data (SQLite file, secrets, logs)
+backend/data/

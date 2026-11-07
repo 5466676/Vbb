@@ -19,7 +19,7 @@ from redis.asyncio import Redis
 from app.config import Settings
 from app.questions.provider import ProviderFactory, SampleProvider
 from app.rooms import store
-from app.rooms.actor import RoomActor
+from app.rooms.actor import ResultsSink, RoomActor
 from app.rooms.bus import Bus
 
 log = logging.getLogger(__name__)
@@ -32,11 +32,13 @@ class RoomManager:
         bus: Bus,
         settings: Settings,
         provider_factory: ProviderFactory = SampleProvider,
+        results_sink: ResultsSink | None = None,
     ) -> None:
         self.redis = redis
         self.bus = bus
         self.settings = settings
         self.provider_factory = provider_factory
+        self.results_sink = results_sink
         self.actors: dict[str, RoomActor] = {}
         self._lock = asyncio.Lock()
 
@@ -61,6 +63,7 @@ class RoomManager:
                 self.settings,
                 self.provider_factory,
                 on_stop=self._stopped,
+                results_sink=self.results_sink,
             )
             self.actors[code] = actor
             try:

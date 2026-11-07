@@ -13,6 +13,7 @@ from app import __version__
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.health import router as health_router
+from app.api.sync import router as sync_router
 from app.config import Settings, get_settings
 from app.db import make_engine, make_sessionmaker
 from app.questions.bank import DbProvider, FallbackProvider
@@ -22,6 +23,16 @@ from app.rooms.bus import Bus
 from app.rooms.hub import Hub
 from app.rooms.manager import RoomManager
 from app.rooms.matchmaker import Matchmaker
+from app.sync.results import db_results_sink
+
+
+def make_redis(url: str) -> Redis:
+    """``memory://`` runs an in-process Redis (home server: one process, nothing to install)."""
+    if url.startswith("memory://"):
+        import fakeredis
+
+        return fakeredis.FakeAsyncRedis(server=fakeredis.FakeServer())
+    return Redis.from_url(url)
 
 
 def db_provider_factory(sessionmaker, settings: Settings) -> ProviderFactory:
@@ -46,7 +57,7 @@ def create_app(
 
     @contextlib.asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        redis = Redis.from_url(settings.redis_url)
+        redis = make_redis(settings.redis_url)
         set_redis(redis)
         engine = make_engine(settings.database_url)
         sessionmaker = make_sessionmaker(engine)
@@ -54,7 +65,7 @@ def create_app(
         factory = provider_factory or db_provider_factory(sessionmaker, settings)
         bus = Bus(redis)
         await bus.start()
-        manager = RoomManager(redis, bus, settings, factory)
+        manager = RoomManager(redis, bus, settings, factory, db_results_sink(sessionmaker))
         hub = Hub(redis, bus, manager, settings)
         app.state.hub = hub
         app.state.redis = redis
@@ -78,6 +89,7 @@ def create_app(
     app.include_router(health_router)
     app.include_router(auth_router)
     app.include_router(admin_router)
+    app.include_router(sync_router)
 
     @app.websocket("/ws")
     async def ws_endpoint(ws: WebSocket) -> None:

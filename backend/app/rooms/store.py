@@ -16,7 +16,7 @@ from app.bots.simple import Difficulty
 from app.engine.armies import Army
 from app.engine.models import MatchState, Mode
 from app.maps import MapKind
-from app.models.question import CATEGORIES, GENERAL_PACK
+from app.models.question import CATEGORIES, GENERAL_PACK, SOLO_PACK
 
 CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"  # no 0/O/1/I/L
 CODE_LEN = 6
@@ -81,6 +81,8 @@ class RoomSettings(BaseModel):
     def pack_names(cls, v: list[str]) -> list[str]:
         if any(not (1 <= len(x) <= 40) for x in v):
             raise ValueError("pack names are 1-40 characters")
+        if SOLO_PACK in v:
+            raise ValueError("the solo pack is offline only (its answers are on the devices)")
         return list(dict.fromkeys(v))
 
 
@@ -110,6 +112,7 @@ class RoomData(BaseModel):
     autostart_at_ms: int | None = None
     map_kind: MapKind | None = None
     match: MatchState | None = None
+    match_uid: str | None = None  # unique per match (results are saved under it)
     perms: dict[int, list[int]] = Field(
         default_factory=dict
     )  # seat -> display order of MCQ options

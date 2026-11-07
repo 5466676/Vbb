@@ -16,7 +16,8 @@ import json
 import logging
 import random
 import time
-from collections.abc import Callable
+import uuid
+from collections.abc import Awaitable, Callable
 from typing import Any
 
 from redis.asyncio import Redis
@@ -51,6 +52,8 @@ from app.rooms.bus import Bus
 from app.rooms.store import RoomData, RoomStatus, Seat
 
 log = logging.getLogger(__name__)
+# called once per finished match: (match_uid, room) -> saves results somewhere
+ResultsSink = Callable[[str, RoomData], Awaitable[None]]
 
 # pauses after events so the client can animate (game ms)
 START_PAUSE_MS = 3000
@@ -81,6 +84,7 @@ class RoomActor:
         settings: Settings,
         provider_factory: ProviderFactory = SampleProvider,
         on_stop: Callable[[str], None] | None = None,
+        results_sink: ResultsSink | None = None,
     ) -> None:
         self.code = code
         self.redis = redis
@@ -89,6 +93,7 @@ class RoomActor:
         self.provider_factory = provider_factory
         self._provider: QuestionProvider | None = None
         self.on_stop = on_stop
+        self.results_sink = results_sink
         self.room: RoomData | None = None
         self.queue: asyncio.Queue[tuple[str, Any]] = asyncio.Queue()
         self.handles: dict[str, asyncio.TimerHandle] = {}
@@ -450,6 +455,7 @@ class RoomActor:
             settings=MatchSettings(mode=r.settings.mode, battle_rounds=r.settings.battle_rounds),
         )
         r.status = RoomStatus.PLAYING
+        r.match_uid = uuid.uuid4().hex
         r.autostart_at_ms = None
         self._provider = None  # settings are final now
         self._cancel("autostart")
@@ -571,6 +577,7 @@ class RoomActor:
             for name in list(r.timers):
                 self._cancel(name)
             self._schedule("cleanup", ENDED_TTL_MS)
+            await self._save_results()
             return
         if m.pending_question is not None and "provide" not in r.timers:
             self._schedule("provide", pause)
@@ -583,6 +590,16 @@ class RoomActor:
                 f"phase:{m.phase_id}", pause + m.settings.timers.target_ms, phase_id=m.phase_id
             )
         self._schedule_bots(pause)
+
+    async def _save_results(self) -> None:
+        """Hand the final standings to the results sink (leaderboard). Never breaks the room."""
+        r = self.room
+        if self.results_sink is None or r is None or r.match is None or r.match_uid is None:
+            return
+        try:
+            await self.results_sink(r.match_uid, r)
+        except Exception:
+            log.exception("room %s: saving results failed", self.code)
 
     async def _emit(self, e: Event, pause: int) -> None:
         """Translate one engine event into client messages (per-player views where needed)."""

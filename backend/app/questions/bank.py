@@ -20,13 +20,13 @@ from typing import Any
 
 from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator
 from sqlalchemy import case, func, select, text
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from app.db import upsert
 from app.engine.models import Question as EngineQuestion
 from app.engine.models import QuestionKind
-from app.models import Player, Question, SeenQuestion
-from app.models.question import CATEGORIES, GENERAL_PACK
+from app.models import Counter, Player, Question, SeenQuestion
+from app.models.question import CATEGORIES, GENERAL_PACK, SOLO_PACK
 
 log = logging.getLogger(__name__)
 SEED_FILE = Path(__file__).parent / "seed" / "seed_ar.json"
@@ -113,6 +113,17 @@ def parse_csv(text_: str) -> list[dict[str, Any]]:
     return rows
 
 
+async def next_version(session: AsyncSession) -> int:
+    """Next value of the question-bank version (one per inserted/edited/deleted question)."""
+    stmt = (
+        upsert(session, Counter)
+        .values(name="questions", value=1)
+        .on_conflict_do_update(index_elements=["name"], set_={"value": Counter.value + 1})
+        .returning(Counter.value)
+    )
+    return (await session.execute(stmt)).scalar_one()
+
+
 async def import_questions(
     session: AsyncSession,
     items: Iterable[dict[str, Any]],
@@ -142,19 +153,38 @@ async def import_questions(
             }
         )
     for row in valid:
-        stmt = insert(Question).values(**row).on_conflict_do_nothing(index_elements=["text_ar"])
-        res = await session.execute(stmt)
-        if res.rowcount:
-            result.inserted += 1
-        else:
+        exists = await session.execute(
+            select(Question.id).where(Question.text_ar == row["text_ar"])
+        )
+        if exists.first() is not None:
             result.duplicates += 1
+            continue
+        session.add(Question(**row, version=await next_version(session)))
+        await session.flush()
+        result.inserted += 1
     await session.commit()
     return result
 
 
-async def load_seed(session: AsyncSession) -> ImportResult:
+def seed_packs() -> dict[str, list[dict[str, Any]]]:
+    """The seed split in two: every third question per category goes to the offline solo pack."""
     items = json.loads(SEED_FILE.read_text(encoding="utf-8"))
-    return await import_questions(session, items, source=SEED_SOURCE)
+    out: dict[str, list[dict[str, Any]]] = {GENERAL_PACK: [], SOLO_PACK: []}
+    per_cat: dict[str, int] = {}
+    for item in items:
+        n = per_cat[item["category"]] = per_cat.get(item["category"], 0) + 1
+        out[SOLO_PACK if n % 3 == 0 else GENERAL_PACK].append(item)
+    return out
+
+
+async def load_seed(session: AsyncSession) -> ImportResult:
+    total = ImportResult()
+    for pack, items in seed_packs().items():
+        res = await import_questions(session, items, pack=pack, source=SEED_SOURCE)
+        total.inserted += res.inserted
+        total.duplicates += res.duplicates
+        total.errors += res.errors
+    return total
 
 
 # ------------------------------------------------------------------------------------------
@@ -195,12 +225,17 @@ class DbProvider:
     ) -> None:
         self.sessionmaker = sessionmaker
         self.categories = [c for c in (categories or []) if c in CATEGORIES]
-        self.packs = packs or [GENERAL_PACK]
+        # the solo pack is on players' devices with its answers: never use it online
+        self.packs = [p for p in (packs or []) if p != SOLO_PACK] or [GENERAL_PACK]
         self.only_reviewed = only_reviewed
         self.window = timedelta(days=seen_window_days)
 
     def _filters(self, kind: QuestionKind, used: list[int]) -> list:
-        f = [Question.type == kind.value, Question.pack.in_(self.packs)]
+        f = [
+            Question.type == kind.value,
+            Question.pack.in_(self.packs),
+            Question.deleted.is_(False),
+        ]
         if self.categories:
             f.append(Question.category.in_(self.categories))
         if self.only_reviewed:
@@ -258,7 +293,7 @@ class DbProvider:
                 raise NoQuestions(f"no {kind.value} questions match the room filters")
             if players:
                 known = select(Player.id, text(str(q.id)), func.now()).where(Player.id.in_(players))
-                stmt = insert(SeenQuestion).from_select(
+                stmt = upsert(s, SeenQuestion).from_select(
                     ["player_id", "question_id", "seen_at"], known
                 )
                 stmt = stmt.on_conflict_do_update(
