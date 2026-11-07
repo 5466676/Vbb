@@ -18,6 +18,7 @@ from app.engine.models import (
     MatchState,
     Mode,
     Phase,
+    PlaceBase,
     PlayerSetup,
     ProvideQuestion,
     Question,
@@ -180,6 +181,7 @@ REVEAL_MS = 4000  # show the correct answer and ranking
 CLAIM_ANIM_MS = 2500  # territories appear after picks
 DUEL_ANIM_MS = 4500  # army marches, battle scene
 START_MS = 4500
+BASE_ANIM_MS = 1800  # a castle lands
 
 
 @dataclass
@@ -201,8 +203,9 @@ def check_invariants(state: MatchState) -> None:
             assert not state.players[t.owner].eliminated, "eliminated players own nothing"
     if state.phase in core.BATTLE_PHASES or state.phase is Phase.RESULTS:
         assert all(t.owner is not None for t in state.territories.values())
+    placing = state.phase in (Phase.STARTING, Phase.BASE_PLACEMENT)
     for p in state.players:
-        if not p.eliminated:
+        if not p.eliminated and not placing:
             assert any(t.owner == p.seat and t.is_base for t in state.territories.values())
 
 
@@ -218,6 +221,7 @@ def play_match(
     towers: int | None = None,
     map_def: MapDef | None = None,
     open_ended: bool = True,
+    choose_bases: bool = True,
 ) -> SimResult:
     rnd = random.Random(seed)
     team_size = n_players // 2 if mode is Mode.TEAMS else 0
@@ -230,7 +234,11 @@ def play_match(
         setups(armies, teams),
         seed=seed,
         settings=MatchSettings(
-            mode=mode, battle_rounds=rounds, base_towers=towers, open_ended=open_ended
+            mode=mode,
+            battle_rounds=rounds,
+            base_towers=towers,
+            open_ended=open_ended,
+            choose_bases=choose_bases,
         ),
     )
     qf = QuestionFactory(seed)
@@ -283,6 +291,17 @@ def play_match(
                 do(Timeout(phase_id=phase_id))
                 longest = max(aq.limits_ms.values())
             clock += longest + REVEAL_MS
+            continue
+        if state.phase is Phase.BASE_PLACEMENT:
+            seat = state.placer
+            assert seat is not None
+            if rnd.random() < 0.1:
+                do(Timeout(phase_id=state.phase_id))
+                clock += timers.base_ms
+            else:
+                do(PlaceBase(seat=seat, territory=core.auto_base(state, seat)))
+                clock += rnd.randint(2500, 5000)
+            clock += BASE_ANIM_MS
             continue
         if state.phase is Phase.EXP_PICKS:
             phase_id = state.phase_id

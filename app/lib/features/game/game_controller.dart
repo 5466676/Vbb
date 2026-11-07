@@ -178,6 +178,8 @@ class GameController extends Notifier<GameState> {
     _bump();
   }
 
+  void placeBase(int territory) => _t.send('place_base', {'territory': territory});
+
   void chooseTarget(int territory) {
     final m = state.match;
     if (m == null || !m.myTurn || !m.targets.contains(territory)) return;
@@ -328,6 +330,7 @@ class GameController extends Notifier<GameState> {
     match.battleRound = (mj['battle_round'] ?? 0) as int;
     match.roundOrder = [for (final s in (mj['round_order'] as List? ?? const [])) s as int];
     match.attacker = mj['attacker'] as int?;
+    match.placer = mj['placer'] as int?;
     // turns already taken this round: everyone listed before the current attacker
     final at = match.attacker == null ? -1 : match.roundOrder.indexOf(match.attacker!);
     if (at > 0) match.turnDone.addAll(match.roundOrder.take(at));
@@ -393,7 +396,14 @@ class GameController extends Notifier<GameState> {
         final dl = p['deadline_ms'] as int?;
         m.deadline = dl == null ? null : m.opensAt!.add(Duration(milliseconds: dl));
         switch (m.phase) {
+          case 'base_placement':
+            final first = m.placer == null;
+            m.placer = p['placer'] as int?;
+            m.placeOptions = [for (final t in (p['options'] as List? ?? [])) t as int];
+            if (first) m.announce('ابنوا قلاعكم', 'كل واحد بدوره بيختار وين يبني قلعتو');
+            if (m.placer == m.mySeat) sound.play('your_turn');
           case 'expansion_question':
+            m.placer = null;
             final before = m.expansionRound;
             m.expansionRound = (p['expansion_round'] ?? m.expansionRound) as int;
             if (before == 0 && m.expansionRound <= 1) m.announce('تقاسم الأرض', 'جاوب أسرع وأصح لتختار أراضيك');
@@ -456,6 +466,24 @@ class GameController extends Notifier<GameState> {
             sound.play(q.answered ? (right ? 'correct' : 'wrong') : 'time_up');
           }
         }
+      case 'base_placed':
+        final seat = p['seat'] as int;
+        final t = m.terr(p['territory'] as int)
+          ..owner = seat
+          ..isBase = true
+          ..towers = (p['towers'] ?? m.baseTowers) as int
+          ..value = (p['value'] ?? 1000) as int;
+        m.flash = t.id;
+        m.effect(Fx('claim', t.id, seat: seat));
+        final auto = (p['auto'] ?? false) == true;
+        m.log(
+          seat == m.mySeat
+              ? (auto ? 'خلص وقتك: بنينالك قلعتك بمكان مناسب' : 'بنيت قلعتك')
+              : '${_name(m, seat)} بنى قلعتو${auto ? ' (تلقائي)' : ''}',
+          seat,
+          'tower',
+        );
+        sound.play('claim');
       case 'territory_claimed':
         final t = m.terr(p['territory'] as int)
           ..owner = p['seat'] as int

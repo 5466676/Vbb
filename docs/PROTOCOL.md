@@ -56,6 +56,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `start_match` | `{}` | host; needs ≥2 seats, every human ready; teams need 4/6/8 |
 | `answer` | `{"question_id": str, "choice": 0–3}` or `{"question_id": str, "value": number}` | only while the question is open; one answer per question |
 | `pick_territory` | `{"territories": [id, …]}` | expansion picks; illegal or taken picks are replaced by auto-picks |
+| `place_base` | `{"territory": id}` | castle placement, your turn only (`phase_changed.placer`); one of `options` |
 | `choose_target` | `{"territory": id}` | your battle turn; must be one of `phase_changed.targets` |
 | `use_powerup` | `{"powerup": "remove_two"\|"hint"\|"shield"\|"double", "territory"?: id}` | `shield` needs one of your territories |
 | `use_ability` | `{"territory"?: id}` | your army's once-per-match ability (`pharaoh` needs a territory) |
@@ -87,6 +88,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `answer_locked` | `{"seat"}` — someone answered (no content) |
 | `question_result` | `{"id", "correct_index" (your order) or "answer", "ranking": [seat], "answers": {seat: {"choice" (your order) \| "value", "elapsed_ms"}}}` |
 | `pick_locked` | `{"seat"}` |
+| `base_placed` | `{"seat", "territory", "auto", "towers", "value"}` — a player's castle is built (§6.0) |
 | `territory_claimed` | `{"seat", "territory", "auto", "value"}` |
 | `battle_started` | `{"rounds", "open_ended"}` — open length: `rounds` is only a safety cap |
 | `round_started` | `{"round", "order", "win_share" (null in fixed-rounds matches)}` — `order`: this round's attackers (seats) in turn order; eliminated players and extra turns are not listed. `win_share`: the share of the map (0–1) that wins now (GAME_RULES §6.3) |
@@ -112,10 +114,11 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 
 | phase | extra fields |
 |---|---|
+| `base_placement` | `placer`, `options: [id]` (free spots not touching a castle), `deadline_ms` (12 s) |
 | `expansion_question` | `expansion_round` (a `question` follows) |
-| `expansion_picks` | `quota: {seat: picks}`, `ranking`, `deadline_ms` (≈5 s) |
-| `battle_target` | `attacker`, `round`, `targets: [id]`, `deadline_ms` (≈8 s) |
-| `battle_duel` | `attacker`, `defender`, `territory` (an MCQ follows, only these two answer) |
+| `expansion_picks` | `quota: {seat: picks}`, `ranking`, `deadline_ms` (10 s) |
+| `battle_target` | `attacker`, `round`, `targets: [id]`, `deadline_ms` (20 s) |
+| `battle_duel` | `attacker`, `defender`, `territory` (an MCQ follows for everyone still in; only these two decide the land) |
 | `battle_tiebreak` | `attacker`, `defender`, `territory` (a numeric question follows) |
 | `results` | — (`match_ended` follows) |
 
@@ -127,7 +130,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
   "match": null | {
     "map_id", "map_kind", "phase", "phase_id", "deadline_in_ms",
     "expansion_round", "battle_round", "rounds", "base_towers",
-    "attacker", "round_order": [seats], "duel": {"attacker", "defender", "territory"} | null,
+    "attacker", "placer", "round_order": [seats], "duel": {"attacker", "defender", "territory"} | null,
     "pick_quota": {seat: n}, "your_seat",
     "territories": [{"id", "owner", "value", "is_base", "towers", "shielded" (own team only)}],
     "players": [{"seat", "name", "army", "team", "score", "eliminated", "connected",

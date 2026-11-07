@@ -91,7 +91,9 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
       }
       return;
     }
-    if (m.phase == 'expansion_picks') {
+    if (m.phase == 'base_placement') {
+      if (m.placer == m.mySeat && m.placeOptions.contains(id)) game.placeBase(id);
+    } else if (m.phase == 'expansion_picks') {
       game.togglePick(id);
     } else if (m.myTurn) {
       game.chooseTarget(id);
@@ -112,6 +114,8 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
             for (final e in m.territories.entries)
               if (e.value.owner == m.mySeat) e.key,
           }
+        : m.phase == 'base_placement'
+        ? (m.placer == m.mySeat ? m.placeOptions.toSet() : <int>{})
         : m.phase == 'expansion_picks'
         ? _legalPicks(m)
         : m.myTurn
@@ -256,6 +260,10 @@ class _PhaseBanner extends StatelessWidget {
       'shield' => 'اختار أرض من أراضيك لتحطلها درع',
       'ability' => 'اختار أرض من أراضيك',
       _ => switch (m.phase) {
+        'base_placement' =>
+          m.placer == m.mySeat
+              ? 'اختار وين تبني قلعتك (مو لازقة بقلعة غيرك)'
+              : '${name(m.placer)} عم يختار مكان قلعتو…',
         'expansion_question' => 'التوسّع — الجولة ${m.expansionRound}',
         'expansion_picks' =>
           (m.quota[m.mySeat] ?? 0) > 0
@@ -274,9 +282,12 @@ class _PhaseBanner extends StatelessWidget {
         : win == null
         ? '  •  جولة المعارك ${m.battleRound}/${m.rounds}'
         : '  •  الجولة ${m.battleRound}  •  للفوز ${(win * 100).round()}٪ من الخريطة';
-    final timed = m.phase == 'expansion_picks' || m.phase == 'battle_target';
+    final timed = m.phase == 'expansion_picks' || m.phase == 'battle_target' || m.phase == 'base_placement';
     return _Ribbon(
-      highlight: m.myTurn || (m.phase == 'expansion_picks' && (m.quota[m.mySeat] ?? 0) > 0),
+      highlight:
+          m.myTurn ||
+          (m.phase == 'expansion_picks' && (m.quota[m.mySeat] ?? 0) > 0) ||
+          (m.phase == 'base_placement' && m.placer == m.mySeat),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

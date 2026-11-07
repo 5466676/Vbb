@@ -16,7 +16,7 @@ const _botNames = ['صلاح', 'خالد', 'طارق', 'قطز', 'بيبرس', '
 const _armies = ['islamic', 'ayyubid', 'crusader', 'roman', 'pharaoh', 'mongol', 'ottoman', 'ww2'];
 
 // pauses for animations before the next window opens (same as the server's room actor)
-const _startPause = 4500, _revealPause = 4000, _claimPause = 2500, _duelPause = 4500;
+const _startPause = 4500, _revealPause = 4000, _claimPause = 2500, _duelPause = 4500, _basePause = 1800;
 const _networkSlack = 600;
 
 /// A whole match against bots inside the app: no server, no internet.
@@ -121,6 +121,7 @@ class LocalGame implements GameTransport {
       setups: setups,
       teams: teams,
       openEnded: openEnded,
+      chooseBases: true,
       rng: _rnd,
     );
     for (final s in _template.seaLinks) {
@@ -137,7 +138,7 @@ class LocalGame implements GameTransport {
       'players': [
         for (final p in _m.players) {'seat': p.seat, 'name': p.name, 'army': p.army, 'team': p.team, 'bot': p.isBot},
       ],
-      'bases': _template.bases.take(n).toList(),
+      'bases': const <int>[], // players place their castles (base_placed)
     });
     _after(_m.start(), forcePause: _startPause);
   }
@@ -170,6 +171,8 @@ class LocalGame implements GameTransport {
           final chosen = [for (final t in (p['territories'] as List? ?? [])) t as int];
           if (chosen.length >= (_m.pickQuota[0] ?? 0)) _after(_m.pick(0, chosen));
           _lastPicks = chosen;
+        case 'place_base':
+          _after(_m.placeBase(0, p['territory'] as int));
         case 'choose_target':
           _after(_m.chooseTarget(0, p['territory'] as int));
         case 'use_powerup':
@@ -197,6 +200,7 @@ class LocalGame implements GameTransport {
     var pause = forcePause;
     if (types.contains('question_result')) pause = max(pause, _revealPause);
     if (types.contains('territory_claimed')) pause = max(pause, _claimPause);
+    if (types.contains('base_placed')) pause = max(pause, _basePause);
     if (types.contains('battle_result') || types.contains('shield_blocked')) pause = max(pause, _duelPause);
     if (types.contains('phase_changed')) {
       for (final k in _timers.keys.where((k) => k.startsWith('phase:') || k.startsWith('bot:') || k == 'provide').toList()) {
@@ -215,6 +219,9 @@ class LocalGame implements GameTransport {
     }
     if (_m.pendingQuestion != null && !_timers.containsKey('provide')) {
       _schedule('provide', pause, _provide);
+    } else if (_m.phase == 'base_placement') {
+      final id = _m.phaseId;
+      _schedule('phase:$id', pause + _m.settings.baseMs, () => _after(_m.timeout(id)));
     } else if (_m.phase == 'expansion_picks') {
       final id = _m.phaseId;
       _schedule('phase:$id', pause + _m.settings.pickMs, () {
@@ -244,6 +251,7 @@ class LocalGame implements GameTransport {
         return;
       case 'phase_changed':
         final d = {...e.data, 'opens_in_ms': pause};
+        if (e.data['phase'] == 'base_placement') d['deadline_ms'] = _m.settings.baseMs;
         if (e.data['phase'] == 'expansion_picks') d['deadline_ms'] = _m.settings.pickMs;
         if (e.data['phase'] == 'battle_target') d['deadline_ms'] = _m.settings.targetMs;
         _out('phase_changed', d);
@@ -318,6 +326,8 @@ class LocalGame implements GameTransport {
       final aq = _m.active;
       if (aq != null && aq.participants.contains(p.seat) && !aq.answers.containsKey(p.seat)) {
         delay = min(aq.limitsMs[p.seat]! - 200, randInt(_rnd, prof.minMs, prof.maxMs));
+      } else if (_m.phase == 'base_placement' && _m.placer == p.seat) {
+        delay = pause + randInt(_rnd, 2500, 5000);
       } else if (_m.phase == 'expansion_picks' && _m.pickQuota.containsKey(p.seat) && !_m.picks.containsKey(p.seat)) {
         delay = pause + randInt(_rnd, 2500, 6000);
       } else if (_m.phase == 'battle_target' && _m.attacker == p.seat) {
@@ -344,6 +354,8 @@ class LocalGame implements GameTransport {
     if (aq != null && aq.participants.contains(seat) && !aq.answers.containsKey(seat)) {
       final a = botAnswer(aq.question, aq.limitsMs[seat]!, level, _rnd);
       _after(_m.answer(seat, choice: a.choice, value: a.value, elapsedMs: a.elapsedMs));
+    } else if (_m.phase == 'base_placement' && _m.placer == seat) {
+      _after(_m.placeBase(seat, _m.autoBase(seat)));
     } else if (_m.phase == 'expansion_picks' && _m.pickQuota.containsKey(seat) && !_m.picks.containsKey(seat)) {
       _after(_m.pick(seat, botPicks(_m, seat, _m.pickQuota[seat]!, _rnd)));
     } else if (_m.phase == 'battle_target' && _m.attacker == seat) {
@@ -371,6 +383,7 @@ class LocalGame implements GameTransport {
         'rounds': _m.battleRounds,
         'base_towers': _m.baseTowers,
         'attacker': _m.attacker,
+        'placer': _m.placer,
         'duel': _m.duel == null
             ? null
             : {'attacker': _m.duel!.attacker, 'defender': _m.duel!.defender, 'territory': _m.duel!.territory},

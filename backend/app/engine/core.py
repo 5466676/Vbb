@@ -30,6 +30,7 @@ from app.engine.models import (
     Mode,
     Phase,
     PickTerritories,
+    PlaceBase,
     PlayerSetup,
     PlayerState,
     PowerUp,
@@ -88,16 +89,16 @@ def create_match(
         player_states.append(
             PlayerState(seat=p.seat, name=p.name, army=p.army, team=team, is_bot=p.is_bot)
         )
-        base = territories[map_def.bases[p.seat]]
-        base.owner = p.seat
-        base.is_base = True
-        base.towers = towers
-        base.value = A.AYYUBID_BASE_VALUE if p.army is Army.AYYUBID else settings.base_value
+        if not settings.choose_bases:
+            _make_base(territories[map_def.bases[p.seat]], p.seat, p.army, towers, settings)
 
     rounds = settings.battle_rounds or (
         MAX_BATTLE_ROUNDS if settings.open_ended else DEFAULT_BATTLE_ROUNDS[n]
     )
     return MatchState(
+        default_bases={p.seat: map_def.bases[p.seat] for p in players}
+        if settings.choose_bases
+        else {},
         match_id=match_id,
         settings=settings,
         map_id=map_def.id,
@@ -108,6 +109,15 @@ def create_match(
         battle_rounds=rounds,
         base_towers=towers,
     )
+
+
+def _make_base(
+    t: TerritoryState, seat: int, army: Army, towers: int, settings: MatchSettings
+) -> None:
+    t.owner = seat
+    t.is_base = True
+    t.towers = towers
+    t.value = A.AYYUBID_BASE_VALUE if army is Army.AYYUBID else settings.base_value
 
 
 # ==========================================================================================
@@ -275,7 +285,99 @@ def _on_start(state: MatchState, action: StartMatch, rng: Rng, ev: list[Event]) 
             data={"players": len(state.players), "rounds": state.battle_rounds},
         )
     )
+    if state.settings.choose_bases:
+        # §6.0: in a random order, each player places their castle
+        order = [p.seat for p in state.players]
+        rng.shuffle(order)
+        state.place_order = order
+        _next_placement(state, ev)
+        return
     _start_expansion_round(state, ev)
+
+
+# ==========================================================================================
+# Castle placement (§6.0)
+# ==========================================================================================
+
+
+def legal_bases(state: MatchState) -> list[int]:
+    """Free territories that do not touch a castle (castles keep a gap between them)."""
+    bases = {t.id for t in state.territories.values() if t.is_base}
+    return sorted(
+        t.id
+        for t in state.territories.values()
+        if t.owner is None and not any(n in bases for n in state.neighbors[t.id])
+    )
+
+
+def auto_base(state: MatchState, seat: int) -> int:
+    """The map's suggested spot if still legal, else the legal spot farthest from other castles."""
+    legal = legal_bases(state) or free_territories(state)
+    want = state.default_bases.get(seat)
+    if want in legal:
+        return want  # type: ignore[return-value]
+    bases = [t.id for t in state.territories.values() if t.is_base]
+    if not bases:
+        return legal[0]
+    dist = {b: _distances(state, b) for b in bases}
+    return max(legal, key=lambda t: (min(dist[b].get(t, 99) for b in bases), -t))
+
+
+def _distances(state: MatchState, start: int) -> dict[int, int]:
+    out = {start: 0}
+    frontier = [start]
+    while frontier:
+        nxt = []
+        for t in frontier:
+            for n in state.neighbors[t]:
+                if n not in out:
+                    out[n] = out[t] + 1
+                    nxt.append(n)
+        frontier = nxt
+    return out
+
+
+def _next_placement(state: MatchState, ev: list[Event]) -> None:
+    if not state.place_order:
+        state.placer = None
+        _start_expansion_round(state, ev)
+        return
+    state.placer = state.place_order.pop(0)
+    _set_phase(
+        state,
+        Phase.BASE_PLACEMENT,
+        ev,
+        placer=state.placer,
+        options=legal_bases(state),
+        deadline_ms=state.settings.timers.base_ms,
+    )
+
+
+def _place_base(state: MatchState, seat: int, tid: int, auto: bool, ev: list[Event]) -> None:
+    p = state.players[seat]
+    t = state.territories[tid]
+    _make_base(t, seat, p.army, state.base_towers, state.settings)
+    ev.append(
+        Event(
+            type="base_placed",
+            data={
+                "seat": seat,
+                "territory": tid,
+                "auto": auto,
+                "towers": t.towers,
+                "value": t.value,
+            },
+        )
+    )
+    _next_placement(state, ev)
+
+
+def _on_place_base(state: MatchState, action: PlaceBase, rng: Rng, ev: list[Event]) -> None:
+    if state.phase is not Phase.BASE_PLACEMENT or action.seat != state.placer:
+        raise RuleError("it is not your turn to place a castle")
+    if action.territory not in legal_bases(state):
+        raise RuleError("a castle needs a free spot that does not touch another castle")
+    _place_base(state, action.seat, action.territory, False, ev)
 
 
 def _on_provide_question(
@@ -347,6 +449,10 @@ def _on_timeout(state: MatchState, action: Timeout, rng: Rng, ev: list[Event]) -
         if state.active is None:
             return  # the question has not been delivered yet; the room retries
         _resolve_question(state, rng, ev)
+    elif state.phase is Phase.BASE_PLACEMENT:
+        seat = state.placer
+        assert seat is not None
+        _place_base(state, seat, auto_base(state, seat), True, ev)
     elif state.phase is Phase.EXP_PICKS:
         _resolve_picks(state, rng, ev)
     elif state.phase is Phase.BATTLE_TARGET:
@@ -480,6 +586,7 @@ _HANDLERS = {
     Answer: _on_answer,
     Timeout: _on_timeout,
     PickTerritories: _on_pick,
+    PlaceBase: _on_place_base,
     ChooseTarget: _on_choose_target,
     UsePowerUp: _on_powerup,
     UseAbility: _on_ability,

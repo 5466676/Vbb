@@ -83,6 +83,12 @@ Every player starts **every match** with **one of each**. They cannot be bought,
 LOBBY → STARTING → EXPANSION (×N, simultaneous) → BATTLE (×R rounds, turn-based) → RESULTS
 ```
 
+### 6.0 CASTLES (القلاع) — placed by the players
+Before the expansion, in a random order, each player places their castle (base): tap any free
+territory that does not touch another castle (**12 s**). On timeout the server uses the map's
+suggested spot, or the legal spot farthest from the other castles. A castle starts with the base
+value and towers of §3.
+
 ### 6.1 EXPANSION (فتح الأراضي) — simultaneous, repeat until no free territory is left
 1. One numeric question to **all** players at the same moment.
 2. Rank everyone.

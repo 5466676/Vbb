@@ -482,3 +482,13 @@ acting instantly, land handed out by itself). Changes:
     calmer pace (above the old 8–12 target, by the owner's choice of a calmer game).
 - Next in this series: army choice before an offline match, each player placing their own castle,
   the attacker choosing the question category, marching troops.
+
+## Players place their castles (2026-11-07)
+
+The castle used to appear by itself at a fixed spot when the match began, which the owner found
+abrupt. New stage `base_placement` (GAME_RULES §6.0): in a random order each player taps a free
+territory that does not touch another castle (12 s, `place_base`); on timeout the map's suggested
+spot is used, else the legal spot farthest from the other castles (`core.auto_base`, also what bots
+do). `match_started.bases` is now empty and castles arrive as `base_placed`. The engine keeps
+`MatchSettings.choose_bases = False` by default so rule tests can set castles directly; rooms, the
+offline game and the simulation turn it on.

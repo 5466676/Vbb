@@ -33,6 +33,8 @@ const domination = 2 / 3;
 
 class Settings {
   bool openEnded = true;
+  bool chooseBases = false; // players place their castles in turn (GAME_RULES §6.0)
+  int baseMs = 12000;
   int mcqMs = 10000;
   int numericMs = 15000;
   int pickMs = 10000;
@@ -164,9 +166,12 @@ class MatchState {
     required List<PlayerSetup> setups,
     required bool teams,
     bool openEnded = true,
+    bool chooseBases = false,
     Random? rng,
   }) {
-    final s = Settings()..openEnded = openEnded;
+    final s = Settings()
+      ..openEnded = openEnded
+      ..chooseBases = chooseBases;
     final n = setups.length;
     if (n < 2 || n > 8) throw RuleError('a match needs 2-8 players');
     final terr = {for (final id in neighbors.keys) id: TerritoryState(id, s.normalValue)};
@@ -174,14 +179,90 @@ class MatchState {
     final players = <PlayerState>[];
     for (final p in setups..sort((a, b) => a.seat.compareTo(b.seat))) {
       players.add(PlayerState(seat: p.seat, name: p.name, army: p.army, team: teams && p.team != null ? p.team! : p.seat, isBot: p.isBot));
-      terr[bases[p.seat]]!
-        ..owner = p.seat
-        ..isBase = true
-        ..towers = towers
-        ..value = p.army == 'ayyubid' ? ayyubidBaseValue : s.baseValue;
+      if (!chooseBases) _makeBase(terr[bases[p.seat]]!, p.seat, p.army, towers, s);
     }
     return MatchState._(s, mapId, {for (final e in neighbors.entries) e.key: (e.value.toSet().toList()..sort())}, terr, players,
-        openEnded ? maxBattleRounds : defaultBattleRounds[n]!, towers, rng ?? Random());
+        openEnded ? maxBattleRounds : defaultBattleRounds[n]!, towers, rng ?? Random())
+      ..defaultBases = chooseBases ? {for (final p in setups) p.seat: bases[p.seat]} : {};
+  }
+
+  static void _makeBase(TerritoryState t, int seat, String army, int towers, Settings s) {
+    t
+      ..owner = seat
+      ..isBase = true
+      ..towers = towers
+      ..value = army == 'ayyubid' ? ayyubidBaseValue : s.baseValue;
+  }
+
+  // ------------------------------------------------------------------ castle placement (§6.0)
+
+  Map<int, int> defaultBases = {}; // seat -> the map's suggestion
+  List<int> placeOrder = [];
+  int? placer;
+
+  /// Free territories that do not touch a castle.
+  List<int> legalBases() {
+    final bases = {for (final t in territories.values) if (t.isBase) t.id};
+    return [
+      for (final t in territories.values)
+        if (t.owner == null && !neighbors[t.id]!.any(bases.contains)) t.id,
+    ]..sort();
+  }
+
+  Map<int, int> _distances(int start) {
+    final out = {start: 0};
+    var frontier = [start];
+    while (frontier.isNotEmpty) {
+      final next = <int>[];
+      for (final t in frontier) {
+        for (final n in neighbors[t]!) {
+          if (!out.containsKey(n)) {
+            out[n] = out[t]! + 1;
+            next.add(n);
+          }
+        }
+      }
+      frontier = next;
+    }
+    return out;
+  }
+
+  /// The map's suggested spot if still legal, else the legal spot farthest from other castles.
+  int autoBase(int seat) {
+    var legal = legalBases();
+    if (legal.isEmpty) legal = freeTerritories();
+    final want = defaultBases[seat];
+    if (want != null && legal.contains(want)) return want;
+    final bases = [for (final t in territories.values) if (t.isBase) t.id];
+    if (bases.isEmpty) return legal.first;
+    final dist = {for (final b in bases) b: _distances(b)};
+    int score(int t) => bases.map((b) => dist[b]![t] ?? 99).reduce(min);
+    return legal.reduce((a, b) => score(b) > score(a) ? b : a);
+  }
+
+  void _nextPlacement(List<Ev> ev) {
+    if (placeOrder.isEmpty) {
+      placer = null;
+      _startExpansionRound(ev);
+      return;
+    }
+    placer = placeOrder.removeAt(0);
+    _setPhase('base_placement', ev, {'placer': placer, 'options': legalBases(), 'deadline_ms': settings.baseMs});
+  }
+
+  void _placeBase(int seat, int tid, bool auto, List<Ev> ev) {
+    final t = territories[tid]!;
+    _makeBase(t, seat, players[seat].army, baseTowers, settings);
+    ev.add(Ev('base_placed', {'seat': seat, 'territory': tid, 'auto': auto, 'towers': t.towers, 'value': t.value}));
+    _nextPlacement(ev);
+  }
+
+  List<Ev> placeBase(int seat, int tid) {
+    final ev = <Ev>[];
+    if (phase != 'base_placement' || seat != placer) throw RuleError('it is not your turn to place a castle');
+    if (!legalBases().contains(tid)) throw RuleError('a castle needs a free spot that does not touch another castle');
+    _placeBase(seat, tid, false, ev);
+    return ev;
   }
 
   // ------------------------------------------------------------------ queries
@@ -264,6 +345,11 @@ class MatchState {
   List<Ev> start() {
     final ev = <Ev>[];
     if (phase != 'starting') throw RuleError('match already started');
+    if (settings.chooseBases) {
+      placeOrder = [for (final p in players) p.seat]..shuffle(rng);
+      _nextPlacement(ev);
+      return ev;
+    }
     _startExpansionRound(ev);
     return ev;
   }
@@ -308,6 +394,8 @@ class MatchState {
     if ({'expansion_question', 'battle_duel', 'battle_tiebreak'}.contains(phase)) {
       if (active == null) return ev;
       _resolveQuestion(ev);
+    } else if (phase == 'base_placement') {
+      _placeBase(placer!, autoBase(placer!), true, ev);
     } else if (phase == 'expansion_picks') {
       _resolvePicks(ev);
     } else if (phase == 'battle_target') {

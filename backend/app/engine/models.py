@@ -36,6 +36,7 @@ class Timers(BaseModel):
     mcq_ms: int = 10_000
     numeric_ms: int = 15_000
     pick_ms: int = 10_000
+    base_ms: int = 12_000  # placing your castle
     target_ms: int = 20_000  # time to think: whom to attack and with which category
     latency_grace_ms: int = 150
 
@@ -43,6 +44,7 @@ class Timers(BaseModel):
 class MatchSettings(BaseModel):
     mode: Mode = Mode.FFA
     open_ended: bool = True  # True: ends by domination/last one standing; False: fixed rounds
+    choose_bases: bool = False  # True: players place their castles in turn (§6.0); rooms use it
     battle_rounds: int | None = None  # None = by player count (fixed) / safety cap (open)
     tie_window_ms: int = 500
     normal_value: int = 200
@@ -112,6 +114,7 @@ class AnswerRecord(BaseModel):
 
 class Phase(StrEnum):
     STARTING = "starting"
+    BASE_PLACEMENT = "base_placement"
     EXP_QUESTION = "expansion_question"
     EXP_PICKS = "expansion_picks"
     BATTLE_TARGET = "battle_target"
@@ -188,6 +191,10 @@ class MatchState(BaseModel):
     rng_state: int
     battle_rounds: int
     base_towers: int
+    # castle placement (§6.0)
+    default_bases: dict[int, int] = Field(default_factory=dict)  # seat -> the map's suggestion
+    place_order: list[int] = Field(default_factory=list)  # who still has to place, in order
+    placer: int | None = None
     # expansion
     expansion_round: int = 0
     ranking: list[int] = Field(default_factory=list)
@@ -237,6 +244,12 @@ class PickTerritories(BaseModel):
     territories: list[int]
 
 
+class PlaceBase(BaseModel):
+    type: Literal["place_base"] = "place_base"
+    seat: int
+    territory: int
+
+
 class ChooseTarget(BaseModel):
     type: Literal["choose_target"] = "choose_target"
     seat: int
@@ -272,6 +285,7 @@ Action = Annotated[
     | ProvideQuestion
     | Answer
     | PickTerritories
+    | PlaceBase
     | ChooseTarget
     | UsePowerUp
     | UseAbility

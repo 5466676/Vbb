@@ -28,6 +28,7 @@ CLIENT_TYPES = {
     "start_match",
     "answer",
     "pick_territory",
+    "place_base",
     "choose_target",
     "use_powerup",
     "use_ability",

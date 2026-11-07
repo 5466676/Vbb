@@ -35,6 +35,7 @@ from app.engine.models import (
     Mode,
     Phase,
     PickTerritories,
+    PlaceBase,
     PlayerSetup,
     PowerUp,
     ProvideQuestion,
@@ -60,6 +61,7 @@ START_PAUSE_MS = 4500
 REVEAL_PAUSE_MS = 4000
 CLAIM_PAUSE_MS = 2500
 DUEL_PAUSE_MS = 4500
+BASE_PAUSE_MS = 1800  # a castle lands before the next player places theirs
 NETWORK_SLACK_MS = 500  # extra wait before a question timeout
 ENDED_TTL_MS = 5 * 60_000
 BOT_NAMES = ["صلاح", "خالد", "طارق", "زنوبيا", "هارون", "بيبرس", "قطز", "سيف"]
@@ -459,6 +461,7 @@ class RoomActor:
                 mode=r.settings.mode,
                 battle_rounds=r.settings.battle_rounds,
                 open_ended=r.settings.length == "open",
+                choose_bases=True,
             ),
         )
         r.status = RoomStatus.PLAYING
@@ -486,7 +489,7 @@ class RoomActor:
                     }
                     for p in r.match.players
                 ],
-                "bases": tpl["bases"],
+                "bases": [],  # players place their castles (base_placed)
             },
         )
         await self._apply(StartMatch())
@@ -542,6 +545,8 @@ class RoomActor:
             return PickTerritories(
                 seat=seat, territories=[int(t) for t in p.get("territories", [])]
             )
+        if type_ == "place_base":
+            return PlaceBase(seat=seat, territory=int(p.get("territory", -1)))
         if type_ == "choose_target":
             return ChooseTarget(seat=seat, territory=int(p.get("territory", -1)))
         if type_ == "use_powerup":
@@ -572,6 +577,8 @@ class RoomActor:
             pause = max(pause, REVEAL_PAUSE_MS)
         if "territory_claimed" in types:
             pause = max(pause, CLAIM_PAUSE_MS)
+        if "base_placed" in types:
+            pause = max(pause, BASE_PAUSE_MS)
         if "battle_result" in types or "shield_blocked" in types:
             pause = max(pause, DUEL_PAUSE_MS)
         if any(e.type == "phase_changed" for e in events):
@@ -588,6 +595,10 @@ class RoomActor:
             return
         if m.pending_question is not None and "provide" not in r.timers:
             self._schedule("provide", pause)
+        elif m.phase is Phase.BASE_PLACEMENT and f"phase:{m.phase_id}" not in r.timers:
+            self._schedule(
+                f"phase:{m.phase_id}", pause + m.settings.timers.base_ms, phase_id=m.phase_id
+            )
         elif m.phase is Phase.EXP_PICKS and f"phase:{m.phase_id}" not in r.timers:
             self._schedule(
                 f"phase:{m.phase_id}", pause + m.settings.timers.pick_ms, phase_id=m.phase_id
@@ -619,7 +630,9 @@ class RoomActor:
         data = dict(e.data)
         if e.type in ("phase_changed",):
             deadline = None
-            if data.get("phase") == Phase.EXP_PICKS.value:
+            if data.get("phase") == Phase.BASE_PLACEMENT.value:
+                deadline = r.match.settings.timers.base_ms
+            elif data.get("phase") == Phase.EXP_PICKS.value:
                 deadline = r.match.settings.timers.pick_ms
             elif data.get("phase") == Phase.BATTLE_TARGET.value:
                 deadline = r.match.settings.timers.target_ms
@@ -758,6 +771,8 @@ class RoomActor:
             ):
                 limit = m.active.limits_ms[seat]
                 delay = min(limit - 200, self.rnd.randint(prof.min_ms, prof.max_ms))
+            elif m.phase is Phase.BASE_PLACEMENT and m.placer == seat:
+                delay = pause + self.rnd.randint(2500, 5000)
             elif m.phase is Phase.EXP_PICKS and seat in m.pick_quota and seat not in m.picks:
                 delay = pause + self.rnd.randint(2500, 6000)
             elif m.phase is Phase.BATTLE_TARGET and m.attacker == seat:
@@ -781,6 +796,8 @@ class RoomActor:
         if m.active is not None and seat in m.active.participants and seat not in m.active.answers:
             a = bots.answer(m.active.question, seat, m.active.limits_ms[seat], level, self.rnd)
             await self._apply(a)
+        elif m.phase is Phase.BASE_PLACEMENT and m.placer == seat:
+            await self._apply(PlaceBase(seat=seat, territory=core.auto_base(m, seat)))
         elif m.phase is Phase.EXP_PICKS and seat in m.pick_quota and seat not in m.picks:
             await self._apply(bots.picks(m, seat, m.pick_quota[seat], self.rnd))
         elif m.phase is Phase.BATTLE_TARGET and m.attacker == seat:
@@ -861,6 +878,7 @@ class RoomActor:
             "rounds": m.battle_rounds,
             "base_towers": m.base_towers,
             "attacker": m.attacker,
+            "placer": m.placer,
             "round_order": m.round_order,
             "duel": m.duel.model_dump() if m.duel else None,
             "pick_quota": {str(k): v for k, v in m.pick_quota.items()},

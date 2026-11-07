@@ -9,6 +9,7 @@ from app.engine.models import (
     AnswerRecord,
     Phase,
     PickTerritories,
+    PlaceBase,
     ProvideQuestion,
     QuestionKind,
     StartMatch,
@@ -208,3 +209,25 @@ def test_no_answer_ranks_last_in_expansion():
     s = started(grid_map(3), [Army.ROMAN] * 3)
     answer_numeric(s, {1: 0, 2: 5})
     assert s.ranking[-1] == 0
+
+
+def test_players_place_their_castles_in_turn():
+    s = new_match(line_map(9, [0, 8]), A2, choose_bases=True)
+    assert not any(t.is_base for t in s.territories.values())
+    ev = step(s, StartMatch())
+    assert s.phase is Phase.BASE_PLACEMENT
+    first = s.placer
+    assert first is not None and core.legal_bases(s) == list(range(9))
+    step(s, PlaceBase(seat=first, territory=4))
+    assert s.territories[4].is_base and s.territories[4].owner == first
+    second = s.placer
+    assert second is not None and second != first
+    with pytest.raises(core.RuleError):
+        step(s, PlaceBase(seat=second, territory=5))  # touches the first castle
+    assert 3 not in core.legal_bases(s) and 5 not in core.legal_bases(s)
+    ev = step(s, Timeout(phase_id=s.phase_id))  # too slow: the map's spot, 0 or 8, is taken
+    placed = [e for e in ev if e.type == "base_placed"]
+    assert placed and placed[0].data["auto"] is True
+    assert placed[0].data["territory"] in (0, 8)
+    assert s.phase is Phase.EXP_QUESTION  # everyone has a castle: expansion starts
+    assert "phase_changed" in types(ev)

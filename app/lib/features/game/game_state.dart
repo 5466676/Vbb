@@ -188,6 +188,8 @@ class MatchView {
   int expansionRound = 0;
   int battleRound = 0;
   int? attacker;
+  int? placer; // castle placement: whose turn it is
+  List<int> placeOptions = const [];
   List<int> roundOrder = const []; // this battle round's attackers, in turn order
   double? winShare; // open length: owning this share of the map wins (eases over time); null = fixed rounds
   final Set<int> turnDone = {}; // seats that already had their turn this round
