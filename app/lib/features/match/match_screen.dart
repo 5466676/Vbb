@@ -30,7 +30,12 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     if (_loadedFor == mapId) return;
     _loadedFor = mapId;
     final t = await MapTemplate.load(mapId);
-    if (mounted) setState(() => _template = t);
+    if (!mounted) return;
+    setState(() => _template = t);
+    // decode the end-of-match art early, so the results never open on a blank frame
+    for (final a in const ['assets/ui/victory.webp', 'assets/ui/defeat.webp']) {
+      precacheImage(AssetImage(a), context);
+    }
   }
 
   Set<int> _legalPicks(MatchView m) {

@@ -24,6 +24,7 @@ class ResultsView extends ConsumerWidget {
     int lands(int seat) => m.territories.values.where((t) => t.owner == seat).length;
     return Container(
       decoration: BoxDecoration(
+        color: const Color(0xFF120B05), // until the painting has loaded
         image: DecorationImage(
           image: AssetImage(won ? 'assets/ui/victory.webp' : 'assets/ui/defeat.webp'),
           fit: BoxFit.cover,
