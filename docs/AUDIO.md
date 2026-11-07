@@ -59,7 +59,7 @@ army shouts, swords), never like arcade or UI chimes.
 
 | army | `capture_<army>` |
 |---|---|
-| islamic, ayyubid, ottoman | a group shouting «الله أكبر» — **recorded by real people** (the owner and 4–5 relatives on a phone; we clean it and layer it to sound like an army). Not AI: a generated takbir sounds wrong and the phrase deserves care |
+| islamic, ayyubid, ottoman | **no music under the takbir** (owner): a non-musical battle bed (horses, camels, swords, marching; no drums, horns or instruments) plus a group shouting «الله أكبر» — **recorded by real people** (the owner and 4–5 relatives on a phone; we clean it and layer it to sound like an army). Not AI: a generated takbir sounds wrong and the phrase deserves care |
 | crusader, roman, mongol, pharaoh, ww2 | a wordless army war cry (ElevenLabs candidates). No "Deus vult": it is used by extremists today |
 
 Recording tips: a quiet room, phone 1–2 m away, 3–4 short takes of «الله أكبر» together, plus one
