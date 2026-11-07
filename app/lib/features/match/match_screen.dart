@@ -10,7 +10,8 @@ import '../game/game_controller.dart';
 import '../game/game_state.dart';
 import 'duel_splash.dart';
 import 'map_view.dart';
-import 'question_panel.dart';
+import 'question_arena.dart';
+import 'stage_sign.dart';
 import 'results_view.dart';
 
 /// The match: map in the middle, players on the side, question on top when one is open.
@@ -111,7 +112,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                   child: LayoutBuilder(
                     builder: (context, box) {
                       // the open question takes the lower part; the map moves up instead of being covered
-                      final questionRoom = !asking ? 0.0 : box.maxHeight * (q.kind == 'mcq' ? 0.34 : 0.28);
+                      const questionRoom = 0.0;
                       return Stack(
                         children: [
                           // the same painting, darkened, fills the space around the map
@@ -123,9 +124,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                               colorBlendMode: BlendMode.darken,
                             ),
                           ),
-                          AnimatedPositioned(
-                            duration: const Duration(milliseconds: 350),
-                            curve: Curves.easeOutCubic,
+                          Positioned(
                             left: 0,
                             right: 0,
                             top: 44,
@@ -158,11 +157,21 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                             ),
                           if (asking)
                             Positioned(
-                              left: 70,
-                              right: 12,
-                              bottom: 4,
-                              child: Center(
-                                child: QuestionPanel(
+                              left: 66,
+                              right: 6,
+                              top: 44,
+                              bottom: 6,
+                              child: AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 250),
+                                transitionBuilder: (child, anim) => FadeTransition(
+                                  opacity: anim,
+                                  child: ScaleTransition(
+                                    scale: Tween(begin: 0.92, end: 1.0).animate(anim),
+                                    child: child,
+                                  ),
+                                ),
+                                child: QuestionArena(
+                                  key: ValueKey(q.id),
                                   match: m,
                                   onChoice: ref.read(gameProvider.notifier).answerChoice,
                                   onValue: ref.read(gameProvider.notifier).answerValue,
@@ -179,6 +188,10 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                                 mode: _territoryMode,
                                 onMode: (mode) => setState(() => _territoryMode = _territoryMode == mode ? null : mode),
                               ),
+                            ),
+                          if (m.banner != null)
+                            Positioned.fill(
+                              child: StageSign(key: ValueKey('sign${m.bannerId}'), text: m.banner!, sub: m.bannerSub),
                             ),
                           if (m.phase == 'battle_duel' && m.attacker != null && m.defender != null)
                             Positioned.fill(

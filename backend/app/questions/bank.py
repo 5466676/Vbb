@@ -210,6 +210,7 @@ def to_engine(q: Question) -> EngineQuestion:
         correct_index=q.correct_index,
         answer=q.numeric_answer,
         unit=q.unit_ar,
+        category=q.category or "",
     )
 
 

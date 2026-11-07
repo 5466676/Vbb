@@ -88,6 +88,7 @@ class Question(BaseModel):
     correct_index: int | None = None  # MCQ only
     answer: float | None = None  # numeric only
     unit: str = ""  # numeric only, e.g. "متر"
+    category: str = ""  # shown to players (not secret)
 
 
 class AnswerRecord(BaseModel):

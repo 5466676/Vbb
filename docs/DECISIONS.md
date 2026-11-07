@@ -411,3 +411,25 @@ Players could not tell when their attack turn would come. `round_started` now ca
 a strip under the phase ribbon: portraits in order, the current attacker large and glowing,
 finished turns greyed with a check, and for me «دورك بعد N أدوار» / «إنت الجاي!» (with a short
 sound when I am next). The offline engine sends the same field.
+
+## Question arena, target reveal, stage signs (2026-11-07)
+
+The owner compared the game with a commercial Arabic trivia-conquest game they enjoyed and found
+ours dull. What that genre does better, in short: the question owns the whole screen, number
+questions end in a show (arrows on a target), stage changes are announced big, the map is bright and
+clear. We keep our own theme, armies and art (nothing copied) and switch to a **bright cartoon**
+look, starting with pace:
+
+- **Question arena** (`question_arena.dart`, replaces the parchment panel): fills the battlefield;
+  players' swallow-tail flags on both sides (attacker right, defender left in duels) with answered
+  checks and rank after the reveal; category chip with an icon; chunky outlined answer buttons that
+  show who picked what after the reveal; a phone-style number pad (keyboard works too).
+- **Target reveal** for numeric questions: the correct answer sits on the bullseye and each player's
+  arrow flies in, landing at a distance from the centre on a square-root scale of the relative error,
+  with their value and time.
+- **The reveal is now actually seen**: the next stage arrived in the same batch and cleared the
+  question at once; the client now keeps a resolved question until `opens_in_ms` (the server's
+  existing reveal pause) has passed.
+- **Stage signs**: a wooden sign on chains drops for «تقاسم الأرض», «الحرب!», «الجولة N»,
+  «تعادل!» and eliminations.
+- Protocol: `question` carries `category` (not secret).

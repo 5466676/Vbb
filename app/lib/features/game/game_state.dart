@@ -114,8 +114,10 @@ class QuestionView {
     required this.participants,
     required this.timeMs,
     required this.receivedAt,
+    this.category = '',
   });
   final String id;
+  final String category;
   final String kind; // mcq | numeric
   final String text;
   final String unit;
@@ -197,6 +199,16 @@ class MatchView {
   int? lastCaptured;
   int? flash; // territory to highlight briefly (claim, capture, hit)
   final List<Fx> fx = []; // short map animations, drawn by the map's effects layer
+  // a big stage announcement ("الحرب!", "الجولة 3"…); the id changes for every new one
+  String? banner;
+  String? bannerSub;
+  int bannerId = 0;
+
+  void announce(String text, [String? sub]) {
+    banner = text;
+    bannerSub = sub;
+    bannerId++;
+  }
 
   // results
   List<Map<String, dynamic>>? standings;

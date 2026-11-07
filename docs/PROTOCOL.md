@@ -83,7 +83,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 |---|---|
 | `match_started` | `{"map_id", "map_kind", "mode", "rounds", "base_towers", "players": [{"seat", "name", "army", "team", "bot"}], "bases": [territory per seat]}` — the client loads the map template `map_id` |
 | `phase_changed` | `{"phase", "phase_id", "opens_in_ms", "deadline_ms"?, …}` — see phases below |
-| `question` | `{"id", "kind": mcq\|numeric, "text", "unit", "options" (your order, MCQ only), "participant", "participants": [seat], "time_ms", "phase_id"}` — **no answer**. Non-participants get it as spectators. |
+| `question` | `{"id", "kind": mcq\|numeric, "text", "unit", "category", "options" (your order, MCQ only), "participant", "participants": [seat], "time_ms", "phase_id"}` — **no answer**. Non-participants get it as spectators. |
 | `answer_locked` | `{"seat"}` — someone answered (no content) |
 | `question_result` | `{"id", "correct_index" (your order) or "answer", "ranking": [seat], "answers": {seat: {"choice" (your order) \| "value", "elapsed_ms"}}}` |
 | `pick_locked` | `{"seat"}` |

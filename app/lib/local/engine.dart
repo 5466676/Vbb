@@ -39,7 +39,7 @@ class Settings {
 }
 
 class Question {
-  Question({required this.id, required this.kind, required this.text, this.options = const [], this.correctIndex, this.answer, this.unit = ''});
+  Question({required this.id, required this.kind, required this.text, this.options = const [], this.correctIndex, this.answer, this.unit = '', this.category = ''});
   final String id;
   final String kind; // mcq | numeric
   final String text;
@@ -47,6 +47,7 @@ class Question {
   final int? correctIndex;
   final double? answer;
   final String unit;
+  final String category;
 }
 
 class AnswerRecord {

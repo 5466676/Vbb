@@ -241,6 +241,7 @@ class LocalGame implements GameTransport {
           'kind': q.kind,
           'text': q.text,
           'unit': q.unit,
+          'category': q.category,
           'options': q.kind == 'mcq' ? q.options : <String>[],
           'participant': aq.participants.contains(0),
           'participants': aq.participants,
@@ -272,6 +273,7 @@ class LocalGame implements GameTransport {
       correctIndex: q['correct_index'] as int?,
       answer: (q['answer'] as num?)?.toDouble(),
       unit: (q['unit'] ?? '') as String,
+      category: (q['category'] ?? '') as String,
     )));
   }
 

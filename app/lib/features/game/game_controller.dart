@@ -309,6 +309,7 @@ class GameController extends Notifier<GameState> {
         kind: q['kind'] as String,
         text: q['text'] as String,
         unit: (q['unit'] ?? '') as String,
+        category: (q['category'] ?? '') as String,
         options: [for (final o in (q['options'] as List? ?? [])) '$o'],
         participant: (q['participant'] ?? false) as bool,
         participants: [for (final s in (q['participants'] as List? ?? [])) s as int],
@@ -324,6 +325,23 @@ class GameController extends Notifier<GameState> {
     state = state.copy(room: room, match: match);
   }
 
+  /// The next stage opens after a pause the server announces (`opens_in_ms`); a resolved question
+  /// stays on screen until then so everyone sees the reveal (who was right, the arrows).
+  void _dropQuestion(MatchView m, int opensMs) {
+    final q = m.question;
+    if (q == null) return;
+    if (opensMs <= 0 || !q.resolved) {
+      m.question = null;
+      return;
+    }
+    Timer(Duration(milliseconds: opensMs), () {
+      if (m.question == q) {
+        m.question = null;
+        _bump();
+      }
+    });
+  }
+
   String _name(MatchView m, int? seat) => seat == null || seat >= m.players.length ? '' : m.players[seat].name;
 
   void _matchEvent(MatchView m, String type, Map<String, dynamic> p) {
@@ -337,11 +355,13 @@ class GameController extends Notifier<GameState> {
         m.deadline = dl == null ? null : m.opensAt!.add(Duration(milliseconds: dl));
         switch (m.phase) {
           case 'expansion_question':
+            final before = m.expansionRound;
             m.expansionRound = (p['expansion_round'] ?? m.expansionRound) as int;
+            if (before == 0 && m.expansionRound <= 1) m.announce('تقاسم الأرض', 'جاوب أسرع وأصح لتختار أراضيك');
           case 'expansion_picks':
             m.quota = ((p['quota'] as Map?) ?? {}).map((k, v) => MapEntry(int.parse('$k'), v as int));
             m.myPicks = [];
-            m.question = null;
+            _dropQuestion(m, opens);
           case 'battle_target':
             final prev = m.attacker;
             m.attacker = p['attacker'] as int?;
@@ -351,13 +371,16 @@ class GameController extends Notifier<GameState> {
             m.targets = [for (final t in (p['targets'] as List? ?? [])) t as int];
             m.defender = null;
             m.duelTerritory = null;
-            m.question = null;
+            _dropQuestion(m, opens);
             if (m.myTurn) sound.play('your_turn');
           case 'battle_duel' || 'battle_tiebreak':
             m.attacker = p['attacker'] as int?;
             m.defender = p['defender'] as int?;
             m.duelTerritory = p['territory'] as int?;
-            if (m.phase == 'battle_tiebreak') sound.play('tiebreak');
+            if (m.phase == 'battle_tiebreak') {
+              sound.play('tiebreak');
+              m.announce('تعادل!', 'سؤال الحسم');
+            }
         }
       case 'question':
         final q = QuestionView(
@@ -365,6 +388,7 @@ class GameController extends Notifier<GameState> {
           kind: p['kind'] as String,
           text: p['text'] as String,
           unit: (p['unit'] ?? '') as String,
+          category: (p['category'] ?? '') as String,
           options: [for (final o in (p['options'] as List? ?? [])) '$o'],
           participant: (p['participant'] ?? false) as bool,
           participants: [for (final s in (p['participants'] as List? ?? [])) s as int],
@@ -402,6 +426,7 @@ class GameController extends Notifier<GameState> {
         sound.play('claim');
       case 'battle_started':
         m.log('بدأت المعارك! ${p['rounds']} جولات', null, 'round');
+        m.announce('الحرب!', '${p['rounds']} جولات • كل واحد بيهاجم مرة بالجولة');
         sound.play('battle_start');
         _t.send('resync'); // army bonuses change values at the start of battle
       case 'round_started':
@@ -410,6 +435,7 @@ class GameController extends Notifier<GameState> {
         m.turnDone.clear();
         m.attacker = null;
         m.log('الجولة ${p['round']}', null, 'round');
+        if ((p['round'] as int) > 1) m.announce('الجولة ${p['round']}', 'من ${m.rounds}');
         sound.play('round_start');
       case 'turn_skipped':
         if (p['seat'] is int) m.turnDone.add(p['seat'] as int);
@@ -464,6 +490,7 @@ class GameController extends Notifier<GameState> {
             ..towers = 0;
         }
         m.log('${_name(m, seat)} خرج من المعركة', seat, 'out');
+        m.announce('${_name(m, seat)} خرج!', by == null ? null : 'على إيد ${_name(m, by)}');
         sound.play('eliminated');
       case 'extra_turn':
         sound.play('extra_turn');
