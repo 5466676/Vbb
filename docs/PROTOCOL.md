@@ -89,7 +89,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `pick_locked` | `{"seat"}` |
 | `territory_claimed` | `{"seat", "territory", "auto", "value"}` |
 | `battle_started` | `{"rounds"}` |
-| `round_started` | `{"round"}` |
+| `round_started` | `{"round", "order"}` — `order`: this round's attackers (seats) in turn order; eliminated players and extra turns are not listed |
 | `turn_skipped` | `{"seat"}` — the attacker had no legal target |
 | `target_chosen` | `{"attacker", "defender", "territory", "auto"}` |
 | `shield_blocked` | `{"territory", "defender"}` — no question; the turn ends |
@@ -127,7 +127,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
   "match": null | {
     "map_id", "map_kind", "phase", "phase_id", "deadline_in_ms",
     "expansion_round", "battle_round", "rounds", "base_towers",
-    "attacker", "duel": {"attacker", "defender", "territory"} | null,
+    "attacker", "round_order": [seats], "duel": {"attacker", "defender", "territory"} | null,
     "pick_quota": {seat: n}, "your_seat",
     "territories": [{"id", "owner", "value", "is_base", "towers", "shielded" (own team only)}],
     "players": [{"seat", "name", "army", "team", "score", "eliminated", "connected",

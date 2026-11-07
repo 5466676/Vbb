@@ -192,6 +192,39 @@ void main() {
     );
     m = c.read(gameProvider).match!;
     expect(m.question, isNull, reason: 'a new turn clears the old question');
+    expect(m.turnsUntilMine(), isNull, reason: 'no round order yet');
+    // a round where seat 1 attacks first, then me
+    game.handle(
+      ServerMessage('round_started', {
+        'round': 2,
+        'order': [1, 0],
+      }),
+    );
+    game.handle(
+      ServerMessage('phase_changed', {
+        'phase': 'battle_target',
+        'phase_id': 10,
+        'deadline_ms': 8000,
+        'attacker': 1,
+        'round': 2,
+        'targets': [],
+      }),
+    );
+    m = c.read(gameProvider).match!;
+    expect(m.turnsUntilMine(), 1, reason: 'I am next');
+    game.handle(
+      ServerMessage('phase_changed', {
+        'phase': 'battle_target',
+        'phase_id': 11,
+        'deadline_ms': 8000,
+        'attacker': 0,
+        'round': 2,
+        'targets': [1, 3],
+      }),
+    );
+    m = c.read(gameProvider).match!;
+    expect(m.turnsUntilMine(), 0);
+    expect(m.turnDone, {1});
     expect(m.territories[5]!.owner, 0);
     expect(m.myTurn, isTrue);
     expect(m.targets, [1, 3]);

@@ -287,7 +287,11 @@ class GameController extends Notifier<GameState> {
     match.deadline = left == null ? null : DateTime.now().add(Duration(milliseconds: left));
     match.expansionRound = (mj['expansion_round'] ?? 0) as int;
     match.battleRound = (mj['battle_round'] ?? 0) as int;
+    match.roundOrder = [for (final s in (mj['round_order'] as List? ?? const [])) s as int];
     match.attacker = mj['attacker'] as int?;
+    // turns already taken this round: everyone listed before the current attacker
+    final at = match.attacker == null ? -1 : match.roundOrder.indexOf(match.attacker!);
+    if (at > 0) match.turnDone.addAll(match.roundOrder.take(at));
     final duel = (mj['duel'] as Map?)?.cast<String, dynamic>();
     match.defender = duel?['defender'] as int?;
     match.duelTerritory = duel?['territory'] as int?;
@@ -339,7 +343,10 @@ class GameController extends Notifier<GameState> {
             m.myPicks = [];
             m.question = null;
           case 'battle_target':
+            final prev = m.attacker;
             m.attacker = p['attacker'] as int?;
+            if (prev != null && prev != m.attacker) m.turnDone.add(prev);
+            if (m.turnsUntilMine() == 1) sound.play('ready'); // you're next
             m.battleRound = (p['round'] ?? m.battleRound) as int;
             m.targets = [for (final t in (p['targets'] as List? ?? [])) t as int];
             m.defender = null;
@@ -399,9 +406,13 @@ class GameController extends Notifier<GameState> {
         _t.send('resync'); // army bonuses change values at the start of battle
       case 'round_started':
         m.battleRound = p['round'] as int;
+        m.roundOrder = [for (final s in (p['order'] as List? ?? const [])) s as int];
+        m.turnDone.clear();
+        m.attacker = null;
         m.log('الجولة ${p['round']}', null, 'round');
         sound.play('round_start');
       case 'turn_skipped':
+        if (p['seat'] is int) m.turnDone.add(p['seat'] as int);
         m.log('${_name(m, p['seat'] as int?)} ما عندو هدف', p['seat'] as int?);
       case 'target_chosen':
         m.attacker = p['attacker'] as int?;

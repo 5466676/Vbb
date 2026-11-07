@@ -605,6 +605,7 @@ def _build_queue(state: MatchState) -> None:
     start = (seats.index(state.first_seat) + state.battle_round - 1) % len(seats)
     order = seats[start:] + seats[:start]
     state.turn_queue = [s for s in order if not state.players[s].eliminated]
+    state.round_order = list(state.turn_queue)
 
 
 def _next_turn(state: MatchState, ev: list[Event], rng: Rng) -> None:
@@ -625,7 +626,9 @@ def _next_turn(state: MatchState, ev: list[Event], rng: Rng) -> None:
                     _finish(state, ev)
                     return
                 _build_queue(state)
-                ev.append(Event(type="round_started", data={"round": state.battle_round}))
+                order = list(state.round_order)
+                data = {"round": state.battle_round, "order": order}
+                ev.append(Event(type="round_started", data=data))
                 continue
             seat = state.turn_queue.pop(0)
             if state.players[seat].eliminated:

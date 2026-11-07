@@ -137,6 +137,7 @@ class MatchState {
   Map<int, List<int>> picks = {};
   int battleRound = 0;
   List<int> turnQueue = [];
+  List<int> roundOrder = []; // this round's attackers, in order
   int? attacker;
   Duel? duel;
   bool extraTurn = false;
@@ -547,6 +548,7 @@ class MatchState {
     final start = (seats.indexOf(firstSeat) + battleRound - 1) % seats.length;
     final order = [...seats.sublist(start), ...seats.sublist(0, start)];
     turnQueue = [for (final s in order) if (!players[s].eliminated) s];
+    roundOrder = [...turnQueue];
   }
 
   void _nextTurn(List<Ev> ev) {
@@ -563,7 +565,7 @@ class MatchState {
           battleRound++;
           if (battleRound > battleRounds) return _finish(ev);
           _buildQueue();
-          ev.add(Ev('round_started', {'round': battleRound}));
+          ev.add(Ev('round_started', {'round': battleRound, 'order': [...roundOrder]}));
           continue;
         }
         seat = turnQueue.removeAt(0);

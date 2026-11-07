@@ -188,6 +188,7 @@ class MatchState(BaseModel):
     # battle
     battle_round: int = 0
     turn_queue: list[int] = Field(default_factory=list)
+    round_order: list[int] = Field(default_factory=list)  # this round's attackers, in order
     attacker: int | None = None
     duel: Duel | None = None
     extra_turn: bool = False

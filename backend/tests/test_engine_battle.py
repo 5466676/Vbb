@@ -232,3 +232,15 @@ def test_default_towers_depend_on_player_count():
     assert new_match(grid_map(4), [R] * 4).territories[0].towers == 5
     assert new_match(grid_map(5), [R] * 5).base_towers == 3
     assert new_match(grid_map(8), [R] * 8, base_towers=4).base_towers == 4
+
+
+def test_round_started_carries_the_turn_order():
+    s = new_match(line_map(6, [0, 5]), [R, R])
+    ev = to_battle(s, {1: 0, 2: 0, 3: 1, 4: 1})
+    started = [e for e in ev if e.type == "round_started"]
+    assert started and started[0].data["order"] == [0, 1]
+    assert s.round_order == [0, 1]
+    duel(s, 3, att_ms=3000, def_ms=1000)  # seat 0's turn
+    ev = duel(s, core.legal_targets(s, 1)[0], att_ms=3000, def_ms=1000)  # seat 1 ends round 1
+    nxt = [e for e in ev if e.type == "round_started"]
+    assert nxt and nxt[0].data == {"round": 2, "order": [1, 0]}  # rotates one seat

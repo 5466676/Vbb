@@ -185,6 +185,8 @@ class MatchView {
   int expansionRound = 0;
   int battleRound = 0;
   int? attacker;
+  List<int> roundOrder = const []; // this battle round's attackers, in turn order
+  final Set<int> turnDone = {}; // seats that already had their turn this round
   int? defender;
   int? duelTerritory;
   List<int> targets = const [];
@@ -202,6 +204,20 @@ class MatchView {
 
   bool get ended => standings != null;
   PlayerView? get me => mySeat == null ? null : players[mySeat!];
+
+  /// How many turns before mine in this round: 0 = mine now, 1 = I am next, null = not this round.
+  int? turnsUntilMine() {
+    final me = mySeat;
+    if (me == null || !roundOrder.contains(me) || turnDone.contains(me)) return null;
+    if (attacker == me && phase.startsWith('battle')) return 0;
+    final waiting = [
+      for (final s in roundOrder)
+        if (!turnDone.contains(s) && s != attacker && !players[s].eliminated) s,
+    ];
+    final i = waiting.indexOf(me);
+    return i < 0 ? null : i + 1;
+  }
+
   bool get myTurn => phase == 'battle_target' && attacker != null && attacker == mySeat;
 
   Territory terr(int id) => territories.putIfAbsent(id, () => Territory(id: id));

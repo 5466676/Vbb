@@ -855,6 +855,7 @@ class RoomActor:
             "rounds": m.battle_rounds,
             "base_towers": m.base_towers,
             "attacker": m.attacker,
+            "round_order": m.round_order,
             "duel": m.duel.model_dump() if m.duel else None,
             "pick_quota": {str(k): v for k, v in m.pick_quota.items()},
             "your_seat": seat,

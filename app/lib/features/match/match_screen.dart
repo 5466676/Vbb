@@ -147,6 +147,15 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                               child: _PhaseBanner(match: m, mode: _territoryMode),
                             ),
                           ),
+                          if (m.phase.startsWith('battle') && m.roundOrder.isNotEmpty)
+                            Positioned(
+                              top: 46,
+                              left: 70,
+                              right: 0,
+                              child: Center(
+                                child: IgnorePointer(child: TurnStrip(match: m)),
+                              ),
+                            ),
                           if (asking)
                             Positioned(
                               left: 70,
@@ -689,4 +698,109 @@ class _Badge extends StatelessWidget {
     ),
     child: Icon(icon, size: 11, color: Colors.white),
   );
+}
+
+/// This round's attack order: portraits left to right in reading order, the current attacker
+/// large and glowing, finished turns greyed with a check, and how long until my turn.
+class TurnStrip extends StatelessWidget {
+  const TurnStrip({super.key, required this.match});
+  final MatchView match;
+
+  static String? untilText(int? n) => switch (n) {
+    null || 0 => null,
+    1 => 'إنت الجاي!',
+    2 => 'دورك بعد دورين',
+    _ => 'دورك بعد $n أدوار',
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final m = match;
+    final until = m.turnsUntilMine();
+    final note = untilText(until);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: const Color(0xCC1B120A),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0x99D4A64A)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'الأدوار',
+            style: TextStyle(fontFamily: AppTheme.headingFont, color: AppColors.gold, fontSize: 15, height: 1.2),
+          ),
+          const SizedBox(width: 6),
+          for (final (i, s) in m.roundOrder.indexed) ...[
+            if (i > 0) const Icon(Icons.chevron_right, size: 14, color: AppColors.textSecondary),
+            _turnFace(m, s),
+          ],
+          if (note != null) ...[const SizedBox(width: 8), _NextNote(text: note, urgent: until == 1)],
+        ],
+      ),
+    );
+  }
+
+  Widget _turnFace(MatchView m, int seat) {
+    final now = seat == m.attacker;
+    final done = m.turnDone.contains(seat) || m.players[seat].eliminated;
+    final mine = seat == m.mySeat;
+    final d = now ? 34.0 : 26.0;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Opacity(
+          opacity: done ? 0.4 : 1,
+          child: Container(
+            width: d,
+            height: d,
+            padding: EdgeInsets.all(now ? 2.5 : 1.5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: mine ? AppColors.gold : AppColors.seat(seat),
+              boxShadow: [if (now) BoxShadow(color: AppColors.seat(seat), blurRadius: 10, spreadRadius: 1)],
+            ),
+            child: ClipOval(child: Image.asset(armyOf(m.players[seat].army).commander, fit: BoxFit.cover)),
+          ),
+        ),
+        if (done)
+          const Positioned(
+            bottom: -2,
+            left: -2,
+            child: Icon(Icons.check_circle, size: 13, color: AppColors.textSecondary),
+          ),
+      ],
+    );
+  }
+}
+
+class _NextNote extends StatelessWidget {
+  const _NextNote({required this.text, required this.urgent});
+  final String text;
+  final bool urgent;
+
+  @override
+  Widget build(BuildContext context) {
+    final chip = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+      decoration: BoxDecoration(
+        color: urgent ? AppColors.seal : const Color(0xFF3B2610),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.gold, width: urgent ? 1.5 : 1),
+      ),
+      child: Text(text, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, height: 1.2)),
+    );
+    if (!urgent) return chip;
+    // "you're next" beats gently so it is noticed
+    return TweenAnimationBuilder<double>(
+      key: const ValueKey('next'),
+      tween: Tween(begin: 1.3, end: 1),
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.elasticOut,
+      builder: (context, s, child) => Transform.scale(scale: s, child: child),
+      child: chip,
+    );
+  }
 }

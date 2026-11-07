@@ -348,6 +348,7 @@ class LocalGame implements GameTransport {
         'deadline_in_ms': null,
         'expansion_round': _m.expansionRound,
         'battle_round': _m.battleRound,
+        'round_order': _m.roundOrder,
         'rounds': _m.battleRounds,
         'base_towers': _m.baseTowers,
         'attacker': _m.attacker,

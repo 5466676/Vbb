@@ -402,3 +402,12 @@ question scroll covering a third of the map, tools with no names. Changes, all p
   a lock when not usable now.
 - **Results**: "نصر!" / "هزيمة", a three-step podium, counting scores, and «مباراة ثانية» for
   offline matches (same bots and map).
+
+## Turn order on screen (2026-11-07)
+
+Players could not tell when their attack turn would come. `round_started` now carries `order`
+(this round's attackers in turn order; the rule itself is unchanged, GAME_RULES §6.2) and
+`full_state` carries `round_order`, so a reconnecting player sees it too. The match screen shows
+a strip under the phase ribbon: portraits in order, the current attacker large and glowing,
+finished turns greyed with a check, and for me «دورك بعد N أدوار» / «إنت الجاي!» (with a short
+sound when I am next). The offline engine sends the same field.
