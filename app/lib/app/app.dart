@@ -20,10 +20,8 @@ class HarbApp extends StatelessWidget {
       supportedLocales: const [locale],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       // Force RTL even if the device locale is not Arabic.
-      builder: (context, child) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: child ?? const SizedBox.shrink(),
-      ),
+      builder: (context, child) =>
+          Directionality(textDirection: TextDirection.rtl, child: child ?? const SizedBox.shrink()),
       routerConfig: appRouter,
     );
   }

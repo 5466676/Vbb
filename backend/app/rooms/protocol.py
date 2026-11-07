@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 # client -> server
 CLIENT_TYPES = {
     "ping",
+    "resync",
     "create_room",
     "join_room",
     "leave_room",
