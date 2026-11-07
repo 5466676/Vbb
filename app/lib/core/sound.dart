@@ -1,4 +1,9 @@
+import 'dart:async';
+
+import 'dart:io' show Platform;
+
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'armies.dart';
@@ -96,6 +101,58 @@ class SoundService {
     }
     final id = 'capture_$army';
     return play(_sfx.contains(id) ? id : 'capture_generic');
+  }
+
+  // ------------------------------------------------------------------ music
+
+  // widget tests have no audio plugin
+  static final bool _testing = !kIsWeb && Platform.environment.containsKey('FLUTTER_TEST');
+
+  final _decks = <AudioPlayer>[];
+  int _deck = 0;
+  String? _track;
+
+  /// Play a looping music bed ('menu', 'map', 'battle') or stop (null), crossfading 1.5 s.
+  /// Calling it again with the same track does nothing.
+  Future<void> music(String? track) async {
+    if (track == _track) return;
+    _track = track;
+    if (_testing) return;
+    try {
+      if (_decks.isEmpty) _decks.addAll([AudioPlayer(), AudioPlayer()]);
+      final old = _decks[_deck];
+      _deck = 1 - _deck;
+      final next = _decks[_deck];
+      final vol = muted ? 0.0 : settings.musicVolume * 0.7;
+      _fade(old, to: 0, then: old.stop);
+      if (track == null || vol <= 0) return;
+      await next.setReleaseMode(ReleaseMode.loop);
+      await next.setVolume(0);
+      await next.play(AssetSource('audio/music/$track.ogg'));
+      _fade(next, to: vol);
+    } catch (_) {
+      _track = null; // e.g. the browser blocks audio before the first tap: try again next time
+    }
+  }
+
+  /// Follow a new music volume from the settings right away.
+  Future<void> musicVolumeChanged() async {
+    if (_decks.isEmpty || _track == null) return;
+    await _decks[_deck].setVolume(muted ? 0 : settings.musicVolume * 0.7);
+  }
+
+  void _fade(AudioPlayer p, {required double to, Future<void> Function()? then}) {
+    final from = p.volume;
+    var step = 0;
+    Timer.periodic(const Duration(milliseconds: 100), (t) {
+      step++;
+      final v = from + (to - from) * (step / 15);
+      p.setVolume(v.clamp(0, 1)).catchError((_) {});
+      if (step >= 15) {
+        t.cancel();
+        then?.call().catchError((_) {});
+      }
+    });
   }
 
   /// Warm the pools used in a match so the first sounds are not late on slow phones.

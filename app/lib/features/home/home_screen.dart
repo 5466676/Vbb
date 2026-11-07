@@ -30,6 +30,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     _check();
+    ref.read(soundProvider).music('menu');
   }
 
   Future<void> _check() async {

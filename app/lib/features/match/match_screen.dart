@@ -133,6 +133,9 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
         ? m.targets.toSet()
         : <int>{};
 
+    // music follows the stage: calm map music, war drums in battle, silence for the results
+    final track = m.ended ? null : (m.phase.startsWith('battle') ? 'battle' : 'map');
+    WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(gameProvider.notifier).sound.music(track));
     final q = m.question;
     final asking = q != null && !m.ended;
     return Scaffold(
@@ -156,13 +159,30 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                             right: 0,
                             top: 44,
                             bottom: 0,
-                            child: MapView(
-                              template: t,
+                            child: _Shake(
                               match: m,
-                              version: gs.version,
-                              highlight: highlight,
-                              selected: {...m.myPicks, if (_target != null && _targetPhase == m.phaseId) _target!},
-                              onTap: (id) => _tap(m, id),
+                              child: MapView(
+                                template: t,
+                                match: m,
+                                version: gs.version,
+                                highlight: highlight,
+                                selected: {...m.myPicks, if (_target != null && _targetPhase == m.phaseId) _target!},
+                                onTap: (id) => _tap(m, id),
+                              ),
+                            ),
+                          ),
+                          // dark edges frame the battlefield
+                          const Positioned.fill(
+                            child: IgnorePointer(
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  gradient: RadialGradient(
+                                    radius: 0.95,
+                                    colors: [Color(0x00000000), Color(0x00000000), Color(0x66140A02)],
+                                    stops: [0, 0.7, 1],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                           Positioned(
@@ -1065,6 +1085,62 @@ class _CategoryChooser extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Shakes the battlefield briefly when a tower falls (hard) or land is taken (light).
+class _Shake extends StatefulWidget {
+  const _Shake({required this.match, required this.child});
+  final MatchView match;
+  final Widget child;
+
+  @override
+  State<_Shake> createState() => _ShakeState();
+}
+
+class _ShakeState extends State<_Shake> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 450));
+  Fx? _seen;
+  double _amp = 0;
+
+  @override
+  void didUpdateWidget(_Shake old) {
+    super.didUpdateWidget(old);
+    final fx = widget.match.fx;
+    final last = fx.isEmpty ? null : fx.last;
+    if (last != null && !identical(last, _seen)) {
+      _seen = last;
+      final amp = switch (last.kind) {
+        'tower' => 9.0,
+        'capture' => 5.0,
+        'held' => 3.0,
+        _ => 0.0,
+      };
+      if (amp > 0) {
+        _amp = amp;
+        _c.forward(from: 0);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _c,
+      child: widget.child,
+      builder: (context, child) {
+        final t = _c.value;
+        if (!_c.isAnimating) return child!;
+        final k = (1 - t) * _amp;
+        return Transform.translate(offset: Offset(sin(t * 50) * k, cos(t * 37) * k * 0.6), child: child);
+      },
     );
   }
 }

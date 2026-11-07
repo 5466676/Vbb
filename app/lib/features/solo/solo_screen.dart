@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../app/theme.dart';
+import '../../app/ui_kit.dart';
 import '../../core/local_store.dart';
 import '../../core/sound.dart';
 import '../../core/sync_service.dart';
@@ -123,9 +124,9 @@ class _SoloScreenState extends ConsumerState<SoloScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('تدريب'), backgroundColor: AppColors.background),
-      body: Center(
+    return GameScaffold(
+      title: 'تدريب',
+      child: Center(
         child: _loading
             ? Column(
                 mainAxisSize: MainAxisSize.min,

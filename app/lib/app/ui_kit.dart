@@ -363,3 +363,77 @@ class BannerChoice<T> extends StatelessWidget {
     );
   }
 }
+
+/// The frame for secondary screens (settings, training, leaderboard): a painted background,
+/// a wooden header with a Ruqaa title and a round back button, content on a wood board.
+class GameScaffold extends StatelessWidget {
+  const GameScaffold({
+    super.key,
+    required this.title,
+    required this.child,
+    this.background = 'assets/ui/menu/menu_2.webp',
+  });
+  final String title;
+  final Widget child;
+  final String background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(background),
+            fit: BoxFit.cover,
+            colorFilter: const ColorFilter.mode(Color(0x99140C05), BlendMode.darken),
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
+            children: [
+              Container(
+                height: 56,
+                margin: const EdgeInsets.fromLTRB(10, 6, 10, 0),
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFFB57A43), Color(0xFF8A5528)],
+                  ),
+                  border: Border.all(color: const Color(0xFF3A2414), width: 2.5),
+                  boxShadow: const [BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 3))],
+                ),
+                child: Row(
+                  children: [
+                    Semantics(
+                      button: true,
+                      label: 'رجوع',
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).maybePop(),
+                        child: Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: const Color(0xFFFFC233),
+                            border: Border.all(color: const Color(0xFF3A2414), width: 2.5),
+                          ),
+                          child: const Icon(Icons.arrow_forward, color: Color(0xFF3A2414)),
+                        ),
+                      ),
+                    ),
+                    Expanded(child: RuqaaTitle(title, size: 30)),
+                    const SizedBox(width: 40),
+                  ],
+                ),
+              ),
+              Expanded(child: child),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

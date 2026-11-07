@@ -126,6 +126,7 @@ class GameController extends Notifier<GameState> {
       _t.send('quick_match', {'mode': mode, 'size': size, 'army': _settings.army});
   void cancelQuickMatch() => _t.send('cancel_quick_match');
   void leave() {
+    sound.music('menu');
     _t.send('leave_room');
     if (_local != null) stopOffline();
     state = state.copy(clearRoom: true, clearMatch: true, online: socket.status == SocketStatus.online);

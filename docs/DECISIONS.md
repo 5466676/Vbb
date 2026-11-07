@@ -509,3 +509,14 @@ When a target is chosen, the attacker's soldiers walk from their nearest land to
 offline game now pause 3.5 s after `target_chosen` (`MARCH_PAUSE_MS`) before the duel question,
 and the face-to-face splash is timed to end as the question arrives. Simulated lengths at this
 pace: fixed rounds ~13–18 min, open length ~8 (2 players) to ~31 min (8 players).
+
+## Atmosphere pass (2026-11-07)
+
+- **Music beds:** ElevenLabs' music API needs a paid plan, so three 22 s seamless loops were made
+  with its sound-generation API (`assets/audio/music/{menu,map,battle}.ogg`, levelled to −18 LUFS).
+  `SoundService.music()` crossfades (1.5 s) between them: menu → map (expansion) → battle; silent on
+  results. A «الموسيقى والأجواء» slider joins the effects slider. The owner picks between candidates.
+- **Living map:** drifting cloud shadows and waving banners on the castles in their own repaint
+  layer (~20 fps); the battlefield shakes on captures and falling towers; a dark vignette.
+- Settings, training and the leaderboard use a shared `GameScaffold` (painted background, wooden
+  header with a Ruqaa title).

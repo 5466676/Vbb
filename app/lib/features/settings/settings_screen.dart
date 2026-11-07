@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
+import '../../app/ui_kit.dart';
 import '../../core/api.dart';
 import '../../core/settings_store.dart';
+import '../../core/sound.dart';
 
 /// Server link, player name, sound volumes, and account restore.
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -21,6 +23,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   final _pin = TextEditingController();
   String? _status;
   late double _sfx = s.sfxVolume;
+  late double _music = s.musicVolume;
 
   Future<void> _save() async {
     await s.setServerUrl(_url.text);
@@ -59,74 +62,89 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('الإعدادات'), backgroundColor: AppColors.background),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          TextField(
-            controller: _url,
-            textDirection: TextDirection.ltr,
-            keyboardType: TextInputType.url,
-            decoration: const InputDecoration(labelText: 'رابط السيرفر', hintText: 'https://pc.tailnet.ts.net'),
-          ),
-          const SizedBox(height: 10),
-          TextField(
-            controller: _name,
-            maxLength: 24,
-            decoration: const InputDecoration(labelText: 'اسمك باللعبة'),
-          ),
-          const SizedBox(height: 6),
-          FilledButton(onPressed: _save, child: const Text('احفظ وافحص')),
-          if (_status != null)
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Text(_status!, textAlign: TextAlign.center),
-            ),
-          const Divider(height: 32),
-          Text('صوت المؤثرات: ${(_sfx * 100).round()}%'),
-          Slider(
-            value: _sfx,
-            onChanged: (v) => setState(() => _sfx = v),
-            onChangeEnd: (v) => s.setVolumes(sfx: v),
-          ),
-          const Divider(height: 32),
-          const Text('حسابك (لترجع لحسابك على موبايل جديد)', style: TextStyle(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 8),
-          Row(
+    return GameScaffold(
+      title: 'الإعدادات',
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: WoodPanel(
+          padding: const EdgeInsets.all(6),
+          child: ListView(
+            padding: const EdgeInsets.all(16),
             children: [
-              Expanded(
-                child: TextField(
-                  controller: _user,
-                  decoration: const InputDecoration(labelText: 'اسم المستخدم'),
-                ),
+              TextField(
+                controller: _url,
+                textDirection: TextDirection.ltr,
+                keyboardType: TextInputType.url,
+                decoration: const InputDecoration(labelText: 'رابط السيرفر', hintText: 'https://pc.tailnet.ts.net'),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  controller: _pin,
-                  obscureText: true,
-                  keyboardType: TextInputType.number,
-                  maxLength: 8,
-                  decoration: const InputDecoration(labelText: 'رقم سري (4–8 أرقام)'),
-                ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: _name,
+                maxLength: 24,
+                decoration: const InputDecoration(labelText: 'اسمك باللعبة'),
               ),
+              const SizedBox(height: 6),
+              FilledButton(onPressed: _save, child: const Text('احفظ وافحص')),
+              if (_status != null)
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(_status!, textAlign: TextAlign.center),
+                ),
+              const Divider(height: 32),
+              Text('صوت المؤثرات: ${(_sfx * 100).round()}%'),
+              Slider(
+                value: _sfx,
+                onChanged: (v) => setState(() => _sfx = v),
+                onChangeEnd: (v) => s.setVolumes(sfx: v),
+              ),
+              Text('صوت الموسيقى والأجواء: ${(_music * 100).round()}%'),
+              Slider(
+                value: _music,
+                onChanged: (v) => setState(() => _music = v),
+                onChangeEnd: (v) async {
+                  await s.setVolumes(music: v);
+                  await ref.read(soundProvider).musicVolumeChanged();
+                },
+              ),
+              const Divider(height: 32),
+              const Text('حسابك (لترجع لحسابك على موبايل جديد)', style: TextStyle(fontWeight: FontWeight.w800)),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _user,
+                      decoration: const InputDecoration(labelText: 'اسم المستخدم'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _pin,
+                      obscureText: true,
+                      keyboardType: TextInputType.number,
+                      maxLength: 8,
+                      decoration: const InputDecoration(labelText: 'رقم سري (4–8 أرقام)'),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(onPressed: () => _account(false), child: const Text('اعمل حساب')),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton(onPressed: () => _account(true), child: const Text('رجّع حسابي')),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text('رقم جهازك: ${s.deviceId}', style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
             ],
           ),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(onPressed: () => _account(false), child: const Text('اعمل حساب')),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton(onPressed: () => _account(true), child: const Text('رجّع حسابي')),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text('رقم جهازك: ${s.deviceId}', style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-        ],
+        ),
       ),
     );
   }

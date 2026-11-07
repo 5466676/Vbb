@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui' as ui;
 
@@ -141,6 +142,19 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                         ),
                       ),
                       ..._bases(size),
+                      // living map: drifting cloud shadows and the castles' banners in the wind
+                      Positioned.fill(
+                        child: IgnorePointer(
+                          child: _Ambient(
+                            template: t,
+                            match: widget.match,
+                            castles: [
+                              for (final x in widget.match.territories.values)
+                                if (x.isBase && x.owner != null) x.id,
+                            ],
+                          ),
+                        ),
+                      ),
                       ..._labels(size),
                       ..._marches(size),
                       Positioned.fill(
@@ -982,4 +996,108 @@ class _MarchingTroopsState extends State<_MarchingTroops> with SingleTickerProvi
       },
     );
   }
+}
+
+/// Slow ambient life on the map: two or three cloud shadows drift across (soft gradients, no
+/// blur) and a banner in the owner's colour waves on every castle. Ticks at ~20 fps in its own
+/// layer, so the rest of the map does not repaint.
+class _Ambient extends StatefulWidget {
+  const _Ambient({required this.template, required this.match, required this.castles});
+  final MapTemplate template;
+  final MatchView match;
+  final List<int> castles;
+
+  @override
+  State<_Ambient> createState() => _AmbientState();
+}
+
+class _AmbientState extends State<_Ambient> {
+  late final Timer _timer;
+  final _start = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 50), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = DateTime.now().difference(_start).inMilliseconds / 1000;
+    return RepaintBoundary(
+      child: CustomPaint(
+        painter: _AmbientPainter(template: widget.template, match: widget.match, castles: widget.castles, t: t),
+      ),
+    );
+  }
+}
+
+class _AmbientPainter extends CustomPainter {
+  _AmbientPainter({required this.template, required this.match, required this.castles, required this.t});
+  final MapTemplate template;
+  final MatchView match;
+  final List<int> castles;
+  final double t; // seconds
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // cloud shadows: big soft ovals sliding slowly from right to left, wrapping around
+    for (var i = 0; i < 3; i++) {
+      final speed = 0.012 + i * 0.004;
+      final x = (1.3 - ((t * speed + i * 0.41) % 1.6)) * size.width;
+      final y = size.height * (0.25 + 0.27 * i);
+      final r = size.height * (0.32 + 0.06 * i);
+      final rect = Rect.fromCenter(center: Offset(x, y), width: r * 2.6, height: r * 1.3);
+      canvas.drawOval(
+        rect,
+        Paint()..shader = const RadialGradient(colors: [Color(0x22000000), Color(0x00000000)]).createShader(rect),
+      );
+    }
+    // banners on the castles
+    final h = size.height * 0.13;
+    for (final id in castles) {
+      final owner = match.territories[id]?.owner;
+      if (owner == null) continue;
+      final l = template.byId(id).label;
+      final top = Offset(l.dx * size.width + h * 0.08, l.dy * size.height - h * 0.95 - h * 0.18);
+      final poleH = h * 0.42;
+      canvas.drawLine(
+        top,
+        top + Offset(0, poleH),
+        Paint()
+          ..strokeWidth = 2
+          ..color = const Color(0xFF3A2414),
+      );
+      final w = h * 0.38, fh = h * 0.2;
+      final cloth = Path()..moveTo(top.dx, top.dy);
+      for (var k = 1; k <= 8; k++) {
+        final x = top.dx + w * k / 8;
+        cloth.lineTo(x, top.dy + sin(t * 6 + k * 0.9 + id) * fh * 0.12 * k / 8);
+      }
+      for (var k = 8; k >= 0; k--) {
+        final x = top.dx + w * k / 8;
+        cloth.lineTo(x, top.dy + fh + sin(t * 6 + k * 0.9 + id) * fh * 0.12 * k / 8);
+      }
+      cloth.close();
+      canvas.drawPath(cloth, Paint()..color = AppColors.seat(owner));
+      canvas.drawPath(
+        cloth,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2
+          ..color = const Color(0xFF2B1A0E),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(_AmbientPainter old) => true;
 }
