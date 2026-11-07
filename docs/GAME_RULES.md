@@ -48,6 +48,8 @@ No present-day armies or current conflicts. No Nazi symbols.
   - **Fantasy** — painted continents, one per player count (2–8).
   - **World** — the real world map; real regions are grouped into `players × 5` territories.
 - For every map and player count: every territory is reachable and bases are as far apart as possible.
+- Separate land masses (islands) are joined by **sea routes**; a sea route makes two territories neighbours.
+  Very small islands are scenery and cannot be owned.
 - Territory values: normal **200**, base **1000**.
 - Each player starts with one **base** (قلعة) with **5 towers** (lives) in matches of 2–4 players and **3 towers**
   with 5–8 players *(config)*. The base art follows the player's army.

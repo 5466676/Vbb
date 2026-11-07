@@ -216,6 +216,7 @@ def play_match(
     rounds: int | None = None,
     per_player: int = 5,
     towers: int | None = None,
+    map_def: MapDef | None = None,
 ) -> SimResult:
     rnd = random.Random(seed)
     team_size = n_players // 2 if mode is Mode.TEAMS else 0
@@ -224,7 +225,7 @@ def play_match(
     diffs = [difficulty or rnd.choice(list(bots.Difficulty)[:3]) for _ in range(n_players)]
     state = core.create_match(
         f"sim-{seed}",
-        grid_map(n_players, per_player),
+        map_def or grid_map(n_players, per_player),
         setups(armies, teams),
         seed=seed,
         settings=MatchSettings(mode=mode, battle_rounds=rounds, base_towers=towers),

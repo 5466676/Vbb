@@ -151,3 +151,36 @@ slightly strong and is the first candidate for tuning once real players exist.
    **19/13/9/8/6/5/4**. Simulation (200 matches each): 1v1 mean 7.7 min (50% in 8–12 — a 1v1 often
    ends by elimination, accepted), 3 players 9.6 (90%), 4 players 9.9 (99%), 2v2 9.7 (90%);
    5–8 players unchanged (95–99%). `MatchSettings.base_towers` overrides the default.
+
+## Phase 3 — Maps (2026-11-07)
+
+**Built:** `backend/maps/generate.py` (offline) turns each painted map into a template
+`backend/maps/templates/<id>.json`: `fantasy-2p … fantasy-8p` and `world-2p … world-8p` (14 templates, 264 KB).
+`backend/app/maps.py` loads templates, converts them to the engine's `MapDef` and validates them.
+
+**How a template is made:**
+1. Land mask from `backend/maps/shapes/` (the 4-player continent is rebuilt from the mockup coastline).
+2. Land masses smaller than 35% of an average territory are scenery; the rest share `players × 5`
+   territories in proportion to their area.
+3. Each land mass is split by a geodesic k-means (regions grow along the land, so they are always
+   connected and follow bays and lakes), then balanced by adjusting each region's growth speed.
+   Size spread (largest / smallest): fantasy 1.2–2.0×, world 1.3–3.2× (real continents differ).
+4. Neighbours = shared border; separate land masses are joined by sea routes (minimum spanning tree
+   plus any very close pairs). Each route stores its two nearest coastal points for drawing.
+5. Bases: maximise the minimum hop distance, then balance how much land is closest to each base;
+   listed west → east so in team modes team 0 starts in the west.
+6. Validation (also in tests): N territories, symmetric links, connected graph, bases not adjacent,
+   size spread ≤ 4× (fantasy) / 8× (world), polygons inside [0,1], label point inside its polygon.
+
+**Coordinates** are normalised to the painting (x, y ∈ [0, 1]); each template stores the painting's
+`aspect`. The client will draw the painting over the map rectangle and the polygons on top.
+The client gets the same template files in phase 6 (the server only sends the template id).
+
+**World map** territories are a geometric split of the continents, not country borders.
+
+**Bot matches on the real templates** (150 each, mean minutes, share in 8–12 min):
+
+| | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
+|---|---|---|---|---|---|---|---|
+| fantasy | 7.5 (48%) | 9.9 (93%) | 10.0 (100%) | 10.0 (97%) | 9.7 (99%) | 9.7 (99%) | 9.5 (100%) |
+| world | 8.3 (57%) | 10.2 (97%) | 10.1 (100%) | 10.4 (95%) | 9.9 (100%) | 9.9 (100%) | 9.6 (99%) |

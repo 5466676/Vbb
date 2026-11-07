@@ -29,6 +29,8 @@ Target match length 8–12 minutes.
 # backend
 cd backend && pip install -e ".[dev]" && pytest -W error
 ruff check backend
+# map templates (offline; needs the maps extra)
+cd backend && pip install -e ".[maps]" && python -m maps.generate --preview /tmp/maps
 # full stack
 docker compose up --build        # then: curl localhost:8000/health
 # app
