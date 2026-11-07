@@ -96,6 +96,7 @@ class PlayerView {
   final int team;
   final bool bot;
   int score;
+  int bonus = 0; // points not tied to land (army perks, right answers to other duels)
   bool eliminated;
   bool connected;
   bool abilityUsed;
@@ -229,6 +230,10 @@ class MatchView {
     final i = waiting.indexOf(me);
     return i < 0 ? null : i + 1;
   }
+
+  /// What the scoreboard shows: land value plus bonus points (the server's score).
+  int scoreOf(int seat) =>
+      territories.values.where((t) => t.owner == seat).fold(0, (a, t) => a + t.value) + players[seat].bonus;
 
   bool get myTurn => phase == 'battle_target' && attacker != null && attacker == mySeat;
 

@@ -471,7 +471,7 @@ class _TopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final m = match;
-    int land(int seat) => m.territories.values.where((t) => t.owner == seat).fold(0, (a, t) => a + t.value);
+    int land(int seat) => m.scoreOf(seat);
     int count(int seat) => m.territories.values.where((t) => t.owner == seat).length;
     final order = [...m.players]..sort((a, b) => land(b.seat).compareTo(land(a.seat)));
     final top = order.isEmpty ? 1 : max(1, land(order.first.seat));

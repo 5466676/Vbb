@@ -16,7 +16,7 @@ from app.engine.armies import Army
 # Settings and map input
 # ------------------------------------------------------------------------------------------
 
-DEFAULT_BATTLE_ROUNDS = {2: 19, 3: 13, 4: 9, 5: 8, 6: 6, 7: 5, 8: 4}  # calibrated by simulation
+DEFAULT_BATTLE_ROUNDS = {2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4}  # calibrated by simulation
 
 
 class Mode(StrEnum):

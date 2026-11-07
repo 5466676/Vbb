@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -304,6 +305,11 @@ class GameController extends Notifier<GameState> {
         shielded: (t['shielded'] ?? false) as bool,
       );
     }
+    // the server's score is land + bonus: keep the bonus part
+    for (final p in match.players) {
+      final land = match.territories.values.where((t) => t.owner == p.seat).fold(0, (a, t) => a + t.value);
+      p.bonus = max(0, p.score - land);
+    }
     match.phase = mj['phase'] as String;
     match.phaseId = mj['phase_id'] as int;
     final left = mj['deadline_in_ms'] as int?;
@@ -471,6 +477,13 @@ class GameController extends Notifier<GameState> {
         if (m.duelTerritory != null) m.effect(Fx('march', m.duelTerritory!, seat: m.attacker));
         m.log('${_name(m, m.attacker)} هاجم ${_name(m, m.defender)}', m.attacker, 'attack');
         sound.play('march');
+      case 'bonus_points':
+        final pts = ((p['points'] as Map?) ?? {}).map((k, v) => MapEntry(int.parse('$k'), v as int));
+        pts.forEach((s, n) => m.players[s].bonus += n);
+        if (pts.containsKey(m.mySeat)) {
+          m.log('جاوبت صح على مبارزة غيرك: +${pts[m.mySeat]}', m.mySeat, 'power');
+          sound.play('coins');
+        }
       case 'shield_blocked':
         m.log('الدرع صدّ الهجوم', p['defender'] as int?, 'held');
         if (m.duelTerritory != null) m.effect(Fx('held', m.duelTerritory!, seat: p['defender'] as int?));

@@ -274,7 +274,8 @@ class _QuestionArenaState extends State<QuestionArena> {
                 Text(
                   m.phase == 'battle_tiebreak'
                       ? 'سؤال الحسم!'
-                      : '${m.players[m.attacker!].name} هاجم ${m.defender == null ? '' : m.players[m.defender!].name}',
+                      : '${m.players[m.attacker!].name} هاجم ${m.defender == null ? '' : m.players[m.defender!].name}'
+                            '${m.mySeat != m.attacker && m.mySeat != m.defender && q.participant ? '  •  جاوب صح وخود +50' : ''}',
                   style: const TextStyle(color: Toon.red, fontWeight: FontWeight.w900, fontSize: 13, height: 1.2),
                 ),
               Text(

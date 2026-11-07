@@ -450,3 +450,17 @@ look, starting with pace:
 - **Question categories before the match:** a picker with the 23 categories (or all) in the
   offline setup and before creating an online room (sent as the room's `categories` setting).
   Offline, a category set without questions of the needed kind falls back to all categories.
+
+## Nobody just watches; both-right duels go to the tiebreak (2026-11-07)
+
+Simulated 4-player matches had ~34 attacks of which only ~6 captured, and each player sat out half
+the duels. Owner-approved rule changes (GAME_RULES §6.2):
+- **Everyone answers the duel question.** Attacker and defender decide the territory; every other
+  living player who answers correctly gets **+50 bonus points** (`bonus_points` event). The client
+  scoreboard now shows land + bonus (the server's score).
+- **Both right → tiebreak**, always (the 0.5 s speed window is gone); the closer numeric answer
+  wins. The Mongol attack-time perk now only matters as the tiebreak's time key — worth a rebalance.
+- Duels take a little longer with everyone answering, so R drops to
+  `{2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4}`; simulated means are back to ~10–11.7 min.
+- With bots captures stay rare because bots often answer wrong; with people who know the answers
+  the tiebreak rule should move the map more. Revisit after real family matches.

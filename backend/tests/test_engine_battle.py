@@ -244,3 +244,30 @@ def test_round_started_carries_the_turn_order():
     ev = duel(s, core.legal_targets(s, 1)[0], att_ms=3000, def_ms=1000)  # seat 1 ends round 1
     nxt = [e for e in ev if e.type == "round_started"]
     assert nxt and nxt[0].data == {"round": 2, "order": [1, 0]}  # rotates one seat
+
+
+def test_both_right_goes_to_the_tiebreak_even_with_a_big_time_gap():
+    s = two_player_line()
+    step(s, ChooseTarget(seat=0, territory=3))
+    step(s, ProvideQuestion(question=mcq(correct=0)))
+    step(s, Answer(seat=0, choice=0, elapsed_ms=1000))
+    step(s, Answer(seat=1, choice=0, elapsed_ms=6000))
+    assert s.phase is Phase.BATTLE_TIEBREAK  # speed no longer decides between two right answers
+
+
+def test_everyone_answers_the_duel_and_right_watchers_score_points():
+    s = new_match(line_map(7, [0, 3, 6]), [R, R, R])
+    to_battle(s, {1: 0, 2: 0, 4: 1, 5: 2})
+    attacker = s.attacker
+    target = core.legal_targets(s, attacker)[0]
+    defender = s.territories[target].owner
+    watcher = ({0, 1, 2} - {attacker, defender}).pop()
+    step(s, ChooseTarget(seat=attacker, territory=target))
+    ev = step(s, ProvideQuestion(question=mcq(correct=1)))
+    assert s.active is not None and sorted(s.active.participants) == [0, 1, 2]
+    before = s.players[watcher].bonus
+    ev = step(s, Answer(seat=watcher, choice=1, elapsed_ms=900))
+    ev += step(s, Answer(seat=attacker, choice=0, elapsed_ms=1000))  # wrong: the defender holds
+    ev += step(s, Answer(seat=defender, choice=2, elapsed_ms=1200))
+    assert s.players[watcher].bonus == before + core.SPECTATOR_POINTS
+    assert "bonus_points" in types(ev) and "territory_held" in types(ev)

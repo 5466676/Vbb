@@ -48,6 +48,7 @@ class RuleError(ValueError):
     """An action that is not allowed right now. The state is left unchanged."""
 
 
+SPECTATOR_POINTS = 50  # a right answer to someone else's duel question (§6.2.2)
 BATTLE_PHASES = (Phase.BATTLE_TARGET, Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK)
 
 # ==========================================================================================
@@ -693,7 +694,12 @@ def _start_duel(state: MatchState, tid: int, ev: list[Event], rng: Rng, auto: bo
         _finish_turn(state, attacker_won=False, ev=ev, rng=rng)
         return
     _set_phase(state, Phase.BATTLE_DUEL, ev, attacker=attacker, defender=defender, territory=tid)
-    _request_question(state, QuestionKind.MCQ, [attacker, defender], ev)
+    # everyone still in the match answers; only the attacker and the defender decide the land,
+    # the others play for spectator points (§6.2.2)
+    watchers = [
+        p.seat for p in state.players if not p.eliminated and p.seat not in (attacker, defender)
+    ]
+    _request_question(state, QuestionKind.MCQ, [attacker, defender, *watchers], ev)
 
 
 def _resolve_duel(
@@ -705,33 +711,40 @@ def _resolve_duel(
     att, dfd = duel.attacker, duel.defender
     ra, rd = aq.answers.get(att), aq.answers.get(dfd)
     a_ok, d_ok = is_correct(q, ra), is_correct(q, rd)
+    points = {
+        s: SPECTATOR_POINTS
+        for s in aq.participants
+        if s not in (att, dfd) and is_correct(q, aq.answers.get(s))
+    }
+    for s, n in points.items():
+        state.players[s].bonus += n
+    if points:
+        ev.append(
+            Event(type="bonus_points", data={"points": {str(s): n for s, n in points.items()}})
+        )
     if a_ok and d_ok:
-        ta = ra.elapsed_ms - bonus.get(att, 0)  # type: ignore[union-attr]
-        td = rd.elapsed_ms  # type: ignore[union-attr]
-        if abs(ta - td) < state.settings.tie_window_ms:
-            pa, pd = state.players[att], state.players[dfd]
-            if pa.janissary_armed and not pd.turtle_armed:
-                pa.janissary_armed = False
-                ev.append(Event(type="tie_won_by_ability", data={"seat": att}))
-                _apply_duel_outcome(state, True, rng, ev)
-                return
-            if pd.turtle_armed and not pa.janissary_armed:
-                pd.turtle_armed = False
-                ev.append(Event(type="tie_won_by_ability", data={"seat": dfd}))
-                _apply_duel_outcome(state, False, rng, ev)
-                return
-            pa.janissary_armed = pd.turtle_armed = False
-            _set_phase(
-                state,
-                Phase.BATTLE_TIEBREAK,
-                ev,
-                attacker=att,
-                defender=dfd,
-                territory=duel.territory,
-            )
-            _request_question(state, QuestionKind.NUMERIC, [att, dfd], ev)
+        # both right: no race on speed, a numeric tiebreak decides (closest wins) — §6.2.3
+        pa, pd = state.players[att], state.players[dfd]
+        if pa.janissary_armed and not pd.turtle_armed:
+            pa.janissary_armed = False
+            ev.append(Event(type="tie_won_by_ability", data={"seat": att}))
+            _apply_duel_outcome(state, True, rng, ev)
             return
-        _apply_duel_outcome(state, ta < td, rng, ev)
+        if pd.turtle_armed and not pa.janissary_armed:
+            pd.turtle_armed = False
+            ev.append(Event(type="tie_won_by_ability", data={"seat": dfd}))
+            _apply_duel_outcome(state, False, rng, ev)
+            return
+        pa.janissary_armed = pd.turtle_armed = False
+        _set_phase(
+            state,
+            Phase.BATTLE_TIEBREAK,
+            ev,
+            attacker=att,
+            defender=dfd,
+            territory=duel.territory,
+        )
+        _request_question(state, QuestionKind.NUMERIC, [att, dfd], ev)
         return
     # The attacker must answer correctly to win (DECISIONS: phase 2).
     _apply_duel_outcome(state, a_ok, rng, ev)

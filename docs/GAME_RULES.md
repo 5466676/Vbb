@@ -104,7 +104,7 @@ R *(config, draft)* by player count, chosen so a match stays near 8–12 minutes
 
 | Players | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|
-| R | 19 | 13 | 9 | 8 | 6 | 5 | 4 |
+| R | 19 | 11 | 8 | 7 | 5 | 4 | 4 |
 
 (Calibrated by the phase-2 simulation. 1v1 matches often end earlier because a base falls;
 see DECISIONS.md.)
@@ -112,11 +112,14 @@ see DECISIONS.md.)
 A turn:
 1. **Choose target (8 s):** the attacker picks one enemy territory adjacent to their land.
    On timeout the server picks one at random. If no target exists the turn is skipped.
-2. **Duel question:** one MCQ to the **attacker and the defender only**. Everyone else watches.
+2. **Duel question:** one MCQ to **everyone still in the match**. Only the attacker and the
+   defender decide the territory; every other player who answers correctly earns **+50 bonus
+   points**, so nobody just watches.
 3. **Resolve:**
    - The attacker wins only if they **answer correctly** and rank above the defender; otherwise the
      defender holds (so both wrong, or both silent, is a hold).
-   - Both correct with an answer-time gap **< 0.5 s** → tie → one numeric tiebreak question for the two of them.
+   - **Both correct → tie** (speed does not decide) → one numeric tiebreak question for the two of
+     them; the closer answer wins (then the faster).
      In the tiebreak an exact draw (same distance, same time) or two missing answers favour the defender.
      If the attacker's الإنكشارية and the defender's السلحفاة are both armed, they cancel and the tiebreak is played.
    - Captured normal territory: changes owner, value **+100**.

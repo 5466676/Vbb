@@ -4,6 +4,8 @@ library;
 
 import 'dart:math';
 
+const spectatorPoints = 50; // a right answer to someone else's duel question
+
 class RuleError implements Exception {
   RuleError(this.message);
   final String message;
@@ -22,7 +24,7 @@ const ottomanCaptureGain = 150;
 const pharaohPyramidGain = 300;
 const crusaderSiegeTowers = 2;
 
-const defaultBattleRounds = {2: 19, 3: 13, 4: 9, 5: 8, 6: 6, 7: 5, 8: 4};
+const defaultBattleRounds = {2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4};
 
 class Settings {
   int mcqMs = 10000;
@@ -30,7 +32,7 @@ class Settings {
   int pickMs = 5000;
   int targetMs = 8000;
   int latencyGraceMs = 150;
-  int tieWindowMs = 500;
+  int tieWindowMs = 500; // unused since both-right duels always go to the tiebreak
   int normalValue = 200;
   int baseValue = 1000;
   int captureGain = 100;
@@ -618,7 +620,9 @@ class MatchState {
       return;
     }
     _setPhase('battle_duel', ev, {'attacker': att, 'defender': dfd, 'territory': tid});
-    _requestQuestion('mcq', [att, dfd], ev);
+    // everyone still in answers; only attacker and defender decide the land (GAME_RULES §6.2.2)
+    final watchers = [for (final p in players) if (!p.eliminated && p.seat != att && p.seat != dfd) p.seat];
+    _requestQuestion('mcq', [att, dfd, ...watchers], ev);
   }
 
   void _resolveDuel(ActiveQuestion aq, Map<int, int> bonus, List<Ev> ev) {
@@ -626,28 +630,30 @@ class MatchState {
     final q = aq.question;
     final ra = aq.answers[d.attacker], rd = aq.answers[d.defender];
     final aOk = isCorrect(q, ra), dOk = isCorrect(q, rd);
+    final points = {
+      for (final s in aq.participants)
+        if (s != d.attacker && s != d.defender && isCorrect(q, aq.answers[s])) s: spectatorPoints,
+    };
+    points.forEach((s, n) => players[s].bonus += n);
+    if (points.isNotEmpty) ev.add(Ev('bonus_points', {'points': {for (final e in points.entries) '${e.key}': e.value}}));
     if (aOk && dOk) {
-      final ta = ra!.elapsedMs - (bonus[d.attacker] ?? 0);
-      final td = rd!.elapsedMs;
-      if ((ta - td).abs() < settings.tieWindowMs) {
-        final pa = players[d.attacker], pd = players[d.defender];
-        if (pa.janissaryArmed && !pd.turtleArmed) {
-          pa.janissaryArmed = false;
-          ev.add(Ev('tie_won_by_ability', {'seat': d.attacker}));
-          return _applyDuelOutcome(true, ev);
-        }
-        if (pd.turtleArmed && !pa.janissaryArmed) {
-          pd.turtleArmed = false;
-          ev.add(Ev('tie_won_by_ability', {'seat': d.defender}));
-          return _applyDuelOutcome(false, ev);
-        }
+      // both right: no race on speed, a numeric tiebreak decides (closest wins)
+      final pa = players[d.attacker], pd = players[d.defender];
+      if (pa.janissaryArmed && !pd.turtleArmed) {
         pa.janissaryArmed = false;
-        pd.turtleArmed = false;
-        _setPhase('battle_tiebreak', ev, {'attacker': d.attacker, 'defender': d.defender, 'territory': d.territory});
-        _requestQuestion('numeric', [d.attacker, d.defender], ev);
-        return;
+        ev.add(Ev('tie_won_by_ability', {'seat': d.attacker}));
+        return _applyDuelOutcome(true, ev);
       }
-      return _applyDuelOutcome(ta < td, ev);
+      if (pd.turtleArmed && !pa.janissaryArmed) {
+        pd.turtleArmed = false;
+        ev.add(Ev('tie_won_by_ability', {'seat': d.defender}));
+        return _applyDuelOutcome(false, ev);
+      }
+      pa.janissaryArmed = false;
+      pd.turtleArmed = false;
+      _setPhase('battle_tiebreak', ev, {'attacker': d.attacker, 'defender': d.defender, 'territory': d.territory});
+      _requestQuestion('numeric', [d.attacker, d.defender], ev);
+      return;
     }
     _applyDuelOutcome(aOk, ev); // the attacker must answer correctly to win
   }
