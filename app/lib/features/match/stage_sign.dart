@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'question_arena.dart' show Toon;
@@ -34,22 +36,42 @@ class _StageSignState extends State<StageSign> with SingleTickerProviderStateMix
           if (t >= 1) return const SizedBox.shrink();
           final drop = Curves.bounceOut.transform((t / 0.3).clamp(0.0, 1.0));
           final lift = Curves.easeInBack.transform(((t - 0.82) / 0.18).clamp(0.0, 1.0));
-          final y = -1.0 + drop - lift * 1.2; // fraction of the sign's travel
-          return Align(
-            alignment: Alignment(0, -0.35 + y * 1.3),
-            child: Transform.rotate(angle: 0.04 * (1 - drop) - 0.02 * lift, child: child),
+          // sized from the screen: chains reach down a fifth of the height, the plank sits below
+          // them (scaled down if needed), so the sign is whole even on a phone in landscape
+          return LayoutBuilder(
+            builder: (context, box) {
+              final chainH = box.maxHeight * 0.2;
+              final travel = chainH + box.maxHeight * 0.45;
+              final dy = -travel * (1 - drop) - travel * 1.2 * lift;
+              return Align(
+                alignment: Alignment.topCenter,
+                child: Transform.translate(
+                  offset: Offset(0, dy),
+                  child: Transform.rotate(
+                    angle: 0.04 * (1 - drop) - 0.02 * lift,
+                    child: _Sign(
+                      text: widget.text,
+                      sub: widget.sub,
+                      chainH: chainH,
+                      maxPlank: Size(box.maxWidth * 0.9, box.maxHeight * 0.42),
+                    ),
+                  ),
+                ),
+              );
+            },
           );
         },
-        child: _Sign(text: widget.text, sub: widget.sub),
       ),
     );
   }
 }
 
 class _Sign extends StatelessWidget {
-  const _Sign({required this.text, this.sub});
+  const _Sign({required this.text, this.sub, required this.chainH, required this.maxPlank});
   final String text;
   final String? sub;
+  final double chainH;
+  final Size maxPlank;
 
   @override
   Widget build(BuildContext context) {
@@ -57,54 +79,64 @@ class _Sign extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         // chains
-        SizedBox(width: 300, height: 300, child: CustomPaint(painter: _ChainsPainter())),
-        Container(
-          constraints: const BoxConstraints(minWidth: 320),
-          padding: const EdgeInsets.fromLTRB(36, 12, 36, 14),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Toon.outline, width: 3.5),
-            gradient: const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Color(0xFFC98A4B), Color(0xFF9A5E2C)],
-            ),
-            boxShadow: const [
-              BoxShadow(color: Toon.outline, offset: Offset(0, 6)),
-              BoxShadow(color: Color(0x66000000), blurRadius: 16, offset: Offset(0, 10)),
-            ],
-          ),
-          child: CustomPaint(
-            painter: _PlanksPainter(),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  text,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontFamily: 'Ruqaa',
-                    fontSize: 44,
-                    height: 1.25,
-                    color: Color(0xFFFFF3D6),
-                    shadows: [
-                      Shadow(color: Toon.outline, offset: Offset(0, 3)),
-                      Shadow(color: Toon.outline, blurRadius: 2),
-                    ],
-                  ),
+        SizedBox(
+          width: min(300, maxPlank.width * 0.8),
+          height: chainH,
+          child: CustomPaint(painter: _ChainsPainter()),
+        ),
+        ConstrainedBox(
+          constraints: BoxConstraints.loose(maxPlank),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Container(
+              constraints: const BoxConstraints(minWidth: 320),
+              padding: const EdgeInsets.fromLTRB(36, 12, 36, 14),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Toon.outline, width: 3.5),
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFFC98A4B), Color(0xFF9A5E2C)],
                 ),
-                if (sub != null)
-                  Text(
-                    sub!,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Color(0xFFFFE8B0),
-                      fontWeight: FontWeight.w900,
-                      fontSize: 15,
-                      shadows: [Shadow(color: Toon.outline, offset: Offset(0, 1.5))],
+                boxShadow: const [
+                  BoxShadow(color: Toon.outline, offset: Offset(0, 6)),
+                  BoxShadow(color: Color(0x66000000), blurRadius: 16, offset: Offset(0, 10)),
+                ],
+              ),
+              child: CustomPaint(
+                painter: _PlanksPainter(),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      text,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontFamily: 'Ruqaa',
+                        fontSize: 44,
+                        height: 1.25,
+                        color: Color(0xFFFFF3D6),
+                        shadows: [
+                          Shadow(color: Toon.outline, offset: Offset(0, 3)),
+                          Shadow(color: Toon.outline, blurRadius: 2),
+                        ],
+                      ),
                     ),
-                  ),
-              ],
+                    if (sub != null)
+                      Text(
+                        sub!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Color(0xFFFFE8B0),
+                          fontWeight: FontWeight.w900,
+                          fontSize: 15,
+                          shadows: [Shadow(color: Toon.outline, offset: Offset(0, 1.5))],
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

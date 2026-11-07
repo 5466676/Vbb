@@ -498,7 +498,7 @@ class _Options extends StatelessWidget {
     final q = question;
     return LayoutBuilder(
       builder: (context, box) {
-        final h = ((box.maxHeight - 12) / 2).clamp(40.0, 90.0);
+        final h = ((box.maxHeight - 22) / 2).clamp(26.0, 90.0); // two rows always fit their box
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -663,63 +663,68 @@ class _NumberPad extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, box) {
         final keyH = ((box.maxHeight - 60) / 3 - 8).clamp(30.0, 54.0);
+        // scale the whole pad down on short screens: a pad taller than its box would leave
+        // the bottom row (1 2 3 ▶) outside it, where taps never arrive (phones in landscape)
         return Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 360),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  height: 46,
-                  decoration: Toon.chunky(Colors.white, radius: 10, depth: 3),
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          typed.isEmpty ? (hint ?? (sent ? 'انبعت' : 'رقمك')) : typed,
-                          textAlign: TextAlign.center,
-                          textDirection: TextDirection.ltr,
-                          style: TextStyle(
-                            fontSize: typed.isEmpty ? 18 : 26,
-                            fontWeight: FontWeight.w900,
-                            color: typed.isEmpty ? const Color(0x883A2414) : Toon.ink,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: SizedBox(
+              width: min(360.0, box.maxWidth),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: 46,
+                    decoration: Toon.chunky(Colors.white, radius: 10, depth: 3),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            typed.isEmpty ? (hint ?? (sent ? 'انبعت' : 'رقمك')) : typed,
+                            textAlign: TextAlign.center,
+                            textDirection: TextDirection.ltr,
+                            style: TextStyle(
+                              fontSize: typed.isEmpty ? 18 : 26,
+                              fontWeight: FontWeight.w900,
+                              color: typed.isEmpty ? const Color(0x883A2414) : Toon.ink,
+                            ),
                           ),
                         ),
-                      ),
-                      if (unit.isNotEmpty)
-                        Text(
-                          unit,
-                          style: const TextStyle(fontWeight: FontWeight.w800, color: Toon.ink),
-                        ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 8),
-                for (final row in keys)
-                  Directionality(
-                    textDirection: TextDirection.ltr,
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        children: [
-                          for (final k in row)
-                            Expanded(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 4),
-                                child: _Key(
-                                  label: k,
-                                  height: keyH,
-                                  enabled: enabled && (k != '✓' || typed.isNotEmpty),
-                                  onTap: () => onKey(k),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
+                        if (unit.isNotEmpty)
+                          Text(
+                            unit,
+                            style: const TextStyle(fontWeight: FontWeight.w800, color: Toon.ink),
+                          ),
+                      ],
                     ),
                   ),
-              ],
+                  const SizedBox(height: 8),
+                  for (final row in keys)
+                    Directionality(
+                      textDirection: TextDirection.ltr,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: [
+                            for (final k in row)
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  child: _Key(
+                                    label: k,
+                                    height: keyH,
+                                    enabled: enabled && (k != '✓' || typed.isNotEmpty),
+                                    onTap: () => onKey(k),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         );
@@ -738,27 +743,32 @@ class _Key extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final send = label == '✓';
-    return Opacity(
-      opacity: enabled ? 1 : 0.4,
-      child: GestureDetector(
-        onTap: enabled ? onTap : null,
-        child: Container(
-          height: height,
-          decoration: Toon.chunky(send ? Toon.green : const Color(0xFF4FA3E0), radius: 10, depth: 3),
-          child: Center(
-            child: label == '⌫'
-                ? const Icon(Icons.backspace_outlined, color: Colors.white)
-                : send
-                ? const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 30)
-                : Text(
-                    label,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      shadows: [Shadow(color: Toon.outline, offset: Offset(0, 1.5))],
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label == '⌫' ? 'امسح' : (label == '✓' ? 'أرسل الرقم' : label),
+      child: Opacity(
+        opacity: enabled ? 1 : 0.4,
+        child: GestureDetector(
+          onTap: enabled ? onTap : null,
+          child: Container(
+            height: height,
+            decoration: Toon.chunky(send ? Toon.green : const Color(0xFF4FA3E0), radius: 10, depth: 3),
+            child: Center(
+              child: label == '⌫'
+                  ? const Icon(Icons.backspace_outlined, color: Colors.white)
+                  : send
+                  ? const Icon(Icons.play_arrow_rounded, color: Colors.white, size: 30)
+                  : Text(
+                      label,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                        shadows: [Shadow(color: Toon.outline, offset: Offset(0, 1.5))],
+                      ),
                     ),
-                  ),
+            ),
           ),
         ),
       ),
