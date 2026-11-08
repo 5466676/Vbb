@@ -581,3 +581,18 @@ they stay small and exact):
 - All 25 Shami lines (Gemini TTS, voice Enceladus) are in `app/assets/audio/voice/`. The last 21
   were made in 3 batched requests (split on silences, each piece checked with speech-to-text) to
   stay inside the free daily quota. AUDIO.md §4 now documents the Levantine set.
+
+## Neon «system window» look and a Fusha war-commander voice (owner's picks)
+- The owner chose a look inspired by glowing "system window" UIs over wood & paper, for the whole
+  game. Original design (no characters, art or names from any existing work): near-black void,
+  navy panels with 1.6px cyan edges, glow shadows and corner brackets (`AppColors.window`,
+  `WoodPanel`, `ParchmentPanel`, `WarButton` keep their names). Headings are Cairo Black with a
+  glow instead of Aref Ruqaa. Seat colours are bright neon (red, blue, green, amber, violet, cyan,
+  orange, silver).
+- Map: the painting goes through a colour matrix into a dark blue "hologram" (land a step lighter
+  than the sea); owned land is a faint fill with an inner glow and a bright edge drawn as stacked
+  strokes (no blur filters, still cached by the ownership painter's RepaintBoundary).
+- The royal-banner palette and wood & paper bar from the previous entry are superseded.
+- Commentator: all 25 lines regenerated in Modern Standard Arabic, rough war-commander style,
+  voice Enceladus (`tools/audio/commentator_fusha.py`), checked with speech-to-text. UI strings
+  stay in the current spoken style (owner's answer: Fusha for the commentator only).

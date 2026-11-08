@@ -23,7 +23,11 @@ class LobbyScreen extends ConsumerWidget {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          image: DecorationImage(image: AssetImage('assets/ui/lobby/lobby_1.webp'), fit: BoxFit.cover),
+          image: DecorationImage(
+            image: AssetImage('assets/ui/lobby/lobby_1.webp'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Color(0xCC05070F), BlendMode.srcATop),
+          ),
         ),
         child: SafeArea(
           child: Padding(

@@ -153,7 +153,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                         children: [
                           // open sea around the map
                           const Positioned.fill(
-                            child: DecoratedBox(decoration: BoxDecoration(color: Color(0xFF77B9C5))),
+                            child: DecoratedBox(decoration: BoxDecoration(color: Color(0xFF05070F))),
                           ),
                           Positioned(
                             left: 0,
@@ -179,7 +179,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                                 decoration: BoxDecoration(
                                   gradient: RadialGradient(
                                     radius: 0.95,
-                                    colors: [Color(0x00000000), Color(0x00000000), Color(0x66140A02)],
+                                    colors: [Color(0x00000000), Color(0x00000000), Color(0xCC02040C)],
                                     stops: [0, 0.7, 1],
                                   ),
                                 ),
@@ -420,7 +420,7 @@ class _RibbonPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final w = size.width, h = size.height, tail = 18.0;
-    final shade = Paint()..color = const Color(0xFF8C6A3A);
+    final shade = Paint()..color = const Color(0xFF0B3A66);
     // folded tails behind
     for (final left in [true, false]) {
       final x0 = left ? 0.0 : w, dir = left ? 1.0 : -1.0;
@@ -444,8 +444,8 @@ class _RibbonPainter extends CustomPainter {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: highlight
-              ? const [Color(0xFFFFE7A6), Color(0xFFE2B85A)]
-              : const [Color(0xFFF4E6C6), Color(0xFFD9C29A)],
+              ? const [Color(0xFF2A1F6E), Color(0xFF140E40)]
+              : const [Color(0xFF10234A), Color(0xFF081430)],
         ).createShader(body.outerRect),
     );
     canvas.drawRRect(
@@ -453,7 +453,7 @@ class _RibbonPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1
-        ..color = const Color(0x884A3418),
+        ..color = const Color(0xCC3FD0FF),
     );
   }
 
@@ -519,10 +519,10 @@ class _ToolBar extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.fromLTRB(10, 5, 10, 3),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF3D6),
+          color: const Color(0xFF0E1D3D),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF3A2414), width: 2.5),
-          boxShadow: const [BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 3))],
+          border: Border.all(color: const Color(0xFF3FD0FF), width: 1.6),
+          boxShadow: const [BoxShadow(color: Color(0x803FD0FF), blurRadius: 8)],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -545,15 +545,15 @@ class _ToolBar extends ConsumerWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: (id == 'shield' && mode == 'shield') || (id == 'ability' && mode == 'ability')
-                                ? const Color(0xFFFFC233)
-                                : const Color(0xFF3A2414),
+                                ? const Color(0xFFFFCF4A)
+                                : const Color(0xFF3FD0FF),
                           ),
                           child: ClipOval(child: Image.asset(asset, fit: BoxFit.cover)),
                         ),
                         Text(
                           label,
                           style: const TextStyle(
-                            color: Color(0xFF2B1A0E),
+                            color: Color(0xFFE6F7FF),
                             fontSize: 11,
                             fontWeight: FontWeight.w900,
                             height: 1.3,
@@ -598,16 +598,16 @@ class _TopBar extends StatelessWidget {
     return Container(
       height: 58,
       padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
-      // wood & paper: a varnished plank with a lighter top edge and a dark rail
+      // neon: a dark navy strip with a glowing cyan rail
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           stops: [0, 0.08, 0.5, 1],
-          colors: [Color(0xFFE0A86A), Color(0xFFC08850), Color(0xFFA56B37), Color(0xFF7E4B22)],
+          colors: [Color(0xFF0E1D3D), Color(0xFF0A1630), Color(0xFF081228), Color(0xFF060E22)],
         ),
-        border: Border(bottom: BorderSide(color: Color(0xFF3A2414), width: 3)),
-        boxShadow: [BoxShadow(color: Color(0x66000000), offset: Offset(0, 3), blurRadius: 4)],
+        border: Border(bottom: BorderSide(color: Color(0xFF3FD0FF), width: 1.6)),
+        boxShadow: [BoxShadow(color: Color(0x993FD0FF), blurRadius: 10)],
       ),
       child: Row(
         children: [
@@ -675,7 +675,7 @@ class _TopBar extends StatelessWidget {
                       child: Container(
                         constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        decoration: Toon.chunky(Colors.white, radius: 10, depth: 2),
+                        decoration: Toon.chunky(Toon.card, radius: 10, depth: 2),
                         child: Text(
                           e.value,
                           style: TextStyle(
@@ -705,15 +705,15 @@ class _TopBar extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFF3D6),
+              color: const Color(0xFF0E1D3D),
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF3A2414), width: 3),
+              border: Border.all(color: const Color(0xFF3FD0FF), width: 1.8),
             ),
             child: Column(
               children: [
                 const Text(
                   'سجلّ المعركة',
-                  style: TextStyle(fontFamily: AppTheme.headingFont, fontSize: 26, color: Color(0xFF6E1A12)),
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 26, color: Color(0xFF3FD0FF)),
                 ),
                 Expanded(
                   child: ListView(
@@ -726,13 +726,13 @@ class _TopBar extends StatelessWidget {
                               Icon(
                                 _logIcon(t.kind),
                                 size: 16,
-                                color: t.seat == null ? const Color(0xFF8A5528) : AppColors.seat(t.seat),
+                                color: t.seat == null ? const Color(0xFF8FB3C9) : AppColors.seat(t.seat),
                               ),
                               const SizedBox(width: 6),
                               Expanded(
                                 child: Text(
                                   t.text,
-                                  style: const TextStyle(color: Color(0xFF2B1A0E), fontWeight: FontWeight.w700),
+                                  style: const TextStyle(color: Color(0xFFE6F7FF), fontWeight: FontWeight.w700),
                                 ),
                               ),
                             ],
@@ -760,16 +760,13 @@ class _TopBar extends StatelessWidget {
           gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Color(0xFFFFF8E6), Color(0xFFEFDDB4)],
+            colors: [Color(0xFF12284F), Color(0xFF0A1630)],
           ),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: p.seat == m.mySeat ? const Color(0xFFFFC233) : const Color(0xFF3A2414),
-            width: p.seat == m.mySeat ? 3 : 2,
-          ),
+          border: Border.all(color: p.seat == m.mySeat ? AppColors.gold : c, width: p.seat == m.mySeat ? 2.4 : 1.6),
           boxShadow: [
-            const BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 2)),
-            if (now) BoxShadow(color: c, blurRadius: 10, spreadRadius: 1),
+            BoxShadow(color: (p.seat == m.mySeat ? AppColors.gold : c).withValues(alpha: 0.55), blurRadius: 8),
+            if (now) BoxShadow(color: c, blurRadius: 14, spreadRadius: 1),
           ],
         ),
         child: Row(
@@ -777,12 +774,12 @@ class _TopBar extends StatelessWidget {
             // colour tab with the portrait
             Container(
               width: 48,
-              // royal banner tab: seat colour with a gold thread on its inner edge
+              // seat tab: the seat colour sunk into the navy, with a bright thread on its inner edge
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color.lerp(c, Colors.white, 0.12)!, Color.lerp(c, Colors.black, 0.18)!],
+                  colors: [Color.lerp(c, AppColors.panelDeep, 0.35)!, Color.lerp(c, AppColors.panelDeep, 0.7)!],
                 ),
                 borderRadius: const BorderRadiusDirectional.horizontal(start: Radius.circular(7))
                     .resolve(TextDirection.rtl),
@@ -798,7 +795,7 @@ class _TopBar extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white,
-                      border: Border.all(color: const Color(0xFF3A2414), width: 1.5),
+                      border: Border.all(color: const Color(0xFF3FD0FF), width: 1.5),
                     ),
                     child: ClipOval(child: Image.asset(armyOf(p.army).commander, fit: BoxFit.cover)),
                   ),
@@ -817,7 +814,7 @@ class _TopBar extends StatelessWidget {
                 ],
               ),
             ),
-            Container(width: 2.5, color: AppColors.bannerGold),
+            Container(width: 1.6, color: c),
             const SizedBox(width: 6),
             Expanded(
               child: Padding(
@@ -834,7 +831,7 @@ class _TopBar extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                              color: Color(0xFF2B1A0E),
+                              color: Color(0xFFE6F7FF),
                               fontWeight: FontWeight.w900,
                               height: 1.15,
                               fontSize: 13,
@@ -843,7 +840,7 @@ class _TopBar extends StatelessWidget {
                         ),
                         if (m.onFire.contains(p.seat)) const Text('🔥', style: TextStyle(fontSize: 12, height: 1)),
                         if (m.king == p.seat) const Text('👑', style: TextStyle(fontSize: 12, height: 1)),
-                        if (p.bot || p.away) const Icon(Icons.smart_toy_outlined, size: 12, color: Color(0xFF8A5528)),
+                        if (p.bot || p.away) const Icon(Icons.smart_toy_outlined, size: 12, color: Color(0xFF8FB3C9)),
                         if (!p.connected) const Icon(Icons.wifi_off, size: 12, color: AppColors.bad),
                       ],
                     ),
@@ -852,19 +849,19 @@ class _TopBar extends StatelessWidget {
                         Text(
                           p.eliminated ? 'خرج' : '$value',
                           style: TextStyle(
-                            color: Color.lerp(c, Colors.black, 0.25),
+                            color: Color.lerp(c, Colors.white, 0.15),
                             fontWeight: FontWeight.w900,
                             fontSize: 14,
                             height: 1.2,
                           ),
                         ),
                         const Spacer(),
-                        const Icon(Icons.flag, size: 11, color: Color(0xFF8A5528)),
+                        const Icon(Icons.flag, size: 11, color: Color(0xFF8FB3C9)),
                         Text(
                           ' $lands',
                           style: const TextStyle(
                             fontSize: 11,
-                            color: Color(0xFF8A5528),
+                            color: Color(0xFF8FB3C9),
                             height: 1.2,
                             fontWeight: FontWeight.w800,
                           ),
@@ -911,11 +908,11 @@ class _RoundButton extends StatelessWidget {
           height: 40,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: const Color(0xFFFFC233),
-            border: Border.all(color: const Color(0xFF3A2414), width: 2.5),
-            boxShadow: const [BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 2))],
+            color: AppColors.panel,
+            border: Border.all(color: const Color(0xFF3FD0FF), width: 1.6),
+            boxShadow: const [BoxShadow(color: Color(0x803FD0FF), blurRadius: 8)],
           ),
-          child: Icon(icon, size: 20, color: const Color(0xFF3A2414)),
+          child: Icon(icon, size: 20, color: const Color(0xFF3FD0FF)),
         ),
       ),
     ),
@@ -943,10 +940,10 @@ class _LogToast extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFF3D6),
+            color: const Color(0xFF0E1D3D),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF3A2414), width: 2),
-            boxShadow: const [BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 2))],
+            border: Border.all(color: const Color(0xFF3FD0FF), width: 1.4),
+            boxShadow: const [BoxShadow(color: Color(0x803FD0FF), blurRadius: 8)],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -954,12 +951,12 @@ class _LogToast extends StatelessWidget {
               Icon(
                 _logIcon(t.kind),
                 size: 16,
-                color: t.seat == null ? const Color(0xFF8A5528) : AppColors.seat(t.seat),
+                color: t.seat == null ? const Color(0xFF8FB3C9) : AppColors.seat(t.seat),
               ),
               const SizedBox(width: 6),
               Text(
                 t.text,
-                style: const TextStyle(color: Color(0xFF2B1A0E), fontWeight: FontWeight.w900),
+                style: const TextStyle(color: Color(0xFFE6F7FF), fontWeight: FontWeight.w900),
               ),
             ],
           ),
@@ -1008,16 +1005,16 @@ class TurnStrip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
-        color: const Color(0xCC1B120A),
+        color: const Color(0xE6081430),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0x99D4A64A)),
+        border: Border.all(color: const Color(0x993FD0FF)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           const Text(
             'الأدوار',
-            style: TextStyle(fontFamily: AppTheme.headingFont, color: AppColors.gold, fontSize: 15, height: 1.2),
+            style: TextStyle(fontWeight: FontWeight.w900, color: AppColors.gold, fontSize: 15, height: 1.2),
           ),
           const SizedBox(width: 6),
           for (final (i, s) in m.roundOrder.indexed) ...[
@@ -1073,7 +1070,7 @@ class _NextNote extends StatelessWidget {
     final chip = Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
       decoration: BoxDecoration(
-        color: urgent ? AppColors.seal : const Color(0xFF3B2610),
+        color: urgent ? AppColors.seal : const Color(0xFF0B1730),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.gold, width: urgent ? 1.5 : 1),
       ),
@@ -1118,8 +1115,8 @@ class _CountdownState extends State<_Countdown> {
       height: 30,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: left <= 3 ? AppColors.bad : const Color(0xFF3A2414),
-        border: Border.all(color: const Color(0xFFFFC233), width: 1.5),
+        color: left <= 3 ? AppColors.bad : const Color(0xFF3FD0FF),
+        border: Border.all(color: const Color(0xFFFFCF4A), width: 1.5),
       ),
       child: Center(
         child: Text(
@@ -1159,7 +1156,7 @@ class _CategoryChooser extends StatelessWidget {
               children: [
                 const Text(
                   'شو نوع سؤال الهجوم؟',
-                  style: TextStyle(fontFamily: AppTheme.headingFont, fontSize: 22, color: Toon.ink, height: 1.3),
+                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 22, color: Toon.ink, height: 1.3),
                 ),
                 const SizedBox(width: 10),
                 Semantics(
@@ -1187,7 +1184,7 @@ class _CategoryChooser extends StatelessWidget {
                         child: Container(
                           width: 120,
                           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-                          decoration: Toon.chunky(const Color(0xFF6C4AB6), radius: 12),
+                          decoration: Toon.chunky(const Color(0xFF3B2A86), radius: 12),
                           child: Column(
                             children: [
                               Icon(categoryIcon(c), color: Colors.white, size: 28),
@@ -1317,12 +1314,12 @@ class _ScoreDeltaState extends State<_ScoreDelta> with SingleTickerProviderState
                 child: Text(
                   _delta > 0 ? '+$_delta' : '−${-_delta}',
                   style: TextStyle(
-                    color: _delta > 0 ? const Color(0xFF2E9E44) : AppColors.bad,
+                    color: _delta > 0 ? const Color(0xFF5DFFB0) : AppColors.bad,
                     fontWeight: FontWeight.w900,
                     fontSize: 18,
                     shadows: const [
-                      Shadow(color: Colors.white, blurRadius: 3),
-                      Shadow(color: Colors.white, blurRadius: 6),
+                      Shadow(color: Colors.black, blurRadius: 3),
+                      Shadow(color: Colors.black, blurRadius: 6),
                     ],
                   ),
                 ),
@@ -1381,7 +1378,7 @@ class _EmoteBubbles extends StatelessWidget {
                       child: Center(
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          decoration: Toon.chunky(Colors.white, radius: 14, depth: 2),
+                          decoration: Toon.chunky(Toon.card, radius: 14, depth: 2),
                           child: Text(
                             emoteFaces[id] ?? '',
                             style: TextStyle(

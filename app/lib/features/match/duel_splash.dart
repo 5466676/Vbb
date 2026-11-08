@@ -48,7 +48,7 @@ class _DuelSplashState extends State<DuelSplash> with SingleTickerProviderStateM
           return Opacity(
             opacity: out,
             child: Container(
-              color: Colors.black.withValues(alpha: 0.72),
+              color: const Color(0xFF02040C).withValues(alpha: 0.82),
               child: LayoutBuilder(
                 builder: (context, box) {
                   final w = box.maxWidth;
@@ -72,8 +72,9 @@ class _DuelSplashState extends State<DuelSplash> with SingleTickerProviderStateM
                           height: 70,
                           decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: RadialGradient(colors: [Color(0xFFC0392B), Color(0xFF5E140D)]),
-                            boxShadow: [BoxShadow(color: Color(0xAAFFC864), blurRadius: 18)],
+                            gradient: RadialGradient(colors: [Color(0xFF2A1F6E), Color(0xFF060E22)]),
+                            border: Border.fromBorderSide(BorderSide(color: Color(0xFF3FD0FF), width: 2)),
+                            boxShadow: [BoxShadow(color: Color(0xCC3FD0FF), blurRadius: 22)],
                           ),
                           child: CustomPaint(painter: _SwordsPainter()),
                         ),
@@ -108,12 +109,12 @@ class _Side extends StatelessWidget {
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            gradient: const LinearGradient(colors: [Color(0xFFF0CF7A), Color(0xFF8A5A17)]),
+            color: c,
             boxShadow: [BoxShadow(color: c, blurRadius: 16, spreadRadius: 2)],
           ),
           child: Container(
             padding: const EdgeInsets.all(3),
-            decoration: BoxDecoration(shape: BoxShape.circle, color: c),
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.panelDeep),
             child: ClipOval(child: Image.asset(armyOf(player.army).commander, fit: BoxFit.cover)),
           ),
         ),
@@ -121,11 +122,11 @@ class _Side extends StatelessWidget {
         Text(
           player.name,
           style: const TextStyle(
-            fontFamily: AppTheme.headingFont,
-            fontSize: 26,
+            fontWeight: FontWeight.w900,
+            fontSize: 22,
             color: AppColors.textPrimary,
             height: 1.2,
-            shadows: [Shadow(color: Colors.black, blurRadius: 4)],
+            shadows: [Shadow(color: AppColors.neon, blurRadius: 10)],
           ),
         ),
         Text(
@@ -133,7 +134,7 @@ class _Side extends StatelessWidget {
           style: TextStyle(
             color: c,
             fontWeight: FontWeight.w900,
-            shadows: const [Shadow(color: Colors.black, blurRadius: 3)],
+            shadows: [Shadow(color: c, blurRadius: 8)],
           ),
         ),
       ],
@@ -149,11 +150,11 @@ class _SwordsPainter extends CustomPainter {
     final blade = Paint()
       ..strokeWidth = r * 0.2
       ..strokeCap = StrokeCap.round
-      ..color = const Color(0xFFF1F1F1);
+      ..color = const Color(0xFFE6F7FF);
     final hilt = Paint()
       ..strokeWidth = r * 0.24
       ..strokeCap = StrokeCap.round
-      ..color = const Color(0xFFE2B85A);
+      ..color = const Color(0xFF3FD0FF);
     for (final s in [1.0, -1.0]) {
       canvas.drawLine(c + Offset(-r * s, r), c + Offset(r * s, -r), blade);
       final g = c + Offset(-r * s * 0.55, r * 0.55);

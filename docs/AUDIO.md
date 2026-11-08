@@ -100,36 +100,36 @@ Send the files as they come out (WAV or MP3); they get trimmed to clean loops, l
 
 ## 4. Commentator (المعلّق)
 
-**Owner's pick: a Levantine (Syrian, Damascus) commentator, Gemini TTS voice Enceladus**: short,
-playful shouts, like a friend commentating a family game. Earlier MSA epic/herald styles were
-replaced. Lines and the style prompt live in `tools/audio/commentator_shami.py`; each line is
-`app/assets/audio/voice/<id>_<n>.ogg` (mono 44.1 kHz, silence-trimmed, high-passed at 120 Hz,
-about -16 LUFS), and `SoundService.say` picks a variant at random. Generated in batches of up to
-8 lines per request (the free tier allows 10 requests a day), split on silences and checked
-line by line with speech-to-text. Personal use only; a commercial release needs a TTS plan whose
-terms allow it, or a recorded voice.
+**Owner's pick: Modern Standard Arabic, a rough war commander, Gemini TTS voice Enceladus**: a deep,
+gravelly voice shouting short orders. It replaced the Levantine set (too soft and playful for the
+neon look). Lines and the style prompt live in `tools/audio/commentator_fusha.py`; each line is
+`app/assets/audio/voice/<id>_<n>.ogg` (mono 44.1 kHz, silence-trimmed, high-passed at 100 Hz,
+about -16 LUFS), and `SoundService.say` picks a variant at random. Generated in batches of 7 lines
+per request (the free tier allows 10 requests a day), split on silences and checked line by line
+with speech-to-text. Personal use only; a commercial release needs a TTS plan whose terms allow it,
+or a recorded voice.
 
 | id | line(s) |
 |---|---|
-| `start_1`…`start_2` | يلّا يا أبطال، بلّشت المعركة! · شدّوا حيلكم، الحرب بلّشت! |
-| `castles_1` | ابنوا قلاعكم، كل واحد بدورو! |
-| `expansion_1` | تقاسموا الأرض! الأقرب بياخد! |
-| `your_turn_1`…`your_turn_2` | دورك! وين بدك تضرب؟ · يلّا، هجوم! |
-| `duel_1`…`duel_2` | سيف بسيف! مين الأقوى؟ · جاوبوا يا شباب! |
-| `capture_1`…`capture_2` | احتلّها! ما شاء الله! · أرض جديدة! عفيه! |
-| `held_1`…`held_2` | صمد! ولا شبر! · ردّوه على عقبو! |
-| `tower_1` | وقع برج! ضربة موجعة! |
-| `last_tower_1` | آخر برج! انتبه يا بطل! |
-| `eliminated_1` | طار من المعركة! |
-| `tiebreak_1` | تعادل! الحسم بالأرقام! |
-| `final_round_1` | الجولة الأخيرة! كل شي ممكن! |
-| `hurry_1` | يلّا يلّا، الوقت عم يخلص! |
-| `too_slow_1` | خلص الوقت! |
-| `treasure_1` | لقى الكنز! يا محلاها! |
-| `fastest_1` | برافو! أسرع واحد! |
-| `lead_1` | صرت بالمقدمة! |
-| `victory_1`…`victory_2` | نصر عظيم! مبروك يا بطل! · ربحنا! ارفعوا الرايات! |
-| `defeat_1` | معلش، المرة الجاية منربحها! |
+| `start_1`…`start_2` | لِتبدأِ المعركة! · استعدّوا… إلى القتال! |
+| `castles_1` | ابنوا قلاعَكم! |
+| `expansion_1` | تقاسموا الأرض! الأسرعُ يأخذ! |
+| `your_turn_1`…`your_turn_2` | دورُك! اختر هدفك! · هجوم! |
+| `duel_1`…`duel_2` | سيفٌ بسيف! من الأقوى؟ · أجيبوا! |
+| `capture_1`…`capture_2` | سقطتِ الأرض! · أرضٌ جديدة! |
+| `held_1`…`held_2` | صمدَ المدافع! · ارتدَّ الهجوم! |
+| `tower_1` | سقطَ برج! ضربةٌ موجعة! |
+| `last_tower_1` | آخرُ برج! احذر! |
+| `eliminated_1` | خرجَ من المعركة! |
+| `tiebreak_1` | تعادل! الحسمُ بالأرقام! |
+| `final_round_1` | الجولةُ الأخيرة! كلُّ شيءٍ ممكن! |
+| `hurry_1` | أسرِع! الوقتُ ينفد! |
+| `too_slow_1` | انتهى الوقت! |
+| `treasure_1` | وجدَ الكنز! |
+| `fastest_1` | أسرعُ جواب! |
+| `lead_1` | أنت في المقدّمة! |
+| `victory_1`…`victory_2` | نصرٌ عظيم! · ارفعوا الرايات! النصرُ لنا! |
+| `defeat_1` | هُزِمنا… لكنّ الحربَ لم تنتهِ! |
 
 ## 5. Credits
 

@@ -140,7 +140,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          image: DecorationImage(image: AssetImage('assets/ui/menu/menu_$_bg.webp'), fit: BoxFit.cover),
+          image: DecorationImage(
+            image: AssetImage('assets/ui/menu/menu_$_bg.webp'),
+            fit: BoxFit.cover,
+            colorFilter: const ColorFilter.mode(Color(0xCC05070F), BlendMode.srcATop),
+          ),
         ),
         child: SafeArea(
           child: Row(
@@ -149,25 +153,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Center(
                   child: Padding(
                     padding: const EdgeInsets.all(12),
-                    // the crest's empty scroll carries the game's name
-                    child: AspectRatio(
-                      aspectRatio: 873 / 845,
-                      child: LayoutBuilder(
-                        builder: (context, box) => Stack(
-                          children: [
-                            Positioned.fill(child: Image.asset('assets/ui/logo.webp')),
-                            Align(
-                              alignment: const Alignment(0, 0.70),
-                              child: RuqaaTitle(
-                                'حرب العقول',
-                                size: box.maxWidth * 0.085,
-                                color: const Color(0xFF6E1A12),
-                                outline: false,
-                              ),
-                            ),
-                          ],
+                    // the game's name as a glowing system notice
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                          decoration: AppColors.window(radius: 4),
+                          child: const Text(
+                            '! إشعار',
+                            style: TextStyle(color: AppColors.neon, fontWeight: FontWeight.w900, letterSpacing: 1),
+                          ),
                         ),
-                      ),
+                        const SizedBox(height: 14),
+                        const FittedBox(child: RuqaaTitle('حرب العقول', size: 84)),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'جاوب أسرع… واحتلّ الأرض',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 18, fontWeight: FontWeight.w700),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -346,9 +351,9 @@ class _OfflineDialogState extends State<_OfflineDialog> {
                               padding: const EdgeInsets.all(2.5),
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: a.id == _army ? AppColors.gold : const Color(0xFF3A2414),
+                                color: a.id == _army ? AppColors.neon : const Color(0xFF16305E),
                                 boxShadow: [
-                                  if (a.id == _army) const BoxShadow(color: Color(0xAAFFC233), blurRadius: 10),
+                                  if (a.id == _army) const BoxShadow(color: Color(0xAA3FD0FF), blurRadius: 10),
                                 ],
                               ),
                               child: ClipOval(child: Image.asset(a.commander, fit: BoxFit.cover)),
@@ -374,7 +379,7 @@ class _OfflineDialogState extends State<_OfflineDialog> {
                           ],
                         ),
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Color(0xFFE9D6AC), fontSize: 12.5, height: 1.4),
+                        style: const TextStyle(color: Color(0xFF9FC6DB), fontSize: 12.5, height: 1.4),
                       ),
                     );
                   },

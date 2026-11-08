@@ -170,15 +170,13 @@ class _SoloScreenState extends ConsumerState<SoloScreen> {
     return Container(
       constraints: const BoxConstraints(maxWidth: 760),
       padding: const EdgeInsets.fromLTRB(40, 22, 40, 18),
-      decoration: const BoxDecoration(
-        image: DecorationImage(image: AssetImage('assets/ui/question_card.webp'), fit: BoxFit.fill),
-      ),
+      decoration: AppColors.window(),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             '${_i + 1}/${_round.length} • ${q['category']}',
-            style: const TextStyle(color: AppColors.seal, fontWeight: FontWeight.w700),
+            style: const TextStyle(color: AppColors.neon, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
           Text(

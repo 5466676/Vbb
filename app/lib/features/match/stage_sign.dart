@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'question_arena.dart' show Toon;
 
-/// A big wooden sign that drops on two chains to announce a stage ("تقاسم الأرض", "الحرب!",
+/// A big glowing notice window that drops on two light chains to announce a stage ("تقاسم الأرض", "الحرب!",
 /// "الجولة 3"…), swings, holds, then lifts away. Plays once per announcement (keyed by its id)
 /// and never blocks taps.
 class StageSign extends StatefulWidget {
@@ -92,16 +92,16 @@ class _Sign extends StatelessWidget {
               constraints: const BoxConstraints(minWidth: 320),
               padding: const EdgeInsets.fromLTRB(36, 12, 36, 14),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Toon.outline, width: 3.5),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Toon.outline, width: 2),
                 gradient: const LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Color(0xFFC98A4B), Color(0xFF9A5E2C)],
+                  colors: [Color(0xF2102A57), Color(0xF5060E22)],
                 ),
                 boxShadow: const [
-                  BoxShadow(color: Toon.outline, offset: Offset(0, 6)),
-                  BoxShadow(color: Color(0x66000000), blurRadius: 16, offset: Offset(0, 10)),
+                  BoxShadow(color: Color(0xCC3FD0FF), blurRadius: 18),
+                  BoxShadow(color: Color(0x99000000), blurRadius: 16, offset: Offset(0, 10)),
                 ],
               ),
               child: CustomPaint(
@@ -113,13 +113,13 @@ class _Sign extends StatelessWidget {
                       text,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        fontFamily: 'Ruqaa',
-                        fontSize: 44,
-                        height: 1.25,
-                        color: Color(0xFFFFF3D6),
+                        fontWeight: FontWeight.w900,
+                        fontSize: 38,
+                        height: 1.3,
+                        color: Colors.white,
                         shadows: [
-                          Shadow(color: Toon.outline, offset: Offset(0, 3)),
-                          Shadow(color: Toon.outline, blurRadius: 2),
+                          Shadow(color: Toon.outline, blurRadius: 14),
+                          Shadow(color: Toon.outline, blurRadius: 4),
                         ],
                       ),
                     ),
@@ -128,10 +128,10 @@ class _Sign extends StatelessWidget {
                         sub!,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: Color(0xFFFFE8B0),
+                          color: Color(0xFF9FE6FF),
                           fontWeight: FontWeight.w900,
                           fontSize: 15,
-                          shadows: [Shadow(color: Toon.outline, offset: Offset(0, 1.5))],
+                          shadows: [Shadow(color: Toon.outline, blurRadius: 6)],
                         ),
                       ),
                   ],
@@ -150,12 +150,12 @@ class _ChainsPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final link = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 4
-      ..color = const Color(0xFF8C8C8C);
+      ..strokeWidth = 2
+      ..color = const Color(0xFFBFF0FF);
     final edge = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 6.5
-      ..color = Toon.outline;
+      ..strokeWidth = 5
+      ..color = const Color(0x803FD0FF);
     for (final x in [size.width * 0.2, size.width * 0.8]) {
       for (var y = 0.0; y < size.height; y += 16) {
         final r = RRect.fromRectAndRadius(
@@ -176,11 +176,11 @@ class _PlanksPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final seam = Paint()
-      ..color = const Color(0x553A2414)
+      ..color = const Color(0x333FD0FF)
       ..strokeWidth = 2;
     // plank seams and nails
     canvas.drawLine(Offset(-30, size.height / 2), Offset(size.width + 30, size.height / 2), seam);
-    final nail = Paint()..color = const Color(0xFF5A3A1E);
+    final nail = Paint()..color = const Color(0xFF3FD0FF);
     for (final p in [
       const Offset(-22, 6),
       Offset(size.width + 22, 6),

@@ -109,13 +109,12 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                   child: Stack(
                     fit: StackFit.expand,
                     children: [
-                      // brighter and softer than the painting, so the owners' colours read first
+                      // neon: the painting as a dark blue hologram; land a step lighter than the sea, ink near black
                       ColorFiltered(
-                        // fitted on sample colours: sea → bright cartoon blue, land → warm cream, forest → fresh green
                         colorFilter: const ColorFilter.matrix([
-                          1.381, 0.242, -0.595, 0, -2.8, //
-                          -0.421, 2.067, -0.599, 0, 6.2,
-                          -0.440, 0.695, 0.835, 0, 13.1,
+                          0.075, 0.147, 0.028, 0, -30.0, //
+                          0.165, 0.325, 0.061, 0, -60.5,
+                          0.240, 0.472, 0.088, 0, -64.0,
                           0, 0, 0, 1, 0,
                         ]),
                         child: Image.asset(t.image, fit: BoxFit.fill, filterQuality: FilterQuality.medium),
@@ -177,7 +176,7 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
     );
   }
 
-  static const sea = Color(0xFF77B9C5); // the painting's sea after the colour filter
+  static const sea = Color(0xFF071536); // the painting's sea after the colour filter
 
   Rect? _land;
   String? _landFor;
@@ -266,7 +265,7 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: const Color(0xFFFFC233),
-              border: Border.all(color: const Color(0xFF3A2414), width: 2),
+              border: Border.all(color: const Color(0xFFFFF4C2), width: 1.6),
               boxShadow: const [BoxShadow(color: Color(0xAAFFE08A), blurRadius: 10, spreadRadius: 2)],
             ),
             child: Icon(Icons.inventory_2, size: d * 0.6, color: const Color(0xFF6E3B12)),
@@ -446,14 +445,14 @@ class _Towers extends StatelessWidget {
       margin: const EdgeInsets.only(top: 2),
       padding: EdgeInsets.symmetric(horizontal: size * 0.3),
       decoration: BoxDecoration(
-        color: const Color(0xDD2B1D0F),
+        color: const Color(0xE6081430),
         borderRadius: BorderRadius.circular(size),
-        border: Border.all(color: const Color(0xFFD4A64A), width: 1),
+        border: Border.all(color: AppColors.neon, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.castle, size: size, color: count > 0 ? const Color(0xFFE9D6AC) : AppColors.bad),
+          Icon(Icons.castle, size: size, color: count > 0 ? AppColors.neon : AppColors.bad),
           Text(
             ' ×$count',
             style: TextStyle(
@@ -469,7 +468,7 @@ class _Towers extends StatelessWidget {
   }
 }
 
-/// Seat colour wash: soft in the middle, strong at the edge (ink-wash look), ink border on top.
+/// Seat colour: a faint fill, a glow inside the edge and a bright neon border on top.
 class _OwnershipPainter extends CustomPainter {
   _OwnershipPainter({required this.template, required this.match, required this.key});
   final MapTemplate template;
@@ -479,7 +478,7 @@ class _OwnershipPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final sea = Paint()
-      ..color = const Color(0xCC1B3B5A)
+      ..color = const Color(0xAA3FD0FF)
       ..strokeWidth = size.height * 0.004
       ..style = PaintingStyle.stroke;
     for (final s in template.seaLinks) {
@@ -504,16 +503,16 @@ class _OwnershipPainter extends CustomPainter {
       final path = shape.path(size);
       final owner = match.territories[shape.id]?.owner;
       if (owner == null) {
-        fill.color = const Color(0x40FFF3D6); // free land: a light cream wash, flat and calm
+        fill.color = const Color(0x1A3FD0FF); // free land: a faint cyan wash
         canvas.drawPath(path, fill);
         continue;
       }
       final c = AppColors.seat(owner);
-      fill.color = c.withValues(alpha: 0.5);
+      fill.color = c.withValues(alpha: 0.2);
       canvas.drawPath(path, fill);
       canvas.save();
       canvas.clipPath(path);
-      edge.color = c.withValues(alpha: 0.80);
+      edge.color = c.withValues(alpha: 0.45); // inner glow
       canvas.drawPath(path, edge);
       canvas.restore();
     }
@@ -521,17 +520,25 @@ class _OwnershipPainter extends CustomPainter {
     for (final shape in template.territories) {
       final path = shape.path(size);
       final owner = match.territories[shape.id]?.owner;
-      ink
-        ..color = owner == null ? const Color(0x88392A18) : const Color(0xF02B1A0E)
-        ..strokeWidth = size.height * (owner == null ? 0.0035 : 0.0075);
-      canvas.drawPath(path, ink);
-      if (owner != null) {
-        // royal banners: a thin gold thread inside the dark ink
+      if (owner == null) {
         ink
-          ..color = AppColors.bannerGold
-          ..strokeWidth = size.height * 0.0024;
+          ..color = const Color(0x663FD0FF)
+          ..strokeWidth = size.height * 0.0025;
+        canvas.drawPath(path, ink);
+        continue;
+      }
+      // neon edge without blur filters: wide faint strokes under a bright thin core
+      final c = AppColors.seat(owner);
+      for (final (w, a) in const [(0.016, 0.12), (0.009, 0.28)]) {
+        ink
+          ..color = c.withValues(alpha: a)
+          ..strokeWidth = size.height * w;
         canvas.drawPath(path, ink);
       }
+      ink
+        ..color = Color.lerp(c, Colors.white, 0.35)!
+        ..strokeWidth = size.height * 0.0035;
+      canvas.drawPath(path, ink);
     }
   }
 

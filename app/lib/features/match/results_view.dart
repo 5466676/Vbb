@@ -24,11 +24,11 @@ class ResultsView extends ConsumerWidget {
     int lands(int seat) => m.territories.values.where((t) => t.owner == seat).length;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF120B05), // until the painting has loaded
+        color: AppColors.background, // until the painting has loaded
         image: DecorationImage(
           image: AssetImage(won ? 'assets/ui/victory.webp' : 'assets/ui/defeat.webp'),
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.35), BlendMode.darken),
+          colorFilter: const ColorFilter.mode(Color(0xCC05070F), BlendMode.srcATop),
         ),
       ),
       child: Center(
@@ -42,11 +42,7 @@ class ResultsView extends ConsumerWidget {
                 duration: const Duration(milliseconds: 900),
                 curve: Curves.elasticOut,
                 builder: (context, s, child) => Transform.scale(scale: s, child: child),
-                child: RuqaaTitle(
-                  won ? 'نصر!' : 'هزيمة',
-                  size: 64,
-                  color: won ? AppColors.gold : const Color(0xFFD9C7A0),
-                ),
+                child: RuqaaTitle(won ? 'نصر!' : 'هزيمة', size: 64, color: won ? AppColors.gold : AppColors.bad),
               ),
               const SizedBox(height: 4),
               // podium: 2nd, 1st, 3rd (1st in the middle and highest)
@@ -144,7 +140,7 @@ class _Step extends StatelessWidget {
     final first = rank == 0;
     final portrait = first ? 96.0 : 72.0;
     final height = const [150.0, 112.0, 88.0][rank];
-    const medal = [Color(0xFFF0CF7A), Color(0xFFCFD3D6), Color(0xFFC98B4E)];
+    const medal = [AppColors.gold, Color(0xFFCFE6F5), Color(0xFFFF8A3D)];
     return TweenAnimationBuilder<double>(
       tween: Tween(begin: 0, end: 1),
       duration: Duration(milliseconds: 600 + 250 * (2 - rank)),
@@ -158,7 +154,7 @@ class _Step extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            if (first) const Icon(Icons.workspace_premium, color: Color(0xFFF0CF7A), size: 34),
+            if (first) const Icon(Icons.workspace_premium, color: AppColors.gold, size: 34),
             Container(
               width: portrait,
               height: portrait,
@@ -170,7 +166,7 @@ class _Step extends StatelessWidget {
               ),
               child: Container(
                 padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(shape: BoxShape.circle, color: c),
+                decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.panelDeep),
                 child: ClipOval(child: Image.asset(armyOf(p.army).commander, fit: BoxFit.cover)),
               ),
             ),
@@ -195,9 +191,10 @@ class _Step extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [c.withValues(alpha: 0.95), Color.lerp(c, Colors.black, 0.55)!],
+                  colors: [Color.lerp(c, AppColors.panelDeep, 0.45)!, Color.lerp(c, AppColors.panelDeep, 0.85)!],
                 ),
-                border: Border.all(color: medal[rank], width: 2),
+                border: Border.all(color: medal[rank], width: 1.6),
+                boxShadow: [BoxShadow(color: medal[rank].withValues(alpha: 0.6), blurRadius: 12)],
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -205,9 +202,10 @@ class _Step extends StatelessWidget {
                   Text(
                     '${rank + 1}',
                     style: TextStyle(
-                      fontFamily: AppTheme.headingFont,
+                      fontWeight: FontWeight.w900,
                       fontSize: first ? 40 : 30,
                       color: medal[rank],
+                      shadows: [Shadow(color: medal[rank], blurRadius: 12)],
                       height: 1,
                     ),
                   ),

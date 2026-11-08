@@ -1,16 +1,15 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 import 'theme.dart';
 
-/// Game-styled building blocks: wax-seal and wood buttons, parchment and wood panels,
-/// a Ruqaa heading. Everything is painted with gradients and paths (no blur, no images),
+/// Game-styled building blocks in the neon «system window» look: glowing-edge buttons and
+/// panels, a glowing heading. Painted with gradients and box shadows (no blur filters, no images),
 /// so it stays cheap on low-end phones.
 
-/// Calligraphic heading (Aref Ruqaa) with a dark ink outline so it reads on any background.
+/// Heading with a neon glow (kept the old name; the text is Cairo Black now, which reads like
+/// a system notice).
 class RuqaaTitle extends StatelessWidget {
-  const RuqaaTitle(this.text, {super.key, this.size = 34, this.color = AppColors.gold, this.outline = true});
+  const RuqaaTitle(this.text, {super.key, this.size = 34, this.color = AppColors.neon, this.outline = true});
   final String text;
   final double size;
   final Color color;
@@ -18,33 +17,22 @@ class RuqaaTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = TextStyle(
-      fontFamily: AppTheme.headingFont,
-      fontSize: size,
-      height: 1.25,
-      fontWeight: FontWeight.w700,
-    );
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        if (outline)
-          Text(
-            text,
-            textAlign: TextAlign.center,
-            style: style.copyWith(
-              foreground: Paint()
-                ..style = PaintingStyle.stroke
-                ..strokeWidth = size * 0.12
-                ..strokeJoin = StrokeJoin.round
-                ..color = const Color(0xFF1A0F06),
-            ),
-          ),
-        Text(
-          text,
-          textAlign: TextAlign.center,
-          style: style.copyWith(color: color),
-        ),
-      ],
+    return Text(
+      text,
+      textAlign: TextAlign.center,
+      style: TextStyle(
+        fontFamily: AppTheme.fontFamily,
+        fontSize: size * 0.8,
+        height: 1.3,
+        fontWeight: FontWeight.w900,
+        color: Color.lerp(color, Colors.white, 0.35),
+        shadows: outline
+            ? [
+                Shadow(color: color, blurRadius: size * 0.35),
+                Shadow(color: color.withValues(alpha: 0.6), blurRadius: 2),
+              ]
+            : null,
+      ),
     );
   }
 }
@@ -81,11 +69,19 @@ class _WarButtonState extends State<WarButton> {
   @override
   Widget build(BuildContext context) {
     final enabled = widget.onPressed != null;
-    final (top, bottom, fg) = switch (widget.kind) {
-      WarButtonKind.seal => (const Color(0xFFC0392B), const Color(0xFF6E1A12), const Color(0xFFFBE9C6)),
-      WarButtonKind.wood => (const Color(0xFF5A3D22), const Color(0xFF2E1D0F), AppColors.textPrimary),
-      WarButtonKind.parchment => (const Color(0xFFF6EAD0), const Color(0xFFD8C39A), AppColors.ink),
+    // seal: the main action, a lit cyan slab. wood: a dark navy key with a cyan edge.
+    // parchment: the same with a violet edge, for secondary choices.
+    final (top, bottom, fg, edge) = switch (widget.kind) {
+      WarButtonKind.seal => (const Color(0xFF1C6FA8), const Color(0xFF0B3A66), Colors.white, AppColors.neon),
+      WarButtonKind.wood => (const Color(0xFF10234A), const Color(0xFF081430), AppColors.textPrimary, AppColors.neon),
+      WarButtonKind.parchment => (
+        const Color(0xFF1B1446),
+        const Color(0xFF0E0B2A),
+        AppColors.textPrimary,
+        AppColors.violet,
+      ),
     };
+    final lit = widget.kind == WarButtonKind.seal;
     return Semantics(
       button: true,
       enabled: enabled,
@@ -109,19 +105,14 @@ class _WarButtonState extends State<WarButton> {
             child: Container(
               height: widget.height,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFFF0CF7A), Color(0xFF9C6B22), Color(0xFFE2B85A), Color(0xFF7A4E15)],
-                  stops: [0, 0.45, 0.6, 1],
-                ),
-                boxShadow: const [BoxShadow(color: Color(0x99000000), offset: Offset(0, 3), blurRadius: 3)],
+                borderRadius: BorderRadius.circular(6),
+                color: edge,
+                boxShadow: AppColors.glow(edge, blur: lit || _down ? 14 : 8, alpha: lit ? 0.75 : 0.45),
               ),
-              padding: const EdgeInsets.all(2.2), // brass rim
+              padding: const EdgeInsets.all(1.6), // neon edge
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(5),
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -149,14 +140,7 @@ class _WarButtonState extends State<WarButton> {
                                   color: fg,
                                   fontSize: widget.fontSize ?? (widget.kind == WarButtonKind.seal ? 19 : 17),
                                   fontWeight: FontWeight.w800,
-                                  shadows: [
-                                    Shadow(
-                                      color: widget.kind == WarButtonKind.parchment
-                                          ? const Color(0x66FFFFFF)
-                                          : const Color(0xAA000000),
-                                      offset: const Offset(0, 1.5),
-                                    ),
-                                  ],
+                                  shadows: [Shadow(color: edge.withValues(alpha: 0.8), blurRadius: lit ? 8 : 4)],
                                 ),
                               ),
                           ],
@@ -174,7 +158,7 @@ class _WarButtonState extends State<WarButton> {
   }
 }
 
-/// Faint wood grain or wax swirl lines, painted once (cached by the raster cache).
+/// Faint scanlines and corner ticks, painted once (cached by the raster cache).
 class _GrainPainter extends CustomPainter {
   _GrainPainter(this.kind);
   final WarButtonKind kind;
@@ -182,33 +166,33 @@ class _GrainPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final p = Paint()
-      ..style = PaintingStyle.stroke
       ..strokeWidth = 1
-      ..color = kind == WarButtonKind.parchment ? const Color(0x14513A1C) : const Color(0x1AFFFFFF);
-    final r = Random(size.width.toInt() ^ kind.index);
-    for (var i = 0; i < 5; i++) {
-      final y = size.height * (0.15 + 0.17 * i) + r.nextDouble() * 3;
-      final path = Path()..moveTo(0, y);
-      for (var x = 0.0; x <= size.width; x += size.width / 6) {
-        path.quadraticBezierTo(x + size.width / 12, y + (r.nextDouble() - 0.5) * 5, x + size.width / 6, y);
-      }
-      canvas.drawPath(path, p);
+      ..color = const Color(0x0DFFFFFF);
+    for (var y = 3.0; y < size.height; y += 4) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), p);
     }
-    // top highlight
     canvas.drawLine(
-      const Offset(6, 1.5),
-      Offset(size.width - 6, 1.5),
+      const Offset(4, 1.2),
+      Offset(size.width - 4, 1.2),
       Paint()
-        ..color = const Color(0x40FFFFFF)
-        ..strokeWidth = 1.2,
+        ..color = const Color(0x55FFFFFF)
+        ..strokeWidth = 1,
     );
+    final tick = Paint()
+      ..color = kind == WarButtonKind.parchment ? AppColors.violet : AppColors.neon
+      ..strokeWidth = 2;
+    const k = 6.0;
+    canvas.drawLine(Offset(size.width - k - 3, size.height - 3), Offset(size.width - 3, size.height - 3), tick);
+    canvas.drawLine(Offset(size.width - 3, size.height - k - 3), Offset(size.width - 3, size.height - 3), tick);
+    canvas.drawLine(const Offset(3, 3), const Offset(3 + k, 3), tick);
+    canvas.drawLine(const Offset(3, 3), const Offset(3, 3 + k), tick);
   }
 
   @override
   bool shouldRepaint(_GrainPainter old) => old.kind != kind;
 }
 
-/// A dark wood board with a brass frame and corner studs — menus and dialogs sit on it.
+/// A «system window» panel — menus and dialogs sit on it (kept the old name).
 class WoodPanel extends StatelessWidget {
   const WoodPanel({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.width});
   final Widget child;
@@ -219,62 +203,43 @@ class WoodPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: width,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        gradient: const LinearGradient(colors: [Color(0xFFB8893A), Color(0xFF6B4614), Color(0xFFD9AE5C)]),
-        boxShadow: const [BoxShadow(color: Color(0xAA000000), blurRadius: 10, offset: Offset(0, 4))],
-      ),
-      padding: const EdgeInsets.all(3),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          gradient: const LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [Color(0xF23A2715), Color(0xF2241709), Color(0xF2342211)],
-          ),
-        ),
-        child: CustomPaint(
-          foregroundPainter: _StudsPainter(),
-          child: Padding(padding: padding, child: child),
-        ),
+      decoration: AppColors.window(fill: const Color(0xEE081430)),
+      child: CustomPaint(
+        foregroundPainter: _CornersPainter(AppColors.neon),
+        child: Padding(padding: padding, child: child),
       ),
     );
   }
 }
 
-class _StudsPainter extends CustomPainter {
+/// Bright L-shaped corner brackets, the signature of the system windows.
+class _CornersPainter extends CustomPainter {
+  _CornersPainter(this.color);
+  final Color color;
+
   @override
   void paint(Canvas canvas, Size size) {
-    final inner = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1
-      ..color = const Color(0x55D4A64A);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(Rect.fromLTWH(5, 5, size.width - 10, size.height - 10), const Radius.circular(5)),
-      inner,
-    );
-    final stud = Paint()
-      ..shader = const RadialGradient(colors: [Color(0xFFFFE6A3), Color(0xFF8A5A17)])
-          .createShader(Rect.fromCircle(center: Offset.zero, radius: 4));
-    for (final c in [
-      const Offset(10, 10),
-      Offset(size.width - 10, 10),
-      Offset(10, size.height - 10),
-      Offset(size.width - 10, size.height - 10),
+    final p = Paint()
+      ..color = color
+      ..strokeWidth = 2.6
+      ..strokeCap = StrokeCap.square;
+    const k = 12.0, i = 4.0;
+    for (final (x, y, dx, dy) in [
+      (i, i, 1.0, 1.0),
+      (size.width - i, i, -1.0, 1.0),
+      (i, size.height - i, 1.0, -1.0),
+      (size.width - i, size.height - i, -1.0, -1.0),
     ]) {
-      canvas.save();
-      canvas.translate(c.dx, c.dy);
-      canvas.drawCircle(Offset.zero, 3.6, stud);
-      canvas.restore();
+      canvas.drawLine(Offset(x, y), Offset(x + k * dx, y), p);
+      canvas.drawLine(Offset(x, y), Offset(x, y + k * dy), p);
     }
   }
 
   @override
-  bool shouldRepaint(_StudsPainter old) => false;
+  bool shouldRepaint(_CornersPainter old) => old.color != color;
 }
 
-/// A parchment sheet with an ink double border and corner flourishes.
+/// A lighter info window with a violet edge (kept the old name).
 class ParchmentPanel extends StatelessWidget {
   const ParchmentPanel({super.key, required this.child, this.padding = const EdgeInsets.all(16)});
   final Widget child;
@@ -283,55 +248,13 @@ class ParchmentPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        gradient: const RadialGradient(
-          radius: 1.1,
-          colors: [Color(0xFFF7ECD2), Color(0xFFE9D6AC), Color(0xFFCDAF78)],
-          stops: [0, 0.7, 1],
-        ),
-        boxShadow: const [BoxShadow(color: Color(0x99000000), blurRadius: 8, offset: Offset(0, 3))],
-      ),
+      decoration: AppColors.window(edge: AppColors.violet, fill: const Color(0xF0100C30)),
       child: CustomPaint(
-        foregroundPainter: _InkFramePainter(),
+        foregroundPainter: _CornersPainter(AppColors.violet),
         child: Padding(padding: padding, child: child),
       ),
     );
   }
-}
-
-class _InkFramePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final ink = Paint()
-      ..style = PaintingStyle.stroke
-      ..color = const Color(0xAA4A3418);
-    ink.strokeWidth = 1.6;
-    canvas.drawRect(Rect.fromLTWH(5, 5, size.width - 10, size.height - 10), ink);
-    ink.strokeWidth = 0.8;
-    canvas.drawRect(Rect.fromLTWH(9, 9, size.width - 18, size.height - 18), ink);
-    // corner diamonds
-    final fill = Paint()..color = const Color(0xCC7A2A18);
-    for (final c in [
-      const Offset(9, 9),
-      Offset(size.width - 9, 9),
-      Offset(9, size.height - 9),
-      Offset(size.width - 9, size.height - 9),
-    ]) {
-      canvas.drawPath(
-        Path()
-          ..moveTo(c.dx, c.dy - 5)
-          ..lineTo(c.dx + 5, c.dy)
-          ..lineTo(c.dx, c.dy + 5)
-          ..lineTo(c.dx - 5, c.dy)
-          ..close(),
-        fill,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(_InkFramePainter old) => false;
 }
 
 /// A pick-one row of banner-shaped choices (difficulty, map, count…).
@@ -385,7 +308,7 @@ class GameScaffold extends StatelessWidget {
           image: DecorationImage(
             image: AssetImage(background),
             fit: BoxFit.cover,
-            colorFilter: const ColorFilter.mode(Color(0x99140C05), BlendMode.darken),
+            colorFilter: const ColorFilter.mode(Color(0xD905070F), BlendMode.srcATop),
           ),
         ),
         child: SafeArea(
@@ -395,16 +318,7 @@ class GameScaffold extends StatelessWidget {
                 height: 56,
                 margin: const EdgeInsets.fromLTRB(10, 6, 10, 0),
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  gradient: const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0xFFB57A43), Color(0xFF8A5528)],
-                  ),
-                  border: Border.all(color: const Color(0xFF3A2414), width: 2.5),
-                  boxShadow: const [BoxShadow(color: Color(0xFF3A2414), offset: Offset(0, 3))],
-                ),
+                decoration: AppColors.window(radius: 6, fill: const Color(0xEE081430)),
                 child: Row(
                   children: [
                     Semantics(
@@ -417,10 +331,11 @@ class GameScaffold extends StatelessWidget {
                           height: 40,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFFFFC233),
-                            border: Border.all(color: const Color(0xFF3A2414), width: 2.5),
+                            color: AppColors.panelDeep,
+                            border: Border.all(color: AppColors.neon, width: 1.6),
+                            boxShadow: AppColors.glow(AppColors.neon, blur: 8),
                           ),
-                          child: const Icon(Icons.arrow_forward, color: Color(0xFF3A2414)),
+                          child: const Icon(Icons.arrow_forward, color: AppColors.neon),
                         ),
                       ),
                     ),

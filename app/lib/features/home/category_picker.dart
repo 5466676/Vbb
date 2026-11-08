@@ -40,7 +40,7 @@ class _CategoryPickerState extends State<_CategoryPicker> {
               const RuqaaTitle('شو نوع الأسئلة؟', size: 28),
               Text(
                 all ? 'كل الفئات' : 'اخترت ${_on.length} من ${questionCategories.length}',
-                style: const TextStyle(color: Color(0xFFE9D6AC), fontWeight: FontWeight.w800),
+                style: const TextStyle(color: Color(0xFF9FC6DB), fontWeight: FontWeight.w800),
               ),
               const SizedBox(height: 8),
               Flexible(

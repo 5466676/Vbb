@@ -236,127 +236,127 @@
   },
   {
     "file": "voice/start_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «يلّا يا أبطال، بلّشت المعركة!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «لِتبدأِ المعركة!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/start_2.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «شدّوا حيلكم، الحرب بلّشت!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «استعدّوا… إلى القتال!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/castles_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «ابنوا قلاعكم، كل واحد بدورو!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «ابنوا قلاعَكم!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/expansion_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «تقاسموا الأرض! الأقرب بياخد!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «تقاسموا الأرض! الأسرعُ يأخذ!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/your_turn_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «دورك! وين بدك تضرب؟»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «دورُك! اختر هدفك!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/your_turn_2.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «يلّا، هجوم!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «هجوم!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/duel_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «سيف بسيف! مين الأقوى؟»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «سيفٌ بسيف! من الأقوى؟»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/duel_2.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «جاوبوا يا شباب!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أجيبوا!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/capture_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «احتلّها! ما شاء الله!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «سقطتِ الأرض!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/capture_2.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «أرض جديدة! عفيه!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أرضٌ جديدة!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/held_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «صمد! ولا شبر!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «صمدَ المدافع!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/held_2.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «ردّوه على عقبو!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «ارتدَّ الهجوم!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/tower_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «وقع برج! ضربة موجعة!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «سقطَ برج! ضربةٌ موجعة!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/last_tower_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «آخر برج! انتبه يا بطل!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «آخرُ برج! احذر!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/eliminated_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «طار من المعركة!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «خرجَ من المعركة!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/tiebreak_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «تعادل! الحسم بالأرقام!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «تعادل! الحسمُ بالأرقام!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/final_round_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «الجولة الأخيرة! كل شي ممكن!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «الجولةُ الأخيرة! كلُّ شيءٍ ممكن!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/hurry_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «يلّا يلّا، الوقت عم يخلص!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أسرِع! الوقتُ ينفد!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/too_slow_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «خلص الوقت!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «انتهى الوقت!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/treasure_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «لقى الكنز! يا محلاها!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «وجدَ الكنز!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/fastest_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «برافو! أسرع واحد!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أسرعُ جواب!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/lead_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «صرت بالمقدمة!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أنت في المقدّمة!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/victory_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «نصر عظيم! مبروك يا بطل!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «نصرٌ عظيم!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/victory_2.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «ربحنا! ارفعوا الرايات!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «ارفعوا الرايات! النصرُ لنا!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   },
   {
     "file": "voice/defeat_1.ogg",
-    "source": "Gemini TTS, voice Enceladus, Levantine Syrian commentator: «معلش، المرة الجاية منربحها!»",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «هُزِمنا… لكنّ الحربَ لم تنتهِ!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
   }
 ]

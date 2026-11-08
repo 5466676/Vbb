@@ -37,9 +37,9 @@ void main() {
     expect(s.deviceId, id);
   });
 
-  test('theme: old-map palette and the Cairo font', () {
+  test('theme: neon palette and the Cairo font', () {
     final theme = AppTheme.dark();
-    expect(theme.colorScheme.primary, AppColors.gold);
+    expect(theme.colorScheme.primary, AppColors.neon);
     expect(theme.textTheme.bodyMedium?.fontFamily, 'Cairo');
     expect(AppColors.seats.toSet().length, 8);
   });

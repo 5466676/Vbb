@@ -10,22 +10,36 @@ import '../game/game_state.dart';
 
 /// Cartoon palette for the question arena: bright paper, thick dark outlines, chunky shadows.
 abstract final class Toon {
-  static const paper = Color(0xFFFFF3D6);
-  static const paperDark = Color(0xFFF2DDB0);
-  static const outline = Color(0xFF3A2414);
-  static const ink = Color(0xFF2B1A0E);
-  static const green = Color(0xFF43A047);
-  static const red = Color(0xFFE53935);
-  static const gold = Color(0xFFFFC233);
-  static const ringRed = Color(0xFFE8705A);
-  static const ringCream = Color(0xFFFFF0D2);
+  // neon «system window» palette (names kept from the cartoon look)
+  static const paper = Color(0xFF0E1D3D); // panel
+  static const paperDark = Color(0xFF060E22);
+  static const card = Color(0xFF10234A); // answer keys, inputs
+  static const outline = Color(0xFF3FD0FF); // neon edge
+  static const ink = Color(0xFFE6F7FF); // text
+  static const green = Color(0xFF17A86A);
+  static const red = Color(0xFFE0284A);
+  static const gold = Color(0xFFFFCF4A);
+  static const ringRed = Color(0xFF16305E);
+  static const ringCream = Color(0xFF0A1630);
 
-  static BoxDecoration chunky(Color fill, {double radius = 14, double depth = 4}) => BoxDecoration(
-    color: fill,
-    borderRadius: BorderRadius.circular(radius),
-    border: Border.all(color: outline, width: 2.5),
-    boxShadow: [BoxShadow(color: outline, offset: Offset(0, depth))],
-  );
+  static BoxDecoration chunky(Color fill, {double radius = 14, double depth = 4, Color? edge}) {
+    final e = edge ?? (fill == card || fill == paper ? outline : Color.lerp(fill, Colors.white, 0.45)!);
+    return BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [Color.lerp(fill, Colors.white, 0.08)!, fill],
+      ),
+      borderRadius: BorderRadius.circular(radius * 0.55),
+      border: Border.all(color: e, width: 1.6),
+      boxShadow: [
+        BoxShadow(
+          color: e.withValues(alpha: 0.25 + 0.08 * depth),
+          blurRadius: 4 + 2 * depth,
+        ),
+      ],
+    );
+  }
 }
 
 /// Icon for a question category (the owner's 23 names, matched by keyword).
@@ -192,9 +206,16 @@ class _QuestionArenaState extends State<QuestionArena> {
           return Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: Toon.outline, width: 3),
-              gradient: const RadialGradient(colors: [Toon.paper, Toon.paperDark], radius: 1.2),
-              boxShadow: const [BoxShadow(color: Color(0x88000000), blurRadius: 12, offset: Offset(0, 4))],
+              border: Border.all(color: Toon.outline, width: 1.8),
+              gradient: const LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [Color(0xF00E1D3D), Color(0xF5060E22)],
+              ),
+              boxShadow: const [
+                BoxShadow(color: Color(0x993FD0FF), blurRadius: 16),
+                BoxShadow(color: Color(0xAA000000), blurRadius: 24, offset: Offset(0, 6)),
+              ],
             ),
             padding: EdgeInsets.fromLTRB(10, compact ? 6 : 10, 10, compact ? 6 : 10),
             child: Column(
@@ -254,7 +275,7 @@ class _QuestionArenaState extends State<QuestionArena> {
         if (q.category.isNotEmpty)
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: Toon.chunky(const Color(0xFF6C4AB6), radius: 10, depth: 3),
+            decoration: Toon.chunky(const Color(0xFF3B2A86), radius: 10, depth: 3),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -276,12 +297,7 @@ class _QuestionArenaState extends State<QuestionArena> {
                   m.king == m.mySeat
                       ? '👑 إنت الملك: إذا حدا جاوب صح بياخد منك 150'
                       : '👑 سؤال الملك: أسرع جواب صح بياخد 150 من ${m.king == null ? '' : m.players[m.king!].name}',
-                  style: const TextStyle(
-                    color: Color(0xFF8A5A00),
-                    fontWeight: FontWeight.w900,
-                    fontSize: 13,
-                    height: 1.2,
-                  ),
+                  style: const TextStyle(color: Toon.gold, fontWeight: FontWeight.w900, fontSize: 13, height: 1.2),
                 ),
               if (duel)
                 Text(
@@ -385,9 +401,9 @@ class _Flag extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [c, Color.lerp(c, Colors.black, 0.25)!],
+            colors: [Color.lerp(c, Toon.paperDark, 0.35)!, Color.lerp(c, Toon.paperDark, 0.78)!],
           ),
-          border: Border.all(color: Toon.outline, width: 2.5),
+          border: Border.all(color: c, width: 2),
         ),
         child: Column(
           children: [
@@ -542,7 +558,7 @@ class _Options extends StatelessWidget {
 
   Widget _option(QuestionView q, int i) {
     final removed = q.removed.contains(i);
-    var fill = Colors.white;
+    var fill = Toon.card;
     var fg = Toon.ink;
     if (q.resolved) {
       if (i == q.correctIndex) {
@@ -552,7 +568,7 @@ class _Options extends StatelessWidget {
         fill = Toon.red;
         fg = Colors.white;
       } else {
-        fill = const Color(0xFFEDE3CF);
+        fill = const Color(0xFF0A1428);
       }
     } else if (i == q.myChoice) {
       fill = Toon.gold;
@@ -688,7 +704,7 @@ class _NumberPad extends StatelessWidget {
                 children: [
                   Container(
                     height: 46,
-                    decoration: Toon.chunky(Colors.white, radius: 10, depth: 3),
+                    decoration: Toon.chunky(Toon.card, radius: 10, depth: 3),
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     child: Row(
                       children: [
@@ -700,7 +716,7 @@ class _NumberPad extends StatelessWidget {
                             style: TextStyle(
                               fontSize: typed.isEmpty ? 18 : 26,
                               fontWeight: FontWeight.w900,
-                              color: typed.isEmpty ? const Color(0x883A2414) : Toon.ink,
+                              color: typed.isEmpty ? const Color(0x888FB3C9) : Toon.ink,
                             ),
                           ),
                         ),
@@ -766,7 +782,7 @@ class _Key extends StatelessWidget {
           onTap: enabled ? onTap : null,
           child: Container(
             height: height,
-            decoration: Toon.chunky(send ? Toon.green : const Color(0xFF4FA3E0), radius: 10, depth: 3),
+            decoration: Toon.chunky(send ? Toon.green : Toon.card, radius: 10, depth: 3),
             child: Center(
               child: label == '⌫'
                   ? const Icon(Icons.backspace_outlined, color: Colors.white)
@@ -854,7 +870,7 @@ class _TargetState extends State<_Target> with SingleTickerProviderStateMixin {
                 child: Center(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                    decoration: Toon.chunky(Colors.white, radius: 8, depth: 2),
+                    decoration: Toon.chunky(Toon.card, radius: 8, depth: 2),
                     child: Text(
                       '${_fmt(truth)} ${q.unit}',
                       textDirection: TextDirection.rtl,
@@ -935,7 +951,7 @@ class _TargetPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     // wooden stand rim + rings
-    canvas.drawCircle(center, radius + 6, Paint()..color = const Color(0xFF8B5A2B));
+    canvas.drawCircle(center, radius + 6, Paint()..color = const Color(0xFF060E22));
     canvas.drawCircle(
       center,
       radius + 6,
@@ -947,7 +963,7 @@ class _TargetPainter extends CustomPainter {
     for (var i = 6; i >= 1; i--) {
       canvas.drawCircle(center, radius * i / 6, Paint()..color = i.isEven ? Toon.ringRed : Toon.ringCream);
     }
-    canvas.drawCircle(center, radius * 0.1, Paint()..color = const Color(0xFFD84315));
+    canvas.drawCircle(center, radius * 0.1, Paint()..color = Toon.outline);
     for (final s in shots) {
       if (s.value == null) continue;
       final p = ((t - s.start) / 0.3).clamp(0.0, 1.0);
@@ -973,7 +989,7 @@ class _TargetPainter extends CustomPainter {
         Paint()
           ..strokeWidth = 3.2
           ..strokeCap = StrokeCap.round
-          ..color = const Color(0xFFF5E6C8),
+          ..color = const Color(0xFFE6F7FF),
       );
       // fletching in the player's colour
       final side = Offset(-dir.dy, dir.dx);
@@ -1033,9 +1049,9 @@ class _Clock extends StatelessWidget {
         height: 46,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: urgent ? Toon.red : Colors.white,
-          border: Border.all(color: Toon.outline, width: 3),
-          boxShadow: const [BoxShadow(color: Toon.outline, offset: Offset(0, 3))],
+          color: urgent ? Toon.red : Toon.paperDark,
+          border: Border.all(color: urgent ? const Color(0xFFFF8FA3) : Toon.outline, width: 2),
+          boxShadow: [BoxShadow(color: (urgent ? Toon.red : Toon.outline).withValues(alpha: 0.7), blurRadius: 12)],
         ),
         child: Center(
           child: Text(

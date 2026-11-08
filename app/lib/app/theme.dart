@@ -1,38 +1,62 @@
 import 'package:flutter/material.dart';
 
-/// Design tokens: an old war-map look — dark walnut wood, parchment panels, ink and gold.
+/// Design tokens: the neon «system window» look — a near-black void, deep navy panels with
+/// glowing cyan edges, violet accents and bright seat colours that glow on the dark map.
 abstract final class AppColors {
-  static const background = Color(0xFF1B140D); // dark walnut
-  static const surface = Color(0xFF2A2016);
-  static const parchment = Color(0xFFEFE2C4);
-  static const parchmentDark = Color(0xFFD9C7A0);
-  static const ink = Color(0xFF2B2216);
-  static const gold = Color(0xFFD4A64A);
-  static const seal = Color(0xFF9E2B1F); // wax-seal red
-  static const accent = gold;
-  static const textPrimary = Color(0xFFF5ECD7);
-  static const textSecondary = Color(0xFFB9A88A);
-  static const good = Color(0xFF4E9A5B);
-  static const bad = Color(0xFFC0473A);
-  static const glassFill = Color(0x26000000);
-  static const glassBorder = Color(0x55D4A64A);
+  static const background = Color(0xFF05070F); // void
+  static const surface = Color(0xFF0B1730); // panel navy
+  static const panel = Color(0xFF0B1730);
+  static const panelDeep = Color(0xFF060E22);
+  static const parchment = Color(0xFF0E1D3D); // kept name: light panels are now a lifted navy
+  static const parchmentDark = Color(0xFF0A1530);
+  static const ink = Color(0xFFE6F7FF); // text on panels
+  static const neon = Color(0xFF3FD0FF); // edges, focus, primary
+  static const violet = Color(0xFF8A5CFF);
+  static const gold = Color(0xFFFFCF4A); // rank S, rewards, crowns
+  static const seal = Color(0xFFFF3D5A); // danger / attack
+  static const accent = neon;
+  static const textPrimary = Color(0xFFE6F7FF);
+  static const textSecondary = Color(0xFF8FB3C9);
+  static const good = Color(0xFF5DFFB0);
+  static const bad = Color(0xFFFF4D6A);
+  static const glassFill = Color(0xCC0B1730);
+  static const glassBorder = Color(0x993FD0FF);
 
-  /// One colour per seat (flags, borders, territories). Distinct and readable on the maps.
-  // «رايات ملكية»: deep banner tones that stay readable on the painted map
+  /// One colour per seat: bright, distinct, readable as a glow on the dark map.
   static const seats = [
-    Color(0xFFA4161A), // crimson
-    Color(0xFF1D3D7A), // royal blue
-    Color(0xFF2D6A4F), // forest green
-    Color(0xFFC98A00), // gold amber
-    Color(0xFF5B2A86), // royal purple
-    Color(0xFF0E6E73), // deep teal
-    Color(0xFFB4531C), // burnt orange
-    Color(0xFF4A4E57), // iron
+    Color(0xFFFF3D5A), // red
+    Color(0xFF3FA0FF), // blue
+    Color(0xFF3DFFA0), // green
+    Color(0xFFFFC93D), // amber
+    Color(0xFFB06BFF), // violet
+    Color(0xFF2DE2E6), // cyan
+    Color(0xFFFF8A3D), // orange
+    Color(0xFFC8D0DC), // silver
   ];
-  static const bannerGold = Color(0xFFE8C15A);
-  static const bannerText = Color(0xFFFFF3D6);
+  static const bannerGold = neon; // thin bright thread inside owned borders
+  static const bannerText = textPrimary;
 
   static Color seat(int? s) => s == null || s < 0 ? const Color(0x00000000) : seats[s % seats.length];
+
+  /// The glow used on every neon edge.
+  static List<BoxShadow> glow(Color c, {double blur = 10, double alpha = 0.6}) => [
+    BoxShadow(
+      color: c.withValues(alpha: alpha),
+      blurRadius: blur,
+    ),
+  ];
+
+  /// A «system window»: navy panel, 1.5px neon edge, outer glow and a faint inner glow.
+  static BoxDecoration window({Color edge = neon, double radius = 8, Color fill = panel}) => BoxDecoration(
+    gradient: LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color.lerp(fill, edge, 0.08)!, fill],
+    ),
+    borderRadius: BorderRadius.circular(radius),
+    border: Border.all(color: edge, width: 1.6),
+    boxShadow: glow(edge),
+  );
 }
 
 abstract final class AppTheme {
@@ -40,10 +64,10 @@ abstract final class AppTheme {
   static const headingFont = 'Ruqaa'; // Aref Ruqaa, for titles only
 
   static ThemeData dark() {
-    final scheme = ColorScheme.fromSeed(seedColor: AppColors.gold, brightness: Brightness.dark).copyWith(
-      primary: AppColors.gold,
-      onPrimary: AppColors.ink,
-      secondary: AppColors.seal,
+    final scheme = ColorScheme.fromSeed(seedColor: AppColors.neon, brightness: Brightness.dark).copyWith(
+      primary: AppColors.neon,
+      onPrimary: AppColors.background,
+      secondary: AppColors.violet,
       surface: AppColors.surface,
       onSurface: AppColors.textPrimary,
       error: AppColors.bad,
@@ -75,8 +99,8 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           minimumSize: const Size(0, 46),
-          backgroundColor: AppColors.gold,
-          foregroundColor: AppColors.ink,
+          backgroundColor: AppColors.neon,
+          foregroundColor: AppColors.background,
           textStyle: const TextStyle(fontFamily: fontFamily, fontSize: 18, fontWeight: FontWeight.w700),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
@@ -92,12 +116,17 @@ abstract final class AppTheme {
       ),
       snackBarTheme: const SnackBarThemeData(behavior: SnackBarBehavior.floating),
       dialogTheme: DialogThemeData(
-        backgroundColor: const Color(0xFF2B1D0F),
+        backgroundColor: AppColors.panel,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: const BorderSide(color: AppColors.gold, width: 2),
+          side: const BorderSide(color: AppColors.neon, width: 1.6),
         ),
-        titleTextStyle: const TextStyle(fontFamily: headingFont, fontSize: 28, color: AppColors.gold),
+        titleTextStyle: const TextStyle(
+          fontFamily: fontFamily,
+          fontWeight: FontWeight.w900,
+          fontSize: 24,
+          color: AppColors.neon,
+        ),
       ),
     );
   }
