@@ -601,3 +601,5 @@ they stay small and exact):
 - The owner wanted the opening music war-like and kept all four candidates: `music/menu_1..4.ogg`
   (epic anthem, battle preparation, Middle Eastern war, modern hybrid war). `SoundService.music`
   plays a multi-part track as a playlist: a random piece first, then each in turn.
+- Owner: use them in the match too. Expansion plays menu_2, menu_3 and map in turn; battle plays
+  menu_1, menu_4 and battle; the final round keeps its own bed.

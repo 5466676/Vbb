@@ -115,8 +115,13 @@ class SoundService {
   int _part = 0;
   StreamSubscription<void>? _partEnd;
 
-  /// Tracks made of several pieces (`<track>_<n>.ogg`) play them in turn, starting at a random one.
-  static const _musicParts = {'menu': 4};
+  /// Tracks made of several pieces play them in turn, starting at a random one. The four war
+  /// loops play in the menus and, mixed with the match beds, during the match.
+  static const _musicParts = {
+    'menu': ['menu_1', 'menu_2', 'menu_3', 'menu_4'],
+    'map': ['menu_2', 'menu_3', 'map'], // expansion: battle preparation, eastern war
+    'battle': ['menu_1', 'menu_4', 'battle'], // battle: war anthem, modern war
+  };
 
   /// Play a looping music bed ('menu', 'map', 'battle') or stop (null), crossfading 1.5 s.
   /// Calling it again with the same track does nothing.
@@ -141,13 +146,13 @@ class SoundService {
         await next.play(AssetSource('audio/music/$track.ogg'));
       } else {
         // a playlist: each piece once, then the next, round and round
-        _part = _rnd.nextInt(parts);
+        _part = _rnd.nextInt(parts.length);
         await next.setReleaseMode(ReleaseMode.stop);
-        await next.play(AssetSource('audio/music/${track}_${_part + 1}.ogg'));
+        await next.play(AssetSource('audio/music/${parts[_part]}.ogg'));
         _partEnd = next.onPlayerComplete.listen((_) {
           if (_track != track) return;
-          _part = (_part + 1) % parts;
-          next.play(AssetSource('audio/music/${track}_${_part + 1}.ogg')).catchError((_) {});
+          _part = (_part + 1) % parts.length;
+          next.play(AssetSource('audio/music/${parts[_part]}.ogg')).catchError((_) {});
         });
       }
       _fade(next, to: vol);

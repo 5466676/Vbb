@@ -76,7 +76,7 @@ in-match tracks so they crossfade cleanly. All instrumental, no vocals.
 
 | track | length | when |
 |---|---|---|
-| `menu_1`…`menu_4` | four 22 s war loops played in turn (random start) | menus, lobby |
+| `menu_1`…`menu_4` | four 22 s war loops played in turn (random start) | menus, lobby; also in the match: expansion plays `menu_2`, `menu_3`, `map`; battle plays `menu_1`, `menu_4`, `battle` |
 | `match_calm` | 90 s loop | expansion phase |
 | `match_battle` | 90 s loop | battle phase (crossfade from calm on `battle_started`) |
 | `final_rounds` | 30–45 s loop | last two battle rounds |
