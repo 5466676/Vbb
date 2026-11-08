@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'dart:io' show Platform;
 
@@ -80,12 +81,12 @@ class SoundService {
     }
   }
 
-  Future<void> play(String id) async {
+  Future<void> play(String id, {double volume = 1}) async {
     if (muted || settings.sfxVolume <= 0) return;
     final asset = _sfx.contains(id) ? 'audio/sfx/$id.ogg' : null;
     if (asset == null) return;
     final pool = await _pool(asset);
-    await pool?.start(volume: settings.sfxVolume);
+    await pool?.start(volume: settings.sfxVolume * volume);
   }
 
   /// The capturing army's war cry: the takbir for the three Islamic armies.
@@ -152,6 +153,61 @@ class SoundService {
         t.cancel();
         then?.call().catchError((_) {});
       }
+    });
+  }
+
+  // ------------------------------------------------------------------ commentator
+
+  /// Levantine commentator lines (`assets/audio/voice/<id>_<n>.ogg`), variants picked at random.
+  static const _voiceVariants = {
+    'start': 2,
+    'castles': 1,
+    'expansion': 1,
+    'your_turn': 2,
+    'duel': 2,
+    'capture': 2,
+    'held': 2,
+    'tower': 1,
+    'last_tower': 1,
+    'eliminated': 1,
+    'tiebreak': 1,
+    'final_round': 1,
+    'hurry': 1,
+    'too_slow': 1,
+    'treasure': 1,
+    'fastest': 1,
+    'lead': 1,
+    'victory': 2,
+    'defeat': 1,
+  };
+  AudioPlayer? _voice;
+  DateTime _voiceUntil = DateTime(2000);
+  final _rnd = Random();
+
+  /// Say a line (with probability [chance], so frequent events do not tire). A new line does not
+  /// cut one still playing; music ducks while the commentator talks.
+  Future<void> say(String id, {double chance = 1}) async {
+    final n = _voiceVariants[id];
+    if (n == null || muted || settings.voiceVolume <= 0 || _testing) return;
+    if (_rnd.nextDouble() > chance || DateTime.now().isBefore(_voiceUntil)) return;
+    _voiceUntil = DateTime.now().add(const Duration(milliseconds: 1800));
+    try {
+      _voice ??= AudioPlayer();
+      await _voice!.setVolume(settings.voiceVolume);
+      await _voice!.play(AssetSource('audio/voice/${id}_${1 + _rnd.nextInt(n)}.ogg'));
+      _duck();
+    } catch (_) {
+      // no audio device / file: stay silent
+    }
+  }
+
+  void _duck() {
+    if (_decks.isEmpty || _track == null) return;
+    final deck = _decks[_deck];
+    final full = muted ? 0.0 : settings.musicVolume * 0.7;
+    deck.setVolume(full * 0.4).catchError((_) {});
+    Future.delayed(const Duration(milliseconds: 2200), () {
+      if (_track != null) deck.setVolume(full).catchError((_) {});
     });
   }
 

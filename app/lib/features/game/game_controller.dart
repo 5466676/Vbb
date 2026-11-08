@@ -179,6 +179,9 @@ class GameController extends Notifier<GameState> {
     _bump();
   }
 
+  /// Take back control from the autopilot.
+  void back() => _t.send('back');
+
   void placeBase(int territory) => _t.send('place_base', {'territory': territory});
 
   void chooseTarget(int territory, {String? category}) {
@@ -403,13 +406,19 @@ class GameController extends Notifier<GameState> {
             final first = m.placer == null;
             m.placer = p['placer'] as int?;
             m.placeOptions = [for (final t in (p['options'] as List? ?? [])) t as int];
-            if (first) m.announce('ابنوا قلاعكم', 'كل واحد بدوره بيختار وين يبني قلعتو');
+            if (first) {
+              m.announce('ابنوا قلاعكم', 'كل واحد بدوره بيختار وين يبني قلعتو');
+              sound.say('castles');
+            }
             if (m.placer == m.mySeat) sound.play('your_turn');
           case 'expansion_question':
             m.placer = null;
             final before = m.expansionRound;
             m.expansionRound = (p['expansion_round'] ?? m.expansionRound) as int;
-            if (before == 0 && m.expansionRound <= 1) m.announce('تقاسم الأرض', 'جاوب أسرع وأصح لتختار أراضيك');
+            if (before == 0 && m.expansionRound <= 1) {
+              m.announce('تقاسم الأرض', 'جاوب أسرع وأصح لتختار أراضيك');
+              sound.say('expansion');
+            }
           case 'expansion_picks':
             m.quota = ((p['quota'] as Map?) ?? {}).map((k, v) => MapEntry(int.parse('$k'), v as int));
             m.myPicks = [];
@@ -425,13 +434,17 @@ class GameController extends Notifier<GameState> {
             m.defender = null;
             m.duelTerritory = null;
             _dropQuestion(m, opens);
-            if (m.myTurn) sound.play('your_turn');
+            if (m.myTurn) {
+              sound.play('your_turn');
+              sound.say('your_turn', chance: 0.6);
+            }
           case 'battle_duel' || 'battle_tiebreak':
             m.attacker = p['attacker'] as int?;
             m.defender = p['defender'] as int?;
             m.duelTerritory = p['territory'] as int?;
             if (m.phase == 'battle_tiebreak') {
               sound.play('tiebreak');
+              sound.say('tiebreak');
               m.announce('تعادل!', 'سؤال الحسم');
             }
         }
@@ -468,8 +481,18 @@ class GameController extends Notifier<GameState> {
             final won = q.ranking.isNotEmpty && q.ranking.first == m.mySeat;
             final right = q.correctIndex != null ? q.myChoice == q.correctIndex : won;
             sound.play(q.answered ? (right ? 'correct' : 'wrong') : 'time_up');
+            if (!q.answered) {
+              sound.say('too_slow', chance: 0.7);
+            } else if (won && q.kind == 'mcq') {
+              sound.say('fastest', chance: 0.4);
+            }
           }
         }
+      case 'autopilot':
+        final seat = p['seat'] as int;
+        final on = (p['on'] ?? false) == true;
+        m.players[seat].away = on;
+        if (seat == m.mySeat && on) sound.play('ui_error');
       case 'treasure_placed':
         m.treasure = p['territory'] as int?;
         m.log('في كنز مخبّى عالخريطة! يلي بيوصلو أول بياخد +300 وأداة', null, 'power');
@@ -485,6 +508,7 @@ class GameController extends Notifier<GameState> {
         m.effect(Fx('capture', p['territory'] as int, seat: seat, value: (p['points'] ?? 300) as int));
         m.log(seat == m.mySeat ? 'لقيت الكنز! +300 ورجعتلك أداة' : '${_name(m, seat)} لقى الكنز!', seat, 'power');
         sound.play('coins');
+        sound.say('treasure');
       case 'base_placed':
         final seat = p['seat'] as int;
         final t = m.terr(p['territory'] as int)
@@ -527,6 +551,7 @@ class GameController extends Notifier<GameState> {
               : '${p['rounds']} جولات • كل واحد بيهاجم مرة بالجولة',
         );
         sound.play('battle_start');
+        sound.say('start');
         _t.send('resync'); // army bonuses change values at the start of battle
       case 'round_started':
         m.battleRound = p['round'] as int;
@@ -539,6 +564,7 @@ class GameController extends Notifier<GameState> {
         if (m.finalRound) {
           m.announce('الجولة الأخيرة', 'كل احتلال بهالجولة بضعف النقاط!');
           sound.play('tiebreak');
+          sound.say('final_round');
         } else if ((p['round'] as int) > 1) {
           final w = m.winShare;
           m.announce(
@@ -582,24 +608,30 @@ class GameController extends Notifier<GameState> {
         m.lastCaptured = m.flash;
         m.log('${_name(m, attacker)} احتلّ أرض', attacker, 'capture');
         sound.play('sword_clash');
+        sound.say('capture', chance: 0.5);
         sound.capture(m.players[attacker].army);
       case 'territory_held':
         m.terr(p['territory'] as int).value = (p['value'] ?? 200) as int;
         m.effect(Fx('held', p['territory'] as int, seat: p['defender'] as int?));
         m.log('${_name(m, p['defender'] as int?)} صمد', p['defender'] as int?, 'held');
         sound.play('base_guarded');
+        sound.say('held', chance: 0.4);
       case 'tower_hit':
         m.terr(p['territory'] as int).towers = p['towers'] as int;
         m.flash = p['territory'] as int;
         m.effect(Fx('tower', p['territory'] as int, seat: p['attacker'] as int?));
         m.log('سقط برج!', p['attacker'] as int?, 'tower');
         sound.play('tower_hit');
+        sound.say((p['towers'] as int) == 1 ? 'last_tower' : 'tower');
       case 'base_guarded':
         sound.play('base_guarded');
       case 'player_eliminated':
         final seat = p['seat'] as int;
         final by = p['by'] as int?;
         m.players[seat].eliminated = true;
+        for (final t in m.territories.values) {
+          if (t.isBase && t.owner == seat) m.ruins.add(t.id);
+        }
         for (final t in (p['territories'] as List? ?? [])) {
           m.terr(t as int)
             ..owner = by
@@ -609,6 +641,7 @@ class GameController extends Notifier<GameState> {
         m.log('${_name(m, seat)} خرج من المعركة', seat, 'out');
         m.announce('${_name(m, seat)} خرج!', by == null ? null : 'على إيد ${_name(m, by)}');
         sound.play('eliminated');
+        sound.say('eliminated');
       case 'extra_turn':
         sound.play('extra_turn');
       case 'powerup_used':
@@ -650,6 +683,10 @@ class GameController extends Notifier<GameState> {
         m.question = null;
         final myTeam = m.me?.team;
         sound.play(myTeam != null && myTeam == m.winnerTeam ? 'victory' : 'defeat');
+        Future.delayed(
+          const Duration(milliseconds: 1500),
+          () => sound.say(myTeam != null && myTeam == m.winnerTeam ? 'victory' : 'defeat'),
+        );
     }
   }
 }

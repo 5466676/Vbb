@@ -178,6 +178,7 @@ def types(events: list[Event]) -> list[str]:
 # ------------------------------------------------------------------------------------------
 
 REVEAL_MS = 4000  # show the correct answer and ranking
+NUMERIC_REVEAL_MS = 6500  # arrows fly into the target
 CLAIM_ANIM_MS = 2500  # territories appear after picks
 DUEL_ANIM_MS = 4500  # army marches, battle scene
 START_MS = 4500
@@ -291,7 +292,8 @@ def play_match(
             if silent and state.phase_id == phase_id:
                 do(Timeout(phase_id=phase_id))
                 longest = max(aq.limits_ms.values())
-            clock += longest + REVEAL_MS
+            numeric = aq.question.kind is QuestionKind.NUMERIC
+            clock += longest + (NUMERIC_REVEAL_MS if numeric else REVEAL_MS)
             continue
         if state.phase is Phase.BASE_PLACEMENT:
             seat = state.placer

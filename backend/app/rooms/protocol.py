@@ -32,6 +32,7 @@ CLIENT_TYPES = {
     "choose_target",
     "use_powerup",
     "use_ability",
+    "back",
 }
 
 # messages the room owner handles (the rest are handled by the connection hub)

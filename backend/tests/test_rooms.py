@@ -149,8 +149,11 @@ async def test_duplicate_wrong_id_and_late_answers_are_rejected(start_server):
     err = await a.wait_for("error", pred=lambda e: e["code"] == "rule")
     assert "duplicate" in err["message"]
     await a.wait_for("question_result", timeout=10)  # b never answered: timeout resolved it
+    # a late answer to a question that has just closed is a normal race: ignored, no error
+    errors_before = len(b.errors)
     await b.send("answer", {"question_id": q["id"], "value": 5})
-    await b.wait_for("error", pred=lambda e: e["code"] in ("no_question", "rule"))
+    await asyncio.sleep(0.3)
+    assert len(b.errors) == errors_before
     await close_all(clients)
 
 

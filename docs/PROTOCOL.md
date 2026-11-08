@@ -56,6 +56,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `start_match` | `{}` | host; needs ≥2 seats, every human ready; teams need 4/6/8 |
 | `answer` | `{"question_id": str, "choice": 0–3}` or `{"question_id": str, "value": number}` | only while the question is open; one answer per question |
 | `pick_territory` | `{"territories": [id, …]}` | expansion picks; illegal or taken picks are replaced by auto-picks |
+| `back` | `{}` | end the autopilot (any other move ends it too) |
 | `place_base` | `{"territory": id}` | castle placement, your turn only (`phase_changed.placer`); one of `options` |
 | `choose_target` | `{"territory": id, "category"?: name}` (`category`: one of `phase_changed.categories`) | your battle turn; must be one of `phase_changed.targets` |
 | `use_powerup` | `{"powerup": "remove_two"\|"hint"\|"shield"\|"double", "territory"?: id}` | `shield` needs one of your territories |
@@ -89,6 +90,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `question_result` | `{"id", "correct_index" (your order) or "answer", "ranking": [seat], "answers": {seat: {"choice" (your order) \| "value", "elapsed_ms"}}}` |
 | `pick_locked` | `{"seat"}` |
 | `base_placed` | `{"seat", "territory", "auto", "towers", "value"}` — a player's castle is built (§6.0) |
+| `autopilot` | `{"seat", "on"}` — a person let the clock run out: a bot plays for them (no power-ups) until they act or send `back`; `room_state` seats carry `away` |
 | `treasure_placed` | `{"territory"}` — a chest on the free territory farthest from every castle (start of the expansion) |
 | `treasure_found` | `{"seat", "territory", "points": 300, "powerup"}` — whoever claims it gets +300 bonus and one used power-up back (`null` if none was used) |
 | `territory_claimed` | `{"seat", "territory", "auto", "value"}` |

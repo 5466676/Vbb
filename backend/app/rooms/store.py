@@ -96,6 +96,7 @@ class Seat(BaseModel):
     bot: Difficulty | None = None
     connected: bool = True
     left: bool = False  # left during a match: a bot keeps playing
+    away: bool = False  # missed a move: the autopilot plays (no power-ups) until they act again
 
 
 class Timer(BaseModel):

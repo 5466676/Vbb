@@ -60,6 +60,7 @@ ResultsSink = Callable[[str, RoomData], Awaitable[None]]
 # pauses after events so the client can animate (game ms)
 START_PAUSE_MS = 4500
 REVEAL_PAUSE_MS = 4000
+NUMERIC_REVEAL_PAUSE_MS = 6500  # the arrows fly into the target one by one
 CLAIM_PAUSE_MS = 2500
 DUEL_PAUSE_MS = 4500
 BASE_PAUSE_MS = 1800  # a castle lands before the next player places theirs
@@ -259,6 +260,7 @@ class RoomActor:
                     "ready": s.ready,
                     "bot": s.bot.value if s.bot else None,
                     "connected": s.connected,
+                    "away": s.away,
                 }
                 for i, s in enumerate(r.seats)
             ],
@@ -319,7 +321,34 @@ class RoomActor:
             raise RoomError("not_playing", "the match is not running")
         if r.seats[seat].left:
             raise RoomError("left", "you left this match")
-        await self._apply(self._to_action(seat, type_, p, item))
+        if r.seats[seat].away:  # any move (or "back") ends the autopilot
+            await self._set_away(seat, False)
+        if type_ == "back":
+            return
+        action = self._to_action(seat, type_, p, item)
+        if action is not None:
+            await self._apply(action)
+
+    def _owed(self) -> list[int]:
+        """Seats that still owe a move in the current phase."""
+        r = self.room
+        assert r is not None and r.match is not None
+        m = r.match
+        if m.active is not None:
+            return [s for s in m.active.participants if s not in m.active.answers]
+        if m.phase is Phase.BASE_PLACEMENT and m.placer is not None:
+            return [m.placer]
+        if m.phase is Phase.EXP_PICKS:
+            return [s for s in m.pick_quota if s not in m.picks]
+        if m.phase is Phase.BATTLE_TARGET and m.attacker is not None:
+            return [m.attacker]
+        return []
+
+    async def _set_away(self, seat: int, away: bool) -> None:
+        r = self.room
+        assert r is not None
+        r.seats[seat].away = away
+        await self._send(None, "autopilot", {"seat": seat, "on": away})
 
     # ------------------------------------------------------------------ lobby
 
@@ -530,6 +559,8 @@ class RoomActor:
         if type_ == "answer":
             aq = m.active
             if aq is None or p.get("question_id") != aq.question.id:
+                if p.get("question_id") in r.used_questions:
+                    return None  # a late answer to a question that just closed: a normal race
                 raise RoomError("no_question", "this question is not open")
             elapsed = int(item.get("elapsed_ms", 0) / self.settings.time_scale)
             if aq.question.kind is QuestionKind.MCQ:
@@ -579,7 +610,10 @@ class RoomActor:
         if "match_started" in types:
             pause = max(pause, START_PAUSE_MS)
         if "question_result" in types:
-            pause = max(pause, REVEAL_PAUSE_MS)
+            numeric = any(
+                e.type == "question_result" and e.data.get("answer") is not None for e in events
+            )
+            pause = max(pause, NUMERIC_REVEAL_PAUSE_MS if numeric else REVEAL_PAUSE_MS)
         if "territory_claimed" in types:
             pause = max(pause, CLAIM_PAUSE_MS)
         if "base_placed" in types:
@@ -754,6 +788,12 @@ class RoomActor:
             r.used_questions.append(q.id)
             await self._apply(ProvideQuestion(question=q))
         elif name.startswith("phase:"):
+            # people who let the clock run out get the autopilot until they act again
+            if m.phase_id == data["phase_id"]:
+                for seat in self._owed():
+                    s = r.seats[seat]
+                    if s.bot is None and not s.left and s.connected and not s.away:
+                        await self._set_away(seat, True)
             await self._apply(Timeout(phase_id=data["phase_id"]))
         elif name.startswith("bot:"):
             await self._bot_act(int(data["seat"]), int(data["phase_id"]))
@@ -764,7 +804,7 @@ class RoomActor:
         s = r.seats[seat]
         if s.bot is not None:
             return s.bot
-        if s.left or not s.connected:
+        if s.left or not s.connected or s.away:
             return Difficulty.SEAT_KEEPER
         return None
 

@@ -67,7 +67,7 @@ class QuestionArena extends StatefulWidget {
   final MatchView match;
   final void Function(int) onChoice;
   final void Function(double) onValue;
-  final VoidCallback onTick;
+  final void Function(bool urgent) onTick; // every second; urgent in the last five
 
   @override
   State<QuestionArena> createState() => _QuestionArenaState();
@@ -86,9 +86,10 @@ class _QuestionArenaState extends State<QuestionArena> {
       if (!mounted) return;
       final q = widget.match.question;
       final sec = (_leftMs() / 1000).ceil();
-      if (q != null && !q.resolved && !q.answered && q.participant && sec <= 5 && sec > 0 && sec != _lastTick) {
+      // the clock ticks every second you still owe an answer, louder at the end
+      if (q != null && !q.resolved && !q.answered && q.participant && sec > 0 && sec != _lastTick) {
         _lastTick = sec;
-        widget.onTick();
+        widget.onTick(sec <= 5);
       }
       setState(() {});
     });
@@ -864,6 +865,16 @@ class _TargetState extends State<_Target> with SingleTickerProviderStateMixin {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            if (q.ranking.indexOf(s.seat) case final r when r >= 0 && r < 3)
+                              Text(
+                                const ['I', 'II', 'III'][r],
+                                style: TextStyle(
+                                  color: const [Color(0xFFFFE08A), Color(0xFFE6E6E6), Color(0xFFE0A070)][r],
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 12,
+                                  height: 1.1,
+                                ),
+                              ),
                             Text(
                               s.value == null ? '—' : _fmt(s.value!),
                               style: const TextStyle(

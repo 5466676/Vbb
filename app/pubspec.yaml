@@ -43,6 +43,7 @@ flutter:
     - assets/ui/abilities/
     - assets/audio/sfx/
     - assets/audio/music/
+    - assets/audio/voice/
     - assets/audio/private/
     - assets/questions/
   fonts:

@@ -152,6 +152,7 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                               for (final x in widget.match.territories.values)
                                 if (x.isBase && x.owner != null) x.id,
                             ],
+                            ruins: widget.match.ruins.toList(),
                           ),
                         ),
                       ),
@@ -1033,10 +1034,11 @@ class _MarchingTroopsState extends State<_MarchingTroops> with SingleTickerProvi
 /// blur) and a banner in the owner's colour waves on every castle. Ticks at ~20 fps in its own
 /// layer, so the rest of the map does not repaint.
 class _Ambient extends StatefulWidget {
-  const _Ambient({required this.template, required this.match, required this.castles});
+  const _Ambient({required this.template, required this.match, required this.castles, required this.ruins});
   final MapTemplate template;
   final MatchView match;
   final List<int> castles;
+  final List<int> ruins;
 
   @override
   State<_Ambient> createState() => _AmbientState();
@@ -1065,17 +1067,30 @@ class _AmbientState extends State<_Ambient> {
     final t = DateTime.now().difference(_start).inMilliseconds / 1000;
     return RepaintBoundary(
       child: CustomPaint(
-        painter: _AmbientPainter(template: widget.template, match: widget.match, castles: widget.castles, t: t),
+        painter: _AmbientPainter(
+          template: widget.template,
+          match: widget.match,
+          castles: widget.castles,
+          ruins: widget.ruins,
+          t: t,
+        ),
       ),
     );
   }
 }
 
 class _AmbientPainter extends CustomPainter {
-  _AmbientPainter({required this.template, required this.match, required this.castles, required this.t});
+  _AmbientPainter({
+    required this.template,
+    required this.match,
+    required this.castles,
+    required this.ruins,
+    required this.t,
+  });
   final MapTemplate template;
   final MatchView match;
   final List<int> castles;
+  final List<int> ruins;
   final double t; // seconds
 
   @override
@@ -1092,8 +1107,30 @@ class _AmbientPainter extends CustomPainter {
         Paint()..shader = const RadialGradient(colors: [Color(0x22000000), Color(0x00000000)]).createShader(rect),
       );
     }
-    // banners on the castles
     final h = size.height * 0.13;
+    // damaged castles smoke (more for every tower lost) and burn at their last tower;
+    // fallen castles smoulder for the rest of the match
+    for (final id in castles) {
+      final terr = match.territories[id];
+      if (terr == null) continue;
+      final lost = match.baseTowers - terr.towers;
+      if (lost <= 0) continue;
+      final l = template.byId(id).label;
+      final base = Offset(l.dx * size.width, l.dy * size.height - h * 0.45);
+      _smoke(canvas, base, h, puffs: 1 + lost, dark: terr.towers <= 1);
+      if (terr.towers <= 1) _fire(canvas, base + Offset(0, h * 0.25), h * 0.5);
+    }
+    for (final id in ruins) {
+      final l = template.byId(id).label;
+      final base = Offset(l.dx * size.width, l.dy * size.height - h * 0.2);
+      canvas.drawOval(
+        Rect.fromCenter(center: base + Offset(0, h * 0.2), width: h * 0.9, height: h * 0.35),
+        Paint()..color = const Color(0x993A2414),
+      );
+      _smoke(canvas, base, h, puffs: 4, dark: true);
+      _fire(canvas, base + Offset(0, h * 0.15), h * 0.35);
+    }
+    // banners on the castles
     for (final id in castles) {
       final owner = match.territories[id]?.owner;
       if (owner == null) continue;
@@ -1126,6 +1163,35 @@ class _AmbientPainter extends CustomPainter {
           ..strokeWidth = 1.2
           ..color = const Color(0xFF2B1A0E),
       );
+    }
+  }
+
+  void _smoke(Canvas canvas, Offset at, double h, {required int puffs, required bool dark}) {
+    for (var i = 0; i < puffs; i++) {
+      final life = ((t * 0.35 + i / puffs) % 1.0); // 0 = just out of the chimney, 1 = gone
+      final c = at + Offset(sin(t * 1.3 + i * 2.1) * h * 0.12 - life * h * 0.25, -life * h * 0.9);
+      final r = h * (0.08 + life * 0.18);
+      canvas.drawCircle(
+        c,
+        r,
+        Paint()
+          ..color = (dark ? const Color(0xFF2E2620) : const Color(0xFF8C8478)).withValues(alpha: 0.55 * (1 - life)),
+      );
+    }
+  }
+
+  void _fire(Canvas canvas, Offset at, double size) {
+    Path flame(double x, double w, double hgt) => Path()
+      ..moveTo(x - w / 2, at.dy)
+      ..quadraticBezierTo(x - w * 0.6, at.dy - hgt * 0.5, x, at.dy - hgt)
+      ..quadraticBezierTo(x + w * 0.6, at.dy - hgt * 0.5, x + w / 2, at.dy)
+      ..close();
+    for (var i = 0; i < 3; i++) {
+      final flick = 0.75 + 0.25 * sin(t * 14 + i * 2.3);
+      final w = size * (0.45 - i * 0.1), hgt = size * (0.9 - i * 0.2) * flick;
+      final x = at.dx + (i - 1) * size * 0.18;
+      canvas.drawPath(flame(x, w, hgt), Paint()..color = const Color(0xE6E8590C));
+      canvas.drawPath(flame(x, w * 0.5, hgt * 0.55), Paint()..color = const Color(0xE6FFD23F));
     }
   }
 

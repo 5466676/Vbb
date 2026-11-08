@@ -160,6 +160,13 @@ class LocalGame implements GameTransport {
   @override
   void send(String type, [Map<String, dynamic> p = const {}]) {
     if (_closed) return;
+    if (_away && type != 'resync') {
+      // any move (or "back") ends the autopilot
+      _away = false;
+      _out('autopilot', {'seat': 0, 'on': false});
+      _scheduleBots(0);
+    }
+    if (type == 'back') return;
     try {
       switch (type) {
         case 'answer':
@@ -194,6 +201,25 @@ class LocalGame implements GameTransport {
   }
 
   List<int> _lastPicks = [];
+  bool _away = false; // the player let the clock run out: the autopilot plays for them
+
+  /// Seat 0 owes a move in the current phase.
+  bool get _iOwe {
+    final aq = _m.active;
+    if (aq != null) return aq.participants.contains(0) && !aq.answers.containsKey(0);
+    if (_m.phase == 'base_placement') return _m.placer == 0;
+    if (_m.phase == 'expansion_picks') return _m.pickQuota.containsKey(0) && !_m.picks.containsKey(0);
+    if (_m.phase == 'battle_target') return _m.attacker == 0;
+    return false;
+  }
+
+  void _timeoutPhase(int id) {
+    if (_m.phaseId == id && _iOwe && !_away && !_m.players[0].eliminated) {
+      _away = true;
+      _out('autopilot', {'seat': 0, 'on': true});
+    }
+    _after(_m.timeout(id));
+  }
 
   // ------------------------------------------------------------------ engine events
 
@@ -201,7 +227,10 @@ class LocalGame implements GameTransport {
     if (_closed) return;
     final types = {for (final e in events) e.type};
     var pause = forcePause;
-    if (types.contains('question_result')) pause = max(pause, _revealPause);
+    if (types.contains('question_result')) {
+      final numeric = events.any((e) => e.type == 'question_result' && e.data['answer'] != null);
+      pause = max(pause, numeric ? 6500 : _revealPause); // numeric: the arrows fly in one by one
+    }
     if (types.contains('territory_claimed')) pause = max(pause, _claimPause);
     if (types.contains('base_placed')) pause = max(pause, _basePause);
     if (types.contains('target_chosen')) pause = max(pause, _marchPause);
@@ -225,7 +254,7 @@ class LocalGame implements GameTransport {
       _schedule('provide', pause, _provide);
     } else if (_m.phase == 'base_placement') {
       final id = _m.phaseId;
-      _schedule('phase:$id', pause + _m.settings.baseMs, () => _after(_m.timeout(id)));
+      _schedule('phase:$id', pause + _m.settings.baseMs, () => _timeoutPhase(id));
     } else if (_m.phase == 'expansion_picks') {
       final id = _m.phaseId;
       _schedule('phase:$id', pause + _m.settings.pickMs, () {
@@ -238,12 +267,12 @@ class LocalGame implements GameTransport {
           }
           if (_m.phaseId != id) return;
         }
-        _after(_m.timeout(id));
+        _timeoutPhase(id);
       });
       _lastPicks = [];
     } else if (_m.phase == 'battle_target') {
       final id = _m.phaseId;
-      _schedule('phase:$id', pause + _m.settings.targetMs, () => _after(_m.timeout(id)));
+      _schedule('phase:$id', pause + _m.settings.targetMs, () => _timeoutPhase(id));
     }
     _scheduleBots(pause);
   }
@@ -284,7 +313,7 @@ class LocalGame implements GameTransport {
         });
         final longest = aq.limitsMs.values.reduce(max);
         final id = _m.phaseId;
-        _schedule('phase:$id', longest + _m.settings.latencyGraceMs + _networkSlack, () => _after(_m.timeout(id)));
+        _schedule('phase:$id', longest + _m.settings.latencyGraceMs + _networkSlack, () => _timeoutPhase(id));
       default:
         _out(e.type, e.data);
     }
@@ -332,8 +361,9 @@ class LocalGame implements GameTransport {
 
   void _scheduleBots(int pause) {
     for (final p in _m.players) {
-      if (!p.isBot || p.eliminated) continue;
-      final level = bots[p.seat - 1];
+      final autopilot = p.seat == 0 && _away;
+      if ((!p.isBot && !autopilot) || p.eliminated) continue;
+      final level = autopilot ? 'easy' : bots[p.seat - 1];
       final name = 'bot:${p.seat}:${_m.phaseId}';
       if (_timers.containsKey(name)) continue;
       final prof = botProfiles[level]!;
@@ -357,7 +387,8 @@ class LocalGame implements GameTransport {
 
   void _botAct(int seat, String level, int phaseId) {
     if (_m.phaseId != phaseId) return;
-    for (final extra in botExtras(_m, seat, level, _rnd)) {
+    if (seat == 0 && !_away) return; // the player came back
+    for (final extra in seat == 0 ? const <List<Ev> Function()>[] : botExtras(_m, seat, level, _rnd)) {
       try {
         _after(extra());
       } on RuleError {

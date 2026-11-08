@@ -97,6 +97,7 @@ class PlayerView {
   final bool bot;
   int score;
   int bonus = 0; // points not tied to land (army perks, right answers to other duels)
+  bool away = false; // the autopilot is playing for them
   bool eliminated;
   bool connected;
   bool abilityUsed;
@@ -190,6 +191,7 @@ class MatchView {
   int? attacker;
   int? placer; // castle placement: whose turn it is
   int? treasure; // the territory with the chest, until someone takes it
+  final Set<int> ruins = {}; // fallen castles: they smoulder on the map for the rest of the match
   List<int> placeOptions = const [];
   List<int> roundOrder = const []; // this battle round's attackers, in turn order
   bool finalRound = false; // fixed-rounds matches: the last round, captures count double

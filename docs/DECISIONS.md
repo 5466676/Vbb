@@ -520,3 +520,29 @@ pace: fixed rounds ~13–18 min, open length ~8 (2 players) to ~31 min (8 player
   layer (~20 fps); the battlefield shakes on captures and falling towers; a dark vignette.
 - Settings, training and the leaderboard use a shared `GameScaffold` (painted background, wooden
   header with a Ruqaa title).
+
+## From the comparison report: rules and fixes (2026-11-07)
+
+The owner had a local Claude play a commercial game of the genre and ours side by side and report
+(numbers measured from ~800 screenshots and the extracted sound files). Taken from it, with the
+owner's approval:
+- **Fixes:** the number pad's bottom row was outside its box on landscape phones (taps never
+  arrived): the pad now scales to fit; stage signs are sized from the screen height.
+- **Fixed rounds** `{2: 10, 3: 7, 4: 6, 5: 6, 6: 5, 7: 4, 8: 4}`; the **last round** is announced and
+  captures in it gain double (`round_started.final`, `core.is_final_round`), with its own music.
+- **Treasure:** a chest on the free territory farthest from every castle; whoever claims it gets
+  +300 and one used power-up back (`treasure_placed`, `treasure_found`).
+- **Explicit autopilot:** a person who lets the clock run out is marked `away`; a bot plays for
+  them without power-ups, the client shows «🤖 عم نلعب عنك — اكبس لترجع», and any move or `back`
+  ends it (rooms and the offline game).
+- **Sound for phone speakers:** new music beds chosen by measured energy above 300 Hz (map 42 %,
+  battle 47 %, final round 62 %, up from 3–9 %); `your_turn` regenerated as a bright horn + sword;
+  the question clock ticks every second (quiet, louder in the last five).
+- **Levantine commentator** (owner's pick, Gemini Enceladus): lines in
+  `tools/audio/commentator_shami.py`, played by `SoundService.say` on match events (frequent events
+  only sometimes; music ducks). Gemini's free tier allows 10 requests a day: 4 lines are in, the
+  scheduled task finishes the rest after the quota resets.
+- **Castles show damage:** smoke grows with each lost tower, fire at the last one; fallen castles
+  smoulder for the rest of the match. Numeric reveals hold 6.5 s and the cards carry I/II/III.
+- Late answers to a question that has just closed are ignored instead of answered with an error
+  (a normal race now that the autopilot may answer first).

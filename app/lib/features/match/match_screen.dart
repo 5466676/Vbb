@@ -28,6 +28,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
   String? _loadedFor;
   String? _territoryMode; // 'shield' or 'ability': the next tap on my territory uses it
   int? _target; // my chosen target while I pick the question category
+  String? _lastHurry;
   int _targetPhase = -1;
 
   Future<void> _load(String mapId) async {
@@ -223,7 +224,14 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                                   match: m,
                                   onChoice: ref.read(gameProvider.notifier).answerChoice,
                                   onValue: ref.read(gameProvider.notifier).answerValue,
-                                  onTick: () => ref.read(gameProvider.notifier).sound.play('tick'),
+                                  onTick: (urgent) {
+                                    final sound = ref.read(gameProvider.notifier).sound;
+                                    sound.play('tick', volume: urgent ? 1 : 0.4);
+                                    if (urgent && _lastHurry != q.id) {
+                                      _lastHurry = q.id; // once per question, at five seconds left
+                                      sound.say('hurry', chance: 0.5);
+                                    }
+                                  },
                                 ),
                               ),
                             ),
@@ -252,6 +260,29 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                                     setState(() => _target = null);
                                   },
                                   onCancel: () => setState(() => _target = null),
+                                ),
+                              ),
+                            ),
+                          if (m.me?.away ?? false)
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              bottom: 84,
+                              child: Center(
+                                child: Semantics(
+                                  button: true,
+                                  label: 'رجعت',
+                                  child: GestureDetector(
+                                    onTap: () => ref.read(gameProvider.notifier).back(),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                                      decoration: Toon.chunky(Toon.gold, radius: 16),
+                                      child: const Text(
+                                        '🤖 عم نلعب عنك — اكبس لترجع',
+                                        style: TextStyle(color: Toon.ink, fontWeight: FontWeight.w900, fontSize: 16),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
@@ -721,7 +752,7 @@ class _TopBar extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (p.bot) const Icon(Icons.smart_toy_outlined, size: 12, color: Color(0xFF8A5528)),
+                        if (p.bot || p.away) const Icon(Icons.smart_toy_outlined, size: 12, color: Color(0xFF8A5528)),
                         if (!p.connected) const Icon(Icons.wifi_off, size: 12, color: AppColors.bad),
                       ],
                     ),
