@@ -286,6 +286,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                                 ),
                               ),
                             ),
+                          Positioned(left: 0, right: 0, top: 0, height: 56, child: _EmoteBubbles(match: m)),
                           if (m.banner != null)
                             Positioned.fill(
                               child: StageSign(key: ValueKey('sign${m.bannerId}'), text: m.banner!, sub: m.bannerSub),
@@ -607,19 +608,86 @@ class _TopBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          for (final p in order)
-            Expanded(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 230),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 3),
-                  child: _card(m, p, land(p.seat), count(p.seat), top),
-                ),
-              ),
+          // cards slide to their new place when the ranking changes (richest on the right)
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, box) {
+                final w = min(236.0, box.maxWidth / max(1, order.length));
+                return Stack(
+                  children: [
+                    for (final (i, p) in order.indexed)
+                      AnimatedPositioned(
+                        key: ValueKey('card${p.seat}'),
+                        duration: const Duration(milliseconds: 600),
+                        curve: Curves.easeInOutBack,
+                        top: 0,
+                        bottom: 0,
+                        width: w,
+                        right: i * w,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: _ScoreDelta(score: land(p.seat), child: _card(m, p, land(p.seat), count(p.seat), top)),
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
+          ),
+          const SizedBox(width: 4),
+          _RoundButton(icon: Icons.emoji_emotions_outlined, tooltip: 'وجوه وكلمات', onTap: () => _showEmotes(context)),
           const SizedBox(width: 4),
           _RoundButton(icon: Icons.receipt_long, tooltip: 'سجلّ المعركة', onTap: () => _showLog(context)),
         ],
+      ),
+    );
+  }
+
+  void _showEmotes(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (c) => Align(
+        alignment: const Alignment(-0.95, -0.7),
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: 300,
+            padding: const EdgeInsets.all(8),
+            decoration: Toon.chunky(Toon.paper, radius: 14),
+            child: Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              alignment: WrapAlignment.center,
+              children: [
+                for (final e in emoteFaces.entries)
+                  Semantics(
+                    button: true,
+                    label: e.value,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(c);
+                        ProviderScope.containerOf(context).read(gameProvider.notifier).emote(e.key);
+                      },
+                      child: Container(
+                        constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        decoration: Toon.chunky(Colors.white, radius: 10, depth: 2),
+                        child: Text(
+                          e.value,
+                          style: TextStyle(
+                            fontSize: e.value.length <= 2 ? 24 : 14,
+                            fontWeight: FontWeight.w900,
+                            color: Toon.ink,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -1184,6 +1252,139 @@ class _ShakeState extends State<_Shake> with SingleTickerProviderStateMixin {
         final k = (1 - t) * _amp;
         return Transform.translate(offset: Offset(sin(t * 50) * k, cos(t * 37) * k * 0.6), child: child);
       },
+    );
+  }
+}
+
+/// Floats «+150» / «−150» over a player card whenever their score changes.
+class _ScoreDelta extends StatefulWidget {
+  const _ScoreDelta({required this.score, required this.child});
+  final int score;
+  final Widget child;
+
+  @override
+  State<_ScoreDelta> createState() => _ScoreDeltaState();
+}
+
+class _ScoreDeltaState extends State<_ScoreDelta> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+  int _delta = 0;
+
+  @override
+  void didUpdateWidget(_ScoreDelta old) {
+    super.didUpdateWidget(old);
+    if (old.score != widget.score) {
+      _delta = widget.score - old.score;
+      _c.forward(from: 0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Positioned.fill(child: widget.child),
+        AnimatedBuilder(
+          animation: _c,
+          builder: (context, _) {
+            if (!_c.isAnimating || _delta == 0) return const SizedBox.shrink();
+            final t = _c.value;
+            return Positioned(
+              left: 8,
+              top: 18 - 26 * Curves.easeOut.transform(t),
+              child: Opacity(
+                opacity: t < 0.7 ? 1 : (1 - t) / 0.3,
+                child: Text(
+                  _delta > 0 ? '+$_delta' : '−${-_delta}',
+                  style: TextStyle(
+                    color: _delta > 0 ? const Color(0xFF2E9E44) : AppColors.bad,
+                    fontWeight: FontWeight.w900,
+                    fontSize: 18,
+                    shadows: const [
+                      Shadow(color: Colors.white, blurRadius: 3),
+                      Shadow(color: Colors.white, blurRadius: 6),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+}
+
+const emoteFaces = {
+  'laugh': '😂',
+  'clap': '👏',
+  'angry': '😡',
+  'shock': '😱',
+  'strong': '💪',
+  'deal': '🤝',
+  'cool': '😎',
+  'think': '🤔',
+  'bravo': 'برافو!',
+  'go': 'يلّا!',
+  'luck': 'حظ أوفر!',
+  'watch': 'انتبه!',
+};
+
+/// Speech bubbles under the player cards for recent emotes (same layout as the top strip).
+class _EmoteBubbles extends StatelessWidget {
+  const _EmoteBubbles({required this.match});
+  final MatchView match;
+
+  @override
+  Widget build(BuildContext context) {
+    final m = match;
+    final order = [...m.players]..sort((a, b) => m.scoreOf(b.seat).compareTo(m.scoreOf(a.seat)));
+    final now = DateTime.now();
+    return IgnorePointer(
+      child: LayoutBuilder(
+        builder: (context, box) {
+          final w = min(236.0, (box.maxWidth - 12 - 92) / max(1, order.length));
+          return Stack(
+            children: [
+              for (final (i, p) in order.indexed)
+                if (m.emotes[p.seat] case (final id, final at) when now.difference(at).inMilliseconds < 2600)
+                  Positioned(
+                    right: 6 + i * w + w / 2 - 40,
+                    top: 2,
+                    width: 80,
+                    child: TweenAnimationBuilder<double>(
+                      key: ValueKey(at),
+                      tween: Tween(begin: 0, end: 1),
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.elasticOut,
+                      builder: (context, v, child) => Transform.scale(scale: v, child: child),
+                      child: Center(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: Toon.chunky(Colors.white, radius: 14, depth: 2),
+                          child: Text(
+                            emoteFaces[id] ?? '',
+                            style: TextStyle(
+                              fontSize: (emoteFaces[id] ?? '').length <= 2 ? 26 : 14,
+                              fontWeight: FontWeight.w900,
+                              color: Toon.ink,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

@@ -168,6 +168,10 @@ class LocalGame implements GameTransport {
       _scheduleBots(0);
     }
     if (type == 'back') return;
+    if (type == 'emote') {
+      _out('emote', {'seat': 0, 'id': p['id']});
+      return;
+    }
     try {
       switch (type) {
         case 'answer':
@@ -202,7 +206,24 @@ class LocalGame implements GameTransport {
   }
 
   List<int> _lastPicks = [];
-  bool _away = false; // the player let the clock run out: the autopilot plays for them
+  bool _away = false;
+
+  /// Bots react now and then: proud after a capture, upset when they lose land.
+  void _botEmotes(List<Ev> events) {
+    for (final e in events) {
+      if (e.type != 'territory_captured') continue;
+      final att = e.data['attacker'] as int, dfd = e.data['defender'] as int;
+      if (_m.players[att].isBot && _rnd.nextDouble() < 0.35) {
+        _emoteLater(att, const ['strong', 'laugh', 'cool', 'clap'][_rnd.nextInt(4)]);
+      } else if (_m.players[dfd].isBot && _rnd.nextDouble() < 0.3) {
+        _emoteLater(dfd, const ['angry', 'shock', 'watch'][_rnd.nextInt(3)]);
+      }
+    }
+  }
+
+  void _emoteLater(int seat, String id) {
+    _schedule('emote:$seat', 1200 + _rnd.nextInt(1500), () => _out('emote', {'seat': seat, 'id': id}));
+  } // the player let the clock run out: the autopilot plays for them
 
   /// Seat 0 owes a move in the current phase.
   bool get _iOwe {
@@ -226,6 +247,7 @@ class LocalGame implements GameTransport {
 
   void _after(List<Ev> events, {int forcePause = 0}) {
     if (_closed) return;
+    _botEmotes(events);
     final types = {for (final e in events) e.type};
     var pause = forcePause;
     if (types.contains('question_result')) {

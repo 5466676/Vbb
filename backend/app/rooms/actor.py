@@ -64,7 +64,21 @@ NUMERIC_REVEAL_PAUSE_MS = 6500  # the arrows fly into the target one by one
 CLAIM_PAUSE_MS = 2500
 DUEL_PAUSE_MS = 4500
 BASE_PAUSE_MS = 1800  # a castle lands before the next player places theirs
-MARCH_PAUSE_MS = 3500  # the attacker's troops march to the target before the duel question
+MARCH_PAUSE_MS = 3500
+EMOTES = {
+    "laugh",
+    "clap",
+    "angry",
+    "shock",
+    "strong",
+    "deal",
+    "cool",
+    "think",
+    "bravo",
+    "go",
+    "luck",
+    "watch",
+}  # the attacker's troops march to the target before the duel question
 NETWORK_SLACK_MS = 500  # extra wait before a question timeout
 ENDED_TTL_MS = 5 * 60_000
 BOT_NAMES = ["صلاح", "خالد", "طارق", "زنوبيا", "هارون", "بيبرس", "قطز", "سيف"]
@@ -105,6 +119,7 @@ class RoomActor:
         self.rnd = random.Random()
         self.task: asyncio.Task | None = None
         self._sub: int | None = None
+        self._last_emote: dict[int, int] = {}  # seat -> ms of their last emote
 
     # ------------------------------------------------------------------ lifecycle
 
@@ -308,6 +323,12 @@ class RoomActor:
         seat = r.seat_of(pid)
         if seat is None:
             raise RoomError("not_in_room", "you are not in this room")
+        if type_ == "emote":  # a quick face or phrase for everyone (at most one every 2 s)
+            now = now_ms()
+            if p.get("id") in EMOTES and now - self._last_emote.get(seat, 0) >= 2000:
+                self._last_emote[seat] = now
+                await self._send(None, "emote", {"seat": seat, "id": p["id"]})
+            return
         if type_ == "resync":  # the client lost track: send everything again
             await self._send([pid], "full_state", self.full_state(pid))
             return

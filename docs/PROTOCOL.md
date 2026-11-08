@@ -56,6 +56,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `start_match` | `{}` | host; needs ≥2 seats, every human ready; teams need 4/6/8 |
 | `answer` | `{"question_id": str, "choice": 0–3}` or `{"question_id": str, "value": number}` | only while the question is open; one answer per question |
 | `pick_territory` | `{"territories": [id, …]}` | expansion picks; illegal or taken picks are replaced by auto-picks |
+| `emote` | `{"id"}` — one of laugh, clap, angry, shock, strong, deal, cool, think, bravo, go, luck, watch; any time in a room, at most one every 2 s |
 | `back` | `{}` | end the autopilot (any other move ends it too) |
 | `place_base` | `{"territory": id}` | castle placement, your turn only (`phase_changed.placer`); one of `options` |
 | `choose_target` | `{"territory": id, "category"?: name}` (`category`: one of `phase_changed.categories`) | your battle turn; must be one of `phase_changed.targets` |
@@ -90,6 +91,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `question_result` | `{"id", "correct_index" (your order) or "answer", "ranking": [seat], "answers": {seat: {"choice" (your order) \| "value", "elapsed_ms"}}}` |
 | `pick_locked` | `{"seat"}` |
 | `base_placed` | `{"seat", "territory", "auto", "towers", "value"}` — a player's castle is built (§6.0) |
+| `emote` | `{"seat", "id"}` — a player's quick face or phrase (also sent by bots offline) |
 | `autopilot` | `{"seat", "on"}` — a person let the clock run out: a bot plays for them (no power-ups) until they act or send `back`; `room_state` seats carry `away` |
 | `target_locked` | `{"seat"}` — that player has chosen (the target is revealed by `target_chosen` when their duel starts) |
 | `attack_cancelled` | `{"seat", "territory"}` — the target was no longer legal when its turn came |

@@ -179,6 +179,9 @@ class GameController extends Notifier<GameState> {
     _bump();
   }
 
+  /// A quick face or phrase for everyone.
+  void emote(String id) => _t.send('emote', {'id': id});
+
   /// Take back control from the autopilot.
   void back() => _t.send('back');
 
@@ -594,6 +597,10 @@ class GameController extends Notifier<GameState> {
       case 'turn_skipped':
         if (p['seat'] is int) m.turnDone.add(p['seat'] as int);
         m.log('${_name(m, p['seat'] as int?)} ما عندو هدف', p['seat'] as int?);
+      case 'emote':
+        m.emotes[p['seat'] as int] = ('${p['id']}', DateTime.now());
+        sound.play('ui_tap', volume: 0.6);
+        Timer(const Duration(milliseconds: 2800), _bump); // let the bubble go away
       case 'target_locked':
         m.targetLocked.add(p['seat'] as int);
         if (p['seat'] != m.mySeat) sound.play('other_answered');

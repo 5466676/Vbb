@@ -204,6 +204,7 @@ class MatchView {
   final Set<int> targetLocked = {}; // who already chose
   int? king; // the king's question: the leader left out of it
   final Set<int> onFire = {}; // 3+ right answers in a row
+  final Map<int, (String, DateTime)> emotes = {}; // seat -> last quick face/phrase and when
   List<String> offeredCategories = const []; // the attacker picks the duel's category from these
   Map<int, int> quota = const {};
   List<int> myPicks = [];

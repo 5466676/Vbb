@@ -560,3 +560,11 @@ they stay small and exact):
 - **On fire 🔥** after 3 right answers in a row: +50 on every capture until a miss.
 - **Underdog shield:** from round 2, a last player under 70 % of the leader's score gets a free
   shield on their best land.
+
+## Emotes and a livelier scoreboard (2026-11-08)
+
+- **Emotes:** 8 faces and 4 phrases («برافو!», «يلّا!», «حظ أوفر!», «انتبه!») from a button in
+  the top strip; shown as a bubble under the player's card for ~2.6 s. Rooms relay them
+  (`emote`, at most one every 2 s per player); offline, bots react to captures now and then.
+- The player cards slide to their new place when the ranking changes, and every score change
+  floats a «+150» / «−150» over the card.
