@@ -453,14 +453,14 @@ class _Flag extends StatelessWidget {
                       height: 20,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: rank == 0 ? Toon.gold : Colors.white,
+                        color: rank == 0 ? Toon.gold : const Color(0xFFCFE6F5),
                         border: Border.all(color: Toon.outline, width: 1.5),
                       ),
                       child: Center(
                         child: Text(
                           '${rank + 1}',
                           style: const TextStyle(
-                            color: Toon.ink,
+                            color: Color(0xFF05070F),
                             fontWeight: FontWeight.w900,
                             fontSize: 12,
                             height: 1.1,
