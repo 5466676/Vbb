@@ -96,6 +96,7 @@ class GameController extends Notifier<GameState> {
       teams: teams,
       categories: categories,
       openEnded: openEnded,
+      seen: _seen = _settings.seenQuestions,
     );
     _local = g;
     _localSub = g.messages.listen(_on);
@@ -103,7 +104,15 @@ class GameController extends Notifier<GameState> {
     await g.connect();
   }
 
+  Set<String>? _seen; // the offline game adds to it; saved when a match ends or stops
+
+  void _saveSeen() {
+    final s = _seen;
+    if (s != null) _settings.setSeenQuestions(s);
+  }
+
   Future<void> stopOffline() async {
+    _saveSeen();
     await _localSub?.cancel();
     _localSub = null;
     await _local?.close();
@@ -748,6 +757,7 @@ class GameController extends Notifier<GameState> {
         m.standings = [for (final s in p['standings'] as List) (s as Map).cast<String, dynamic>()];
         m.winnerTeam = p['winner_team'] as int?;
         _awardXp(m);
+        _saveSeen();
         m.phase = 'results';
         m.question = null;
         final myTeam = m.me?.team;

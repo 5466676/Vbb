@@ -30,7 +30,8 @@ class LocalGame implements GameTransport {
     this.teams = false,
     this.categories = const [],
     this.openEnded = true,
-  });
+    Set<String>? seen,
+  }) : _used = seen ?? <String>{};
 
   final bool openEnded; // open length (domination) or fixed rounds
 
@@ -52,7 +53,9 @@ class LocalGame implements GameTransport {
   late MatchState _m;
   late MapTemplate _template;
   late List<Map<String, dynamic>> _seats; // room_state seats
-  final _used = <String>{};
+  /// Questions already asked: this match's, plus earlier matches' when the caller keeps the set
+  /// (no repeats until a category runs out).
+  final Set<String> _used;
   List<Map<String, dynamic>> _all = [];
   List<String> _offered = []; // categories offered to the attacker now
   final Map<int, String> _duelCategories = {}; // attacker -> picked category
