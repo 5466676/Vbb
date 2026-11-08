@@ -846,6 +846,20 @@ class _EffectsPainter extends CustomPainter {
           ..color = Color.lerp(color, Colors.white, 0.4 * k)!.withValues(alpha: a * (1 - spread)),
       );
     }
+    // sparks burst out of the land and fall away
+    final rnd = Random(f.territory * 977 + f.at.millisecond);
+    final spark = Paint()..strokeCap = StrokeCap.round;
+    for (var i = 0; i < 16; i++) {
+      final ang = rnd.nextDouble() * 2 * pi;
+      final speed = maxR * (0.35 + 0.5 * rnd.nextDouble());
+      final k = Curves.easeOut.transform((p / 0.8).clamp(0.0, 1.0));
+      final at = c + Offset(cos(ang), sin(ang)) * speed * k + Offset(0, maxR * 0.25 * k * k);
+      final tail = at - Offset(cos(ang), sin(ang)) * size.height * 0.02 * (1 - k);
+      spark
+        ..strokeWidth = size.height * 0.006
+        ..color = (i.isEven ? Colors.white : Color.lerp(color, Colors.white, 0.3)!).withValues(alpha: 1 - k);
+      canvas.drawLine(tail, at, spark);
+    }
     // the flag is driven into the ground
     final plant = Curves.elasticOut.transform((p / 0.5).clamp(0.0, 1.0));
     final fade = p < 0.8 ? 1.0 : 1 - (p - 0.8) / 0.2;

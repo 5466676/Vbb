@@ -663,3 +663,5 @@ they stay small and exact):
 - Motion: the screen edge breathes in cyan while it is my move (`_TurnGlow`, four edge
   gradients); a scan line sweeps across when a new stage sign drops (`_ScanWipe`); slow motes of
   light drift over the map (`_Motes`, own repaint layer).
+- Question screen: answers slide in one after another; at the reveal the right answer pops with
+  a ring of light and my wrong pick shakes. Captures throw sparks out of the land.

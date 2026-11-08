@@ -582,6 +582,35 @@ class _Options extends StatelessWidget {
           ]
         : const <int>[];
     final pressed = i == q.myChoice && !q.resolved;
+    // answers slide in one after another; at the reveal the right one pops with a burst of light
+    // and my wrong one shakes
+    final reveal = !q.resolved
+        ? null
+        : i == q.correctIndex
+        ? true
+        : i == q.myChoice
+        ? false
+        : null;
+    return _Entrance(
+      index: i,
+      child: _Reveal(
+        key: ValueKey('reveal$i${q.resolved}'),
+        good: reveal,
+        child: _optionBody(q, i, removed, fill, fg, enabled, pickers, pressed),
+      ),
+    );
+  }
+
+  Widget _optionBody(
+    QuestionView q,
+    int i,
+    bool removed,
+    Color fill,
+    Color fg,
+    bool enabled,
+    List<int> pickers,
+    bool pressed,
+  ) {
     return Opacity(
       opacity: removed ? 0.25 : 1,
       child: GestureDetector(
@@ -1068,4 +1097,75 @@ class _Clock extends StatelessWidget {
       ),
     );
   }
+}
+
+/// An answer slides up and fades in, a little after the one before it.
+class _Entrance extends StatelessWidget {
+  const _Entrance({required this.index, required this.child});
+  final int index;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: Duration(milliseconds: 380 + 90 * index),
+      curve: Interval(0.22 * index / (1 + 0.22 * index), 1, curve: Curves.easeOutBack),
+      builder: (context, t, child) => Opacity(
+        opacity: t.clamp(0.0, 1.0),
+        child: Transform.translate(offset: Offset(0, 18 * (1 - t)), child: child),
+      ),
+      child: child,
+    );
+  }
+}
+
+/// The reveal: the right answer pops and sends out a ring of light; a wrong pick shakes.
+class _Reveal extends StatelessWidget {
+  const _Reveal({super.key, required this.good, required this.child});
+  final bool? good; // true right answer, false my wrong pick, null nothing
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (good == null) return child;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 700),
+      builder: (context, t, child) {
+        if (good == false) {
+          final dx = sin(t * pi * 8) * 7 * (1 - t);
+          return Transform.translate(offset: Offset(dx, 0), child: child);
+        }
+        final pop = 1 + 0.07 * sin(min(1.0, t / 0.45) * pi);
+        return CustomPaint(
+          foregroundPainter: _RingPainter(t),
+          child: Transform.scale(scale: pop, child: child),
+        );
+      },
+      child: child,
+    );
+  }
+}
+
+class _RingPainter extends CustomPainter {
+  _RingPainter(this.t);
+  final double t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (t >= 1) return;
+    final grow = 6 + 22 * Curves.easeOut.transform(t);
+    final r = RRect.fromRectAndRadius((Offset.zero & size).inflate(grow), Radius.circular(10 + grow));
+    canvas.drawRRect(
+      r,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3 * (1 - t) + 0.5
+        ..color = const Color(0xFF5DFFB0).withValues(alpha: 0.9 * (1 - t)),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_RingPainter old) => old.t != t;
 }
