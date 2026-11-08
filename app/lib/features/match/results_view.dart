@@ -319,6 +319,7 @@ class _XpPanel extends StatelessWidget {
                   alignment: AlignmentDirectional.centerStart,
                   child: FractionallySizedBox(
                     widthFactor: rankProgress(xp),
+                    heightFactor: 1,
                     child: Container(
                       decoration: BoxDecoration(
                         gradient: LinearGradient(colors: [AppColors.violet, c]),
