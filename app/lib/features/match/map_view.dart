@@ -240,7 +240,9 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
         top: shape.label.dy * size.height - d * 0.95,
         width: d,
         height: d,
-        child: IgnorePointer(child: Image.asset(armyOf(m.players[terr.owner!].army).fort, fit: BoxFit.contain)),
+        child: IgnorePointer(
+          child: NeonSprite(armyOf(m.players[terr.owner!].army).fort, color: AppColors.seat(terr.owner)),
+        ),
       );
     }
   }
@@ -288,6 +290,7 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
         from: from,
         to: Offset(l.dx * size.width, l.dy * size.height),
         image: armyOf(m.players[f.seat!].army).soldier,
+        color: AppColors.seat(f.seat),
         height: size.height * 0.13,
       );
     }
@@ -326,10 +329,12 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                           border: Border.all(color: AppColors.seat(terr.owner).withValues(alpha: 0.8), width: 1),
                         ),
                       ),
-                      Image.asset(
-                        armyOf(m.players[terr.owner!].army).soldier,
+                      SizedBox(
                         height: soldierH,
-                        filterQuality: FilterQuality.medium,
+                        child: NeonSprite(
+                          armyOf(m.players[terr.owner!].army).soldier,
+                          color: AppColors.seat(terr.owner),
+                        ),
                       ),
                     ],
                   ),
@@ -1003,10 +1008,18 @@ Offset? marchFrom(MapTemplate template, MatchView match, Fx f, Size size) {
 /// The attacker's troops walk from their land to the target, bobbing as they go, and stop at
 /// the border (the duel decides the rest). One widget per attack, with its own short animation.
 class _MarchingTroops extends StatefulWidget {
-  const _MarchingTroops({super.key, required this.from, required this.to, required this.image, required this.height});
+  const _MarchingTroops({
+    super.key,
+    required this.from,
+    required this.to,
+    required this.image,
+    required this.color,
+    required this.height,
+  });
   final Offset from;
   final Offset to;
   final String image;
+  final Color color;
   final double height;
 
   @override
@@ -1047,7 +1060,7 @@ class _MarchingTroopsState extends State<_MarchingTroops> with SingleTickerProvi
               child: Transform(
                 alignment: Alignment.center,
                 transform: Matrix4.diagonal3Values(faceLeft ? -1 : 1, 1, 1),
-                child: Image.asset(widget.image, fit: BoxFit.contain, filterQuality: FilterQuality.medium),
+                child: NeonSprite(widget.image, color: widget.color),
               ),
             ),
           ),
@@ -1224,4 +1237,38 @@ class _AmbientPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_AmbientPainter old) => true;
+}
+
+/// The armies' paintings on the neon map: a thin outline in the owner's colour (the silhouette,
+/// tinted and drawn a little larger behind) and a slight cool grade. No blur, so it stays cheap.
+class NeonSprite extends StatelessWidget {
+  const NeonSprite(this.asset, {super.key, required this.color});
+  final String asset;
+  final Color color;
+
+  static const _cool = ColorFilter.matrix([
+    1.015, 0, 0, 0, -9.6, //
+    0, 1.08, 0, 0, -10.2,
+    0, 0, 1.04, 0, 4,
+    0, 0, 0, 1, 0,
+  ]);
+
+  @override
+  Widget build(BuildContext context) {
+    Widget img() => Image.asset(asset, fit: BoxFit.contain, filterQuality: FilterQuality.medium);
+    return Stack(
+      fit: StackFit.passthrough,
+      alignment: Alignment.center,
+      children: [
+        Transform.scale(
+          scale: 1.06,
+          child: ColorFiltered(
+            colorFilter: ColorFilter.mode(color.withValues(alpha: 0.85), BlendMode.srcIn),
+            child: img(),
+          ),
+        ),
+        ColorFiltered(colorFilter: _cool, child: img()),
+      ],
+    );
+  }
 }

@@ -634,3 +634,11 @@ they stay small and exact):
   the defence shield, falling towers (hologram block and sparks), castle banners, value tags,
   the troops' pad and the treasure chest use neon glows (stacked strokes, no blur filters)
   instead of ink outlines; cloud shadows became a faint cyan haze.
+
+## Armies fit the neon look (same art)
+- Owner: keep the soldiers and commanders, make them fit. Commander portraits are the same
+  paintings cut out of their parchment background (ISNet background-removal mask only; figure
+  pixels are the original with a slight cool grade) and set on a navy grid with a cyan rim light
+  (`tools/art/neon_commanders.py`). Soldiers, marching troops and castles on the map use
+  `NeonSprite`: a thin outline in the owner's colour (tinted silhouette behind, no blur) and a
+  slight cool grade. Portrait rings take the seat colour.

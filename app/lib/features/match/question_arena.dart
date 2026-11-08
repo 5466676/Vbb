@@ -416,8 +416,9 @@ class _Flag extends StatelessWidget {
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Colors.white,
-                    border: Border.all(color: Toon.outline, width: 2),
+                    color: Toon.paperDark,
+                    border: Border.all(color: Color.lerp(c, Colors.white, 0.3)!, width: 2),
+                    boxShadow: [BoxShadow(color: c.withValues(alpha: 0.6), blurRadius: 8)],
                   ),
                   child: ClipOval(child: Image.asset(armyOf(player.army).commander, fit: BoxFit.cover)),
                 ),

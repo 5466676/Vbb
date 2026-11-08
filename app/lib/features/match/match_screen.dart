@@ -795,8 +795,9 @@ class _TopBar extends StatelessWidget {
                     padding: const EdgeInsets.all(1.5),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white,
-                      border: Border.all(color: const Color(0xFF3FD0FF), width: 1.5),
+                      color: AppColors.panelDeep,
+                      border: Border.all(color: c, width: 1.5),
+                      boxShadow: [BoxShadow(color: c.withValues(alpha: 0.6), blurRadius: 6)],
                     ),
                     child: ClipOval(child: Image.asset(armyOf(p.army).commander, fit: BoxFit.cover)),
                   ),
