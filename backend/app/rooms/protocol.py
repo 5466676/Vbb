@@ -28,9 +28,12 @@ CLIENT_TYPES = {
     "start_match",
     "answer",
     "pick_territory",
+    "place_base",
     "choose_target",
     "use_powerup",
     "use_ability",
+    "back",
+    "emote",
 }
 
 # messages the room owner handles (the rest are handled by the connection hub)

@@ -357,3 +357,311 @@ Building needed Google's Maven Central mirror locally (Maven Central rate-limits
 
 **Not yet:** music and the commentator (lines arrive with the Gemini quota), the battle scene
 animation, marching armies, team chat, progression and gold (phase 8).
+
+## Offline play against bots (2026-11-07)
+
+Free hosts now ask for a card (Hugging Face Docker Spaces need PRO, Render asks for a card), so the
+app can also play with **no server**: `app/lib/local/` ports the engine (`engine.dart`, rule for rule
+from `core.py`) and the bots (`bots.dart`), and `LocalGame` runs a room inside the app with the same
+timers and pauses as the server's room actor. It implements the same `GameTransport` as the online
+socket and speaks the same messages, so every screen works unchanged. Questions come from the
+offline pack bundled in the app (`assets/questions/solo.json`, 435 questions); offline training uses
+it too when no server was ever reached. Tests: full bot matches for 2–8 players and teams on the
+Dart engine, a duel rule test, and a whole `LocalGame` match on a fake clock to `match_ended`.
+Checked in the browser build with no server running. Online play (with family) still needs a server:
+the home PC (`home-server.sh`) or Render.
+
+## Game look: UI kit, map, battle effects (2026-11-07)
+
+A screen-by-screen review after a full offline match found the game looked like a plain app:
+outlined Material buttons, white number pills on the map, no movement when land changed hands, a
+question scroll covering a third of the map, tools with no names. Changes, all painted in code
+(gradients and paths, no blur, no new bitmaps) so low-end phones keep up:
+
+- **UI kit** (`app/lib/app/ui_kit.dart`): `WarButton` (red wax seal for the main action, walnut
+  with a brass rim otherwise, presses in), `WoodPanel`, `ParchmentPanel`, `BannerChoice`, and
+  `RuqaaTitle` in **Aref Ruqaa** (OFL, from Google Fonts) for headings only; body text stays Cairo.
+  Home menu and the offline setup ("مجلس الحرب": bot portraits with +/−, banner choices) use it.
+  The home screen no longer shows "server off" as an error: offline play needs no server.
+- **Map** (`map_view.dart`): three layers that repaint separately — ownership (seat wash that is
+  strong at the edge, ink borders; repaints only when an owner changes), highlight (choices get
+  gold marching-ants borders and everything else dims; ticks only while something is selectable)
+  and effects. Values sit on small cloth banners in the owner's colour; bases show one tower and
+  ×N. The painting fills the space around the map, darkened, instead of black bars.
+- **Battle effects**: the controller records short `Fx` items from server events (the server
+  stays authoritative; effects are decoration only): march arrow from the attacker's nearest land
+  plus crossed swords on `target_chosen`, a flag planted with the colour spreading out and
+  "+value" on `territory_captured`, a shield glint on `territory_held`, a tower falling in dust on
+  `tower_hit`, a small flag on `territory_claimed`. A face-to-face splash with both commanders
+  opens every duel (1.7 s, does not block input).
+- **Question**: the map moves up instead of being covered; participants' portraits with a check
+  when each locks in; a brass clock that reddens and beats in the last five seconds; options
+  carry أ ب ج د seals.
+- **Players and tools**: player cards with land value, territory count, a share bar, attacker /
+  defender badges; the log has icons and a heading; tools are named medallions with a count and
+  a lock when not usable now.
+- **Results**: "نصر!" / "هزيمة", a three-step podium, counting scores, and «مباراة ثانية» for
+  offline matches (same bots and map).
+
+## Turn order on screen (2026-11-07)
+
+Players could not tell when their attack turn would come. `round_started` now carries `order`
+(this round's attackers in turn order; the rule itself is unchanged, GAME_RULES §6.2) and
+`full_state` carries `round_order`, so a reconnecting player sees it too. The match screen shows
+a strip under the phase ribbon: portraits in order, the current attacker large and glowing,
+finished turns greyed with a check, and for me «دورك بعد N أدوار» / «إنت الجاي!» (with a short
+sound when I am next). The offline engine sends the same field.
+
+## Question arena, target reveal, stage signs (2026-11-07)
+
+The owner compared the game with a commercial Arabic trivia-conquest game they enjoyed and found
+ours dull. What that genre does better, in short: the question owns the whole screen, number
+questions end in a show (arrows on a target), stage changes are announced big, the map is bright and
+clear. We keep our own theme, armies and art (nothing copied) and switch to a **bright cartoon**
+look, starting with pace:
+
+- **Question arena** (`question_arena.dart`, replaces the parchment panel): fills the battlefield;
+  players' swallow-tail flags on both sides (attacker right, defender left in duels) with answered
+  checks and rank after the reveal; category chip with an icon; chunky outlined answer buttons that
+  show who picked what after the reveal; a phone-style number pad (keyboard works too).
+- **Target reveal** for numeric questions: the correct answer sits on the bullseye and each player's
+  arrow flies in, landing at a distance from the centre on a square-root scale of the relative error,
+  with their value and time.
+- **The reveal is now actually seen**: the next stage arrived in the same batch and cleared the
+  question at once; the client now keeps a resolved question until `opens_in_ms` (the server's
+  existing reveal pause) has passed.
+- **Stage signs**: a wooden sign on chains drops for «تقاسم الأرض», «الحرب!», «الجولة N»,
+  «تعادل!» and eliminations.
+- Protocol: `question` carries `category` (not secret).
+
+## Owner's map and setup requests (2026-11-07)
+
+- **Picks grow outward (rule change, asked by the owner):** GAME_RULES §6.1.5 — with no free
+  territory next to your land, only the free territories the fewest steps away are legal (BFS over
+  the map), instead of any free territory. Python engine, Dart engine and the client highlight agree.
+- **Fixed full-screen map:** no zoom or pan. The painting is scaled so the whole land fits and the
+  sea covers as much of the screen as possible; its edges fade into a matching sea colour, so there
+  is no visible rectangle. The painting is colour-mapped to the cartoon look (bright blue sea, cream
+  land), owners' colours are stronger, borders thicker, and each territory shows its owner's troops.
+- **Players on a top strip** (the map gets the full width); the war log is a short toast plus a
+  button that opens the whole log.
+- **Power-ups only when usable now:** a small row at the bottom appears on your attack turn or in a
+  question you are answering (shield and army abilities on your turn; فتح during expansion).
+- **Question categories before the match:** a picker with the 23 categories (or all) in the
+  offline setup and before creating an online room (sent as the room's `categories` setting).
+  Offline, a category set without questions of the needed kind falls back to all categories.
+
+## Nobody just watches; both-right duels go to the tiebreak (2026-11-07)
+
+Simulated 4-player matches had ~34 attacks of which only ~6 captured, and each player sat out half
+the duels. Owner-approved rule changes (GAME_RULES §6.2):
+- **Everyone answers the duel question.** Attacker and defender decide the territory; every other
+  living player who answers correctly gets **+50 bonus points** (`bonus_points` event). The client
+  scoreboard now shows land + bonus (the server's score).
+- **Both right → tiebreak**, always (the 0.5 s speed window is gone); the closer numeric answer
+  wins. The Mongol attack-time perk now only matters as the tiebreak's time key — worth a rebalance.
+- Duels take a little longer with everyone answering, so R drops to
+  `{2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4}`; simulated means are back to ~10–11.7 min.
+- With bots captures stay rare because bots often answer wrong; with people who know the answers
+  the tiebreak rule should move the map more. Revisit after real family matches.
+
+## Calmer pace; open or fixed match length (2026-11-07)
+
+The owner found matches too fast and abrupt (sudden stage changes, questions back to back, bots
+acting instantly, land handed out by itself). Changes:
+- **Timers:** picks 5 → 10 s; choosing a target 8 → 20 s (time to think).
+- **Pauses after events:** start 3 → 4.5 s, reveal 2.5 → 4 s, claims 1.5 → 2.5 s, duels 3.5 → 4.5 s.
+- **Bots:** picks after 2.5–6 s (was 0.8–3), target after 3–8 s (was 1–3).
+- **Match length chosen before the match** (setup dialog «المدة», lobby «مدة مفتوحة», room setting
+  `length`, `MatchSettings.open_ended`):
+  - *open* (default) — no round count; ends when one player/team is left or one owns enough of the
+    map: 2/3 (4/5 head to head), easing 1.5 points per attack after the first 16, down to
+    1/(left) + 8 points; checked from round 2 (head to head: round 4). `round_started.win_share`
+    tells the client the current bar. Simulated bot matches: ~8 min (2 players) to ~25 min (8).
+  - *rounds* — the previous table `{2: 19, 3: 11, 4: 8, 5: 7, 6: 5, 7: 4, 8: 4}`; ~12–15 min at the
+    calmer pace (above the old 8–12 target, by the owner's choice of a calmer game).
+- Next in this series: army choice before an offline match, each player placing their own castle,
+  the attacker choosing the question category, marching troops.
+
+## Players place their castles (2026-11-07)
+
+The castle used to appear by itself at a fixed spot when the match began, which the owner found
+abrupt. New stage `base_placement` (GAME_RULES §6.0): in a random order each player taps a free
+territory that does not touch another castle (12 s, `place_base`); on timeout the map's suggested
+spot is used, else the legal spot farthest from the other castles (`core.auto_base`, also what bots
+do). `match_started.bases` is now empty and castles arrive as `base_placed`. The engine keeps
+`MatchSettings.choose_bases = False` by default so rule tests can set castles directly; rooms, the
+offline game and the simulation turn it on.
+
+## The attacker picks the duel's category (2026-11-07)
+
+With 20 s to choose a target, the attacker also picks the duel question's category from three
+offered (`phase_changed.categories` for `battle_target`, `choose_target.category`). The choice is
+kept by the room (not the engine — the engine stays free of question content); providers take an
+optional `category` and fall back to the room's filters when it has no question left. Bots pick
+one at random; on timeout the room's usual filters apply. Offline, the three offered are drawn
+from categories that have questions on the device.
+
+## Marching troops (2026-11-07)
+
+When a target is chosen, the attacker's soldiers walk from their nearest land toward the target
+(their own animation, mirrored to face the way they walk) while the arrow is drawn. Rooms and the
+offline game now pause 3.5 s after `target_chosen` (`MARCH_PAUSE_MS`) before the duel question,
+and the face-to-face splash is timed to end as the question arrives. Simulated lengths at this
+pace: fixed rounds ~13–18 min, open length ~8 (2 players) to ~31 min (8 players).
+
+## Atmosphere pass (2026-11-07)
+
+- **Music beds:** ElevenLabs' music API needs a paid plan, so three 22 s seamless loops were made
+  with its sound-generation API (`assets/audio/music/{menu,map,battle}.ogg`, levelled to −18 LUFS).
+  `SoundService.music()` crossfades (1.5 s) between them: menu → map (expansion) → battle; silent on
+  results. A «الموسيقى والأجواء» slider joins the effects slider. The owner picks between candidates.
+- **Living map:** drifting cloud shadows and waving banners on the castles in their own repaint
+  layer (~20 fps); the battlefield shakes on captures and falling towers; a dark vignette.
+- Settings, training and the leaderboard use a shared `GameScaffold` (painted background, wooden
+  header with a Ruqaa title).
+
+## From the comparison report: rules and fixes (2026-11-07)
+
+The owner had a local Claude play a commercial game of the genre and ours side by side and report
+(numbers measured from ~800 screenshots and the extracted sound files). Taken from it, with the
+owner's approval:
+- **Fixes:** the number pad's bottom row was outside its box on landscape phones (taps never
+  arrived): the pad now scales to fit; stage signs are sized from the screen height.
+- **Fixed rounds** `{2: 10, 3: 7, 4: 6, 5: 6, 6: 5, 7: 4, 8: 4}`; the **last round** is announced and
+  captures in it gain double (`round_started.final`, `core.is_final_round`), with its own music.
+- **Treasure:** a chest on the free territory farthest from every castle; whoever claims it gets
+  +300 and one used power-up back (`treasure_placed`, `treasure_found`).
+- **Explicit autopilot:** a person who lets the clock run out is marked `away`; a bot plays for
+  them without power-ups, the client shows «🤖 عم نلعب عنك — اكبس لترجع», and any move or `back`
+  ends it (rooms and the offline game).
+- **Sound for phone speakers:** new music beds chosen by measured energy above 300 Hz (map 42 %,
+  battle 47 %, final round 62 %, up from 3–9 %); `your_turn` regenerated as a bright horn + sword;
+  the question clock ticks every second (quiet, louder in the last five).
+- **Levantine commentator** (owner's pick, Gemini Enceladus): lines in
+  `tools/audio/commentator_shami.py`, played by `SoundService.say` on match events (frequent events
+  only sometimes; music ducks). Gemini's free tier allows 10 requests a day: 4 lines are in, the
+  scheduled task finishes the rest after the quota resets.
+- **Castles show damage:** smoke grows with each lost tower, fire at the last one; fallen castles
+  smoulder for the rest of the match. Numeric reveals hold 6.5 s and the cards carry I/II/III.
+- Late answers to a question that has just closed are ignored instead of answered with an error
+  (a normal race now that the autopilot may answer first).
+
+## Battle extras: all pick at once, king's question, streaks, underdog shield (2026-11-08)
+
+Owner-picked mechanics (GAME_RULES §6.2 "Battle extras"), behind `MatchSettings.battle_extras`
+(rooms, the offline game and the simulation turn it on; the rule tests keep the plain battle so
+they stay small and exact):
+- **Targets all at once** cuts waiting: one 20 s choosing phase per round (`battle_target` carries
+  `attackers` and per-seat `targets`), then the duels run in round order; targets that became
+  illegal are cancelled (`attack_cancelled`). Each attacker picks their own duel category.
+- **King's question 👑** (3+ players, not teams): an MCQ for all but the leader at the start of
+  every round; the fastest right answer takes 150 of the leader's points.
+- **On fire 🔥** after 3 right answers in a row: +50 on every capture until a miss.
+- **Underdog shield:** from round 2, a last player under 70 % of the leader's score gets a free
+  shield on their best land.
+
+## Emotes and a livelier scoreboard (2026-11-08)
+
+- **Emotes:** 8 faces and 4 phrases («برافو!», «يلّا!», «حظ أوفر!», «انتبه!») from a button in
+  the top strip; shown as a bubble under the player's card for ~2.6 s. Rooms relay them
+  (`emote`, at most one every 2 s per player); offline, bots react to captures now and then.
+- The player cards slide to their new place when the ranking changes, and every score change
+  floats a «+150» / «−150» over the card.
+
+## Royal-banner palette and wood & paper bar (owner's picks)
+- Seat colours are now «رايات ملكية»: deep crimson, royal blue, forest green, gold amber, then
+  purple, teal, burnt orange, iron for seats 5–8. Owned land is filled at 50% with a thin gold
+  thread (`AppColors.bannerGold`) inside the dark border.
+- Top bar: varnished plank gradient with a light top edge; player cards on paper gradient with a
+  gold thread beside the banner tab.
+- Question screen: the owner rejected the first four options; four new ones are on a picker page.
+
+## Levantine commentator complete
+- All 25 Shami lines (Gemini TTS, voice Enceladus) are in `app/assets/audio/voice/`. The last 21
+  were made in 3 batched requests (split on silences, each piece checked with speech-to-text) to
+  stay inside the free daily quota. AUDIO.md §4 now documents the Levantine set.
+
+## Neon «system window» look and a Fusha war-commander voice (owner's picks)
+- The owner chose a look inspired by glowing "system window" UIs over wood & paper, for the whole
+  game. Original design (no characters, art or names from any existing work): near-black void,
+  navy panels with 1.6px cyan edges, glow shadows and corner brackets (`AppColors.window`,
+  `WoodPanel`, `ParchmentPanel`, `WarButton` keep their names). Headings are Cairo Black with a
+  glow instead of Aref Ruqaa. Seat colours are bright neon (red, blue, green, amber, violet, cyan,
+  orange, silver).
+- Map: the painting goes through a colour matrix into a dark blue "hologram" (land a step lighter
+  than the sea); owned land is a faint fill with an inner glow and a bright edge drawn as stacked
+  strokes (no blur filters, still cached by the ownership painter's RepaintBoundary).
+- The royal-banner palette and wood & paper bar from the previous entry are superseded.
+- Commentator: all 25 lines regenerated in Modern Standard Arabic, rough war-commander style,
+  voice Enceladus (`tools/audio/commentator_fusha.py`), checked with speech-to-text. UI strings
+  stay in the current spoken style (owner's answer: Fusha for the commentator only).
+
+## War-style menu music
+- The owner wanted the opening music war-like and kept all four candidates: `music/menu_1..4.ogg`
+  (epic anthem, battle preparation, Middle Eastern war, modern hybrid war). `SoundService.music`
+  plays a multi-part track as a playlist: a random piece first, then each in turn.
+- Owner: use them in the match too. Expansion plays menu_2, menu_3 and map in turn; battle plays
+  menu_1, menu_4 and battle; the final round keeps its own bed.
+
+## Ranks E→S and levels (owner's request)
+- Cosmetic progression (GAME_RULES §9): experience 10 per finished match, +5 per right answer,
+  +30 for a win; ranks E/D/C/B/A/S at 0/200/600/1500/3500/7000; level = 1 + xp ÷ 100.
+- Server: `app/ranks.py` (pure). The hub looks a player's total up once per socket from saved
+  online matches (`db_xp_lookup`, failures never block a connection) and passes it with `join`;
+  seats carry `xp`, and `room_state` seats add `xp`, `rank`, `level`. Bots show a rank by
+  difficulty. `/me/stats` adds `xp`, `rank`, `level`. No new table: totals are linear in the
+  existing MatchResult columns.
+- App: `core/ranks.dart` mirrors the formula. The device keeps its own total (offline matches add
+  to it; online it takes the larger of the server's and its own). Rank badges in the top bar and
+  the lobby, my rank and level on the home screen, and an experience panel with «RANK UP» on the
+  results screen.
+
+## Neon sound effects
+- 17 interface and feedback sounds regenerated with ElevenLabs to match the neon look (digital
+  chimes and energy layered with war drums/horns): taps, menus, question, tick, lock, correct,
+  wrong, time up, claim, round start, your turn, power-up, and a new `rank_up`. Battle sounds
+  (swords, drums, captures per army) stay. Peaks set per role (UI −9 dB … big moments −3 dB).
+
+## Home server on Windows
+- `home-server.ps1` mirrors `home-server.sh` for Windows (venv, install, `home.env` with fresh
+  secrets, migrate, seed, one uvicorn worker in the background, Tailscale Funnel on 443), with
+  `start-server.bat` / `stop-server.bat` to double-click. Needs Python 3.12+ and Tailscale.
+  Not run on Windows yet (no PowerShell in the build container); the owner tests it first.
+
+## Neon polish of the map effects
+- Attack arrows, the crossed swords, flags, the capture effect (now with an energy shockwave),
+  the defence shield, falling towers (hologram block and sparks), castle banners, value tags,
+  the troops' pad and the treasure chest use neon glows (stacked strokes, no blur filters)
+  instead of ink outlines; cloud shadows became a faint cyan haze.
+
+## Armies fit the neon look (same art)
+- Owner: keep the soldiers and commanders, make them fit. Commander portraits are the same
+  paintings cut out of their parchment background (ISNet background-removal mask only; figure
+  pixels are the original with a slight cool grade) and set on a navy grid with a cyan rim light
+  (`tools/art/neon_commanders.py`). Soldiers, marching troops and castles on the map use
+  `NeonSprite`: a thin outline in the owner's colour (tinted silhouette behind, no blur) and a
+  slight cool grade. Portrait rings take the seat colour.
+
+## No repeats and more questions
+- Offline: `LocalGame` takes the device's set of asked question ids (`seen_questions` in
+  settings, saved when a match ends or stops), so questions do not come back until a category
+  runs out. Online rooms already avoid questions any player saw in the last 30 days.
+- 288 new checked questions in `seed/extra_bank.json`, built from compact sources in
+  `backend/scripts/qsrc/*.txt` by `scripts.build_extra_questions` (correct option moved to a
+  stable pseudo-random position; texts already in the seed are skipped — 89 were). Weak
+  categories got the most (flags, inventors, video games, brands, space, riddles, body).
+  `scripts.export_solo` rebuilds the app's offline pack from the seed's solo third and keeps
+  existing ids (531 questions now, 96 new).
+- Test fix: the leaderboard test now waits for the results sink (it is saved just after
+  `match_ended` is broadcast; the old test read too early once seeding took longer).
+
+## Smoothness and motion
+- Results screen scales down to fit a short landscape phone (no clipped buttons).
+- Short vibrations on the moments that matter (your turn, right/wrong, tower hit, elimination,
+  victory, rank up, taps) through `SoundService.play`.
+- Motion: the screen edge breathes in cyan while it is my move (`_TurnGlow`, four edge
+  gradients); a scan line sweeps across when a new stage sign drops (`_ScanWipe`); slow motes of
+  light drift over the map (`_Motes`, own repaint layer).
+- Question screen: answers slide in one after another; at the reveal the right answer pops with
+  a ring of light and my wrong pick shakes. Captures throw sparks out of the land.

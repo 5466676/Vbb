@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../app/theme.dart';
+import '../../app/ui_kit.dart';
 import '../../core/local_store.dart';
 import '../../core/sound.dart';
 import '../../core/sync_service.dart';
@@ -46,7 +49,14 @@ class _SoloScreenState extends ConsumerState<SoloScreen> {
       setState(() => _note = 'عم ننزّل أسئلة التدريب…');
       await ref.read(syncProvider).sync();
     }
-    final all = await store.questions();
+    var all = await store.questions();
+    if (all.isEmpty) {
+      // never reached a server: train on the questions bundled with the app
+      all = [
+        for (final q in jsonDecode(await rootBundle.loadString('assets/questions/solo.json')) as List)
+          (q as Map).cast<String, dynamic>(),
+      ];
+    }
     all.shuffle(Random());
     setState(() {
       _round = all.take(perRound).toList();
@@ -114,9 +124,9 @@ class _SoloScreenState extends ConsumerState<SoloScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('تدريب'), backgroundColor: AppColors.background),
-      body: Center(
+    return GameScaffold(
+      title: 'تدريب',
+      child: Center(
         child: _loading
             ? Column(
                 mainAxisSize: MainAxisSize.min,
@@ -160,15 +170,13 @@ class _SoloScreenState extends ConsumerState<SoloScreen> {
     return Container(
       constraints: const BoxConstraints(maxWidth: 760),
       padding: const EdgeInsets.fromLTRB(40, 22, 40, 18),
-      decoration: const BoxDecoration(
-        image: DecorationImage(image: AssetImage('assets/ui/question_card.webp'), fit: BoxFit.fill),
-      ),
+      decoration: AppColors.window(),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
             '${_i + 1}/${_round.length} • ${q['category']}',
-            style: const TextStyle(color: AppColors.seal, fontWeight: FontWeight.w700),
+            style: const TextStyle(color: AppColors.neon, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 6),
           Text(

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
+import '../../app/ui_kit.dart' show RankBadge;
 import '../../core/armies.dart';
 import '../game/game_controller.dart';
 import '../game/game_state.dart';
@@ -23,7 +24,11 @@ class LobbyScreen extends ConsumerWidget {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          image: DecorationImage(image: AssetImage('assets/ui/lobby/lobby_1.webp'), fit: BoxFit.cover),
+          image: DecorationImage(
+            image: AssetImage('assets/ui/lobby/lobby_1.webp'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Color(0xCC05070F), BlendMode.srcATop),
+          ),
         ),
         child: SafeArea(
           child: Padding(
@@ -187,9 +192,18 @@ class _SeatRow extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${seat.name}${isHost ? ' 👑' : ''}${seat.bot != null ? ' 🤖 ${_bot(seat.bot!)}' : ''}',
-                  style: const TextStyle(fontWeight: FontWeight.w800),
+                Row(
+                  children: [
+                    RankBadge(seat.xp, size: 17),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        '${seat.name}${isHost ? ' 👑' : ''}${seat.bot != null ? ' 🤖 ${_bot(seat.bot!)}' : ''}',
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
                 Text(army.name, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
               ],
@@ -243,6 +257,12 @@ class _HostBar extends ConsumerWidget {
               label: const Text('فرق'),
               selected: teams,
               onSelected: (v) => game.updateSettings({'mode': v ? 'teams' : 'ffa'}),
+            ),
+            FilterChip(
+              label: const Text('مدة مفتوحة'),
+              tooltip: 'بتخلص لما حدا يسيطر عالخريطة أو يبقى لحالو؛ بلاها: عدد جولات ثابت',
+              selected: (room.settings['length'] ?? 'open') == 'open',
+              onSelected: (v) => game.updateSettings({'length': v ? 'open' : 'rounds'}),
             ),
           ],
         ),

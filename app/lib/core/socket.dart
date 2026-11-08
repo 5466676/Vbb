@@ -15,9 +15,20 @@ class ServerMessage {
 
 enum SocketStatus { offline, connecting, online }
 
+/// Where the game's messages come from: the online server ([GameSocket]) or a match
+/// running inside the app against bots (LocalGame). Both speak docs/PROTOCOL.md.
+abstract class GameTransport {
+  Stream<ServerMessage> get messages;
+  Stream<SocketStatus> get statusStream;
+  SocketStatus get status;
+  Future<void> connect();
+  void send(String type, [Map<String, dynamic> payload = const {}]);
+  Future<void> close();
+}
+
 /// The game socket. Reconnects by itself with backoff; the server answers a reconnect
 /// with `full_state`, so the UI never has to replay anything.
-class GameSocket {
+class GameSocket implements GameTransport {
   GameSocket(this.api);
 
   final Api api;
@@ -30,9 +41,12 @@ class GameSocket {
   int _seq = 0;
   int _attempt = 0;
   bool _wanted = false;
+  @override
   SocketStatus status = SocketStatus.offline;
 
+  @override
   Stream<ServerMessage> get messages => _messages.stream;
+  @override
   Stream<SocketStatus> get statusStream => _status.stream;
 
   void _setStatus(SocketStatus s) {
@@ -41,6 +55,7 @@ class GameSocket {
   }
 
   /// Connect (no-op if already connected or connecting).
+  @override
   Future<void> connect() async {
     _wanted = true;
     if (status != SocketStatus.offline) return;
@@ -90,6 +105,7 @@ class GameSocket {
 
   /// Send a client message. Dropped silently while offline (the server is authoritative,
   /// and the next `full_state` brings the client back in step).
+  @override
   void send(String type, [Map<String, dynamic> payload = const {}]) {
     final ch = _ch;
     if (ch == null) return;
@@ -97,6 +113,7 @@ class GameSocket {
     ch.sink.add(jsonEncode({'type': type, 'seq': _seq, 'payload': payload}));
   }
 
+  @override
   Future<void> close() async {
     _wanted = false;
     _retry?.cancel();

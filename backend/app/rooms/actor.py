@@ -35,6 +35,7 @@ from app.engine.models import (
     Mode,
     Phase,
     PickTerritories,
+    PlaceBase,
     PlayerSetup,
     PowerUp,
     ProvideQuestion,
@@ -46,7 +47,9 @@ from app.engine.models import (
     UsePowerUp,
 )
 from app.maps import MapKind, load_template, map_for, template_id
+from app.models.question import CATEGORIES
 from app.questions.provider import ProviderFactory, QuestionProvider, SampleProvider
+from app.ranks import BOT_XP, level_of, rank_of
 from app.rooms import store
 from app.rooms.bus import Bus
 from app.rooms.store import RoomData, RoomStatus, Seat
@@ -56,10 +59,27 @@ log = logging.getLogger(__name__)
 ResultsSink = Callable[[str, RoomData], Awaitable[None]]
 
 # pauses after events so the client can animate (game ms)
-START_PAUSE_MS = 3000
-REVEAL_PAUSE_MS = 2500
-CLAIM_PAUSE_MS = 1500
-DUEL_PAUSE_MS = 3500
+START_PAUSE_MS = 4500
+REVEAL_PAUSE_MS = 4000
+NUMERIC_REVEAL_PAUSE_MS = 6500  # the arrows fly into the target one by one
+CLAIM_PAUSE_MS = 2500
+DUEL_PAUSE_MS = 4500
+BASE_PAUSE_MS = 1800  # a castle lands before the next player places theirs
+MARCH_PAUSE_MS = 3500
+EMOTES = {
+    "laugh",
+    "clap",
+    "angry",
+    "shock",
+    "strong",
+    "deal",
+    "cool",
+    "think",
+    "bravo",
+    "go",
+    "luck",
+    "watch",
+}  # the attacker's troops march to the target before the duel question
 NETWORK_SLACK_MS = 500  # extra wait before a question timeout
 ENDED_TTL_MS = 5 * 60_000
 BOT_NAMES = ["صلاح", "خالد", "طارق", "زنوبيا", "هارون", "بيبرس", "قطز", "سيف"]
@@ -100,6 +120,7 @@ class RoomActor:
         self.rnd = random.Random()
         self.task: asyncio.Task | None = None
         self._sub: int | None = None
+        self._last_emote: dict[int, int] = {}  # seat -> ms of their last emote
 
     # ------------------------------------------------------------------ lifecycle
 
@@ -255,6 +276,10 @@ class RoomActor:
                     "ready": s.ready,
                     "bot": s.bot.value if s.bot else None,
                     "connected": s.connected,
+                    "away": s.away,
+                    "xp": s.xp,
+                    "rank": rank_of(s.xp),
+                    "level": level_of(s.xp),
                 }
                 for i, s in enumerate(r.seats)
             ],
@@ -273,7 +298,9 @@ class RoomActor:
         kind = item["kind"]
         try:
             if kind == "join":
-                await self._join(pid, item.get("name", ""), item.get("army"))
+                await self._join(
+                    pid, item.get("name", ""), item.get("army"), int(item.get("xp", 0))
+                )
             elif kind == "connected":
                 await self._connected(pid, True)
             elif kind == "disconnected":
@@ -302,6 +329,12 @@ class RoomActor:
         seat = r.seat_of(pid)
         if seat is None:
             raise RoomError("not_in_room", "you are not in this room")
+        if type_ == "emote":  # a quick face or phrase for everyone (at most one every 2 s)
+            now = now_ms()
+            if p.get("id") in EMOTES and now - self._last_emote.get(seat, 0) >= 2000:
+                self._last_emote[seat] = now
+                await self._send(None, "emote", {"seat": seat, "id": p["id"]})
+            return
         if type_ == "resync":  # the client lost track: send everything again
             await self._send([pid], "full_state", self.full_state(pid))
             return
@@ -315,11 +348,38 @@ class RoomActor:
             raise RoomError("not_playing", "the match is not running")
         if r.seats[seat].left:
             raise RoomError("left", "you left this match")
-        await self._apply(self._to_action(seat, type_, p, item))
+        if r.seats[seat].away:  # any move (or "back") ends the autopilot
+            await self._set_away(seat, False)
+        if type_ == "back":
+            return
+        action = self._to_action(seat, type_, p, item)
+        if action is not None:
+            await self._apply(action)
+
+    def _owed(self) -> list[int]:
+        """Seats that still owe a move in the current phase."""
+        r = self.room
+        assert r is not None and r.match is not None
+        m = r.match
+        if m.active is not None:
+            return [s for s in m.active.participants if s not in m.active.answers]
+        if m.phase is Phase.BASE_PLACEMENT and m.placer is not None:
+            return [m.placer]
+        if m.phase is Phase.EXP_PICKS:
+            return [s for s in m.pick_quota if s not in m.picks]
+        if m.phase is Phase.BATTLE_TARGET:
+            return [x for x in m.planners if x not in m.planned]
+        return []
+
+    async def _set_away(self, seat: int, away: bool) -> None:
+        r = self.room
+        assert r is not None
+        r.seats[seat].away = away
+        await self._send(None, "autopilot", {"seat": seat, "on": away})
 
     # ------------------------------------------------------------------ lobby
 
-    async def _join(self, pid: str, name: str, army: str | None) -> None:
+    async def _join(self, pid: str, name: str, army: str | None, xp: int = 0) -> None:
         r = self.room
         assert r is not None
         seat = r.seat_of(pid)
@@ -332,7 +392,7 @@ class RoomActor:
         if len(r.seats) >= r.settings.max_players:
             raise RoomError("full", "the room is full")
         chosen = Army(army) if army in {a.value for a in Army} else self.rnd.choice(list(Army))
-        r.seats.append(Seat(player_id=pid, name=name or "لاعب", army=chosen))
+        r.seats.append(Seat(player_id=pid, name=name or "لاعب", army=chosen, xp=max(0, xp)))
         if r.host is None:
             r.host = pid
         await self.redis.set(store.k_player_room(pid), self.code)
@@ -417,7 +477,9 @@ class RoomActor:
         assert self.room is not None
         taken = {s.name for s in self.room.seats}
         name = next((n for n in BOT_NAMES if n not in taken), "بوت")
-        return Seat(name=name, army=self.rnd.choice(list(Army)), ready=True, bot=level)
+        return Seat(
+            name=name, army=self.rnd.choice(list(Army)), ready=True, bot=level, xp=BOT_XP[level]
+        )
 
     async def _start_match(self) -> None:
         r = self.room
@@ -455,7 +517,13 @@ class RoomActor:
             map_for(r.map_kind, n),
             setups,
             seed=self.rnd.getrandbits(63),
-            settings=MatchSettings(mode=r.settings.mode, battle_rounds=r.settings.battle_rounds),
+            settings=MatchSettings(
+                mode=r.settings.mode,
+                battle_rounds=r.settings.battle_rounds,
+                open_ended=r.settings.length == "open",
+                choose_bases=True,
+                battle_extras=True,
+            ),
         )
         r.status = RoomStatus.PLAYING
         r.match_uid = uuid.uuid4().hex
@@ -482,7 +550,7 @@ class RoomActor:
                     }
                     for p in r.match.players
                 ],
-                "bases": tpl["bases"],
+                "bases": [],  # players place their castles (base_placed)
             },
         )
         await self._apply(StartMatch())
@@ -521,6 +589,8 @@ class RoomActor:
         if type_ == "answer":
             aq = m.active
             if aq is None or p.get("question_id") != aq.question.id:
+                if p.get("question_id") in r.used_questions:
+                    return None  # a late answer to a question that just closed: a normal race
                 raise RoomError("no_question", "this question is not open")
             elapsed = int(item.get("elapsed_ms", 0) / self.settings.time_scale)
             if aq.question.kind is QuestionKind.MCQ:
@@ -538,7 +608,12 @@ class RoomActor:
             return PickTerritories(
                 seat=seat, territories=[int(t) for t in p.get("territories", [])]
             )
+        if type_ == "place_base":
+            return PlaceBase(seat=seat, territory=int(p.get("territory", -1)))
         if type_ == "choose_target":
+            category = p.get("category")
+            if category in r.offered_categories:
+                r.duel_categories[seat] = category
             return ChooseTarget(seat=seat, territory=int(p.get("territory", -1)))
         if type_ == "use_powerup":
             try:
@@ -565,9 +640,16 @@ class RoomActor:
         if "match_started" in types:
             pause = max(pause, START_PAUSE_MS)
         if "question_result" in types:
-            pause = max(pause, REVEAL_PAUSE_MS)
+            numeric = any(
+                e.type == "question_result" and e.data.get("answer") is not None for e in events
+            )
+            pause = max(pause, NUMERIC_REVEAL_PAUSE_MS if numeric else REVEAL_PAUSE_MS)
         if "territory_claimed" in types:
             pause = max(pause, CLAIM_PAUSE_MS)
+        if "base_placed" in types:
+            pause = max(pause, BASE_PAUSE_MS)
+        if "target_chosen" in types:
+            pause = max(pause, MARCH_PAUSE_MS)
         if "battle_result" in types or "shield_blocked" in types:
             pause = max(pause, DUEL_PAUSE_MS)
         if any(e.type == "phase_changed" for e in events):
@@ -584,6 +666,10 @@ class RoomActor:
             return
         if m.pending_question is not None and "provide" not in r.timers:
             self._schedule("provide", pause)
+        elif m.phase is Phase.BASE_PLACEMENT and f"phase:{m.phase_id}" not in r.timers:
+            self._schedule(
+                f"phase:{m.phase_id}", pause + m.settings.timers.base_ms, phase_id=m.phase_id
+            )
         elif m.phase is Phase.EXP_PICKS and f"phase:{m.phase_id}" not in r.timers:
             self._schedule(
                 f"phase:{m.phase_id}", pause + m.settings.timers.pick_ms, phase_id=m.phase_id
@@ -615,10 +701,17 @@ class RoomActor:
         data = dict(e.data)
         if e.type in ("phase_changed",):
             deadline = None
-            if data.get("phase") == Phase.EXP_PICKS.value:
+            if data.get("phase") == Phase.BASE_PLACEMENT.value:
+                deadline = r.match.settings.timers.base_ms
+            elif data.get("phase") == Phase.EXP_PICKS.value:
                 deadline = r.match.settings.timers.pick_ms
             elif data.get("phase") == Phase.BATTLE_TARGET.value:
                 deadline = r.match.settings.timers.target_ms
+                # the attacker also picks the duel's category from three (§6.2.1)
+                pool = list(r.settings.categories or CATEGORIES)
+                r.offered_categories = self.rnd.sample(pool, min(3, len(pool)))
+                r.duel_categories = {}
+                data["categories"] = r.offered_categories
             data["opens_in_ms"] = int(pause * self.settings.time_scale)
             if deadline is not None:
                 data["deadline_ms"] = int(deadline * self.settings.time_scale)
@@ -658,6 +751,7 @@ class RoomActor:
                 "kind": q.kind.value,
                 "text": q.text,
                 "unit": q.unit,
+                "category": q.category,
                 "options": [q.options[i] for i in order] if q.kind is QuestionKind.MCQ else [],
                 "participant": seat in participants,
                 "participants": aq.participants,
@@ -715,10 +809,23 @@ class RoomActor:
         if name == "provide":
             if m.pending_question is None:
                 return
-            q = await self.provider().next(m.pending_question, r.humans(), r.used_questions)
+            category = (
+                r.duel_categories.get(m.duel.attacker)
+                if m.duel is not None and m.phase in (Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK)
+                else None
+            )
+            q = await self.provider().next(
+                m.pending_question, r.humans(), r.used_questions, category
+            )
             r.used_questions.append(q.id)
             await self._apply(ProvideQuestion(question=q))
         elif name.startswith("phase:"):
+            # people who let the clock run out get the autopilot until they act again
+            if m.phase_id == data["phase_id"]:
+                for seat in self._owed():
+                    s = r.seats[seat]
+                    if s.bot is None and not s.left and s.connected and not s.away:
+                        await self._set_away(seat, True)
             await self._apply(Timeout(phase_id=data["phase_id"]))
         elif name.startswith("bot:"):
             await self._bot_act(int(data["seat"]), int(data["phase_id"]))
@@ -729,7 +836,7 @@ class RoomActor:
         s = r.seats[seat]
         if s.bot is not None:
             return s.bot
-        if s.left or not s.connected:
+        if s.left or not s.connected or s.away:
             return Difficulty.SEAT_KEEPER
         return None
 
@@ -753,10 +860,12 @@ class RoomActor:
             ):
                 limit = m.active.limits_ms[seat]
                 delay = min(limit - 200, self.rnd.randint(prof.min_ms, prof.max_ms))
+            elif m.phase is Phase.BASE_PLACEMENT and m.placer == seat:
+                delay = pause + self.rnd.randint(2500, 5000)
             elif m.phase is Phase.EXP_PICKS and seat in m.pick_quota and seat not in m.picks:
-                delay = pause + self.rnd.randint(800, 3000)
-            elif m.phase is Phase.BATTLE_TARGET and m.attacker == seat:
-                delay = pause + self.rnd.randint(1000, 3000)
+                delay = pause + self.rnd.randint(2500, 6000)
+            elif m.phase is Phase.BATTLE_TARGET and seat in m.planners and seat not in m.planned:
+                delay = pause + self.rnd.randint(3000, 8000)
             if delay is not None:
                 self._schedule(name, delay, seat=seat, phase_id=m.phase_id)
 
@@ -776,11 +885,15 @@ class RoomActor:
         if m.active is not None and seat in m.active.participants and seat not in m.active.answers:
             a = bots.answer(m.active.question, seat, m.active.limits_ms[seat], level, self.rnd)
             await self._apply(a)
+        elif m.phase is Phase.BASE_PLACEMENT and m.placer == seat:
+            await self._apply(PlaceBase(seat=seat, territory=core.auto_base(m, seat)))
         elif m.phase is Phase.EXP_PICKS and seat in m.pick_quota and seat not in m.picks:
             await self._apply(bots.picks(m, seat, m.pick_quota[seat], self.rnd))
-        elif m.phase is Phase.BATTLE_TARGET and m.attacker == seat:
+        elif m.phase is Phase.BATTLE_TARGET and seat in m.planners and seat not in m.planned:
             choice = bots.target(m, seat, level, self.rnd)
             if choice is not None:
+                if r.offered_categories:
+                    r.duel_categories[seat] = self.rnd.choice(r.offered_categories)
                 await self._apply(choice)
 
     # ------------------------------------------------------------------ full state
@@ -833,6 +946,7 @@ class RoomActor:
                 "kind": q.kind.value,
                 "text": q.text,
                 "unit": q.unit,
+                "category": q.category,
                 "options": [q.options[i] for i in order] if q.kind is QuestionKind.MCQ else [],
                 "participant": seat in aq.participants,
                 "participants": aq.participants,
@@ -855,6 +969,10 @@ class RoomActor:
             "rounds": m.battle_rounds,
             "base_towers": m.base_towers,
             "attacker": m.attacker,
+            "placer": m.placer,
+            "treasure": m.treasure,
+            "win_share": round(core.domination_share(m), 2) if m.settings.open_ended else None,
+            "round_order": m.round_order,
             "duel": m.duel.model_dump() if m.duel else None,
             "pick_quota": {str(k): v for k, v in m.pick_quota.items()},
             "your_seat": seat,

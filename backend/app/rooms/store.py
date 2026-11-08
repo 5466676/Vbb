@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import secrets
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 from redis.asyncio import Redis
@@ -66,6 +67,7 @@ class RoomSettings(BaseModel):
     battle_rounds: int | None = Field(default=None, ge=1, le=30)
     bots_allowed: bool = True
     categories: list[str] = Field(default_factory=list)  # empty = all categories
+    length: Literal["open", "rounds"] = "open"  # open: ends by domination; rounds: fixed rounds
     packs: list[str] = Field(default_factory=lambda: [GENERAL_PACK], min_length=1, max_length=5)
 
     @field_validator("categories")
@@ -94,6 +96,8 @@ class Seat(BaseModel):
     bot: Difficulty | None = None
     connected: bool = True
     left: bool = False  # left during a match: a bot keeps playing
+    away: bool = False  # missed a move: the autopilot plays (no power-ups) until they act again
+    xp: int = 0  # total experience when the seat was taken (rank and level are derived)
 
 
 class Timer(BaseModel):
@@ -118,6 +122,8 @@ class RoomData(BaseModel):
     )  # seat -> display order of MCQ options
     question_sent_ms: int | None = None
     used_questions: list[str] = Field(default_factory=list)
+    offered_categories: list[str] = Field(default_factory=list)  # the attacker's choices now
+    duel_categories: dict[int, str] = Field(default_factory=dict)  # attacker -> picked category
     timers: dict[str, Timer] = Field(default_factory=dict)
 
     def seat_of(self, pid: str) -> int | None:

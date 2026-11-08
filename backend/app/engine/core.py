@@ -15,6 +15,8 @@ from app.engine import armies as A
 from app.engine.armies import Army
 from app.engine.models import (
     DEFAULT_BATTLE_ROUNDS,
+    DOMINATION,
+    MAX_BATTLE_ROUNDS,
     Action,
     ActiveQuestion,
     Answer,
@@ -28,6 +30,7 @@ from app.engine.models import (
     Mode,
     Phase,
     PickTerritories,
+    PlaceBase,
     PlayerSetup,
     PlayerState,
     PowerUp,
@@ -48,7 +51,11 @@ class RuleError(ValueError):
     """An action that is not allowed right now. The state is left unchanged."""
 
 
-BATTLE_PHASES = (Phase.BATTLE_TARGET, Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK)
+SPECTATOR_POINTS = 50  # a right answer to someone else's duel question (§6.2.2)
+BATTLE_PHASES = (Phase.KING_QUESTION, Phase.BATTLE_TARGET, Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK)
+STREAK_FIRE = 3  # right answers in a row to be on fire
+STREAK_CAPTURE_BONUS = 50  # extra value on every capture while on fire
+KING_POINTS = 150  # the king's question: taken from the leader
 
 # ==========================================================================================
 # Creation
@@ -85,14 +92,16 @@ def create_match(
         player_states.append(
             PlayerState(seat=p.seat, name=p.name, army=p.army, team=team, is_bot=p.is_bot)
         )
-        base = territories[map_def.bases[p.seat]]
-        base.owner = p.seat
-        base.is_base = True
-        base.towers = towers
-        base.value = A.AYYUBID_BASE_VALUE if p.army is Army.AYYUBID else settings.base_value
+        if not settings.choose_bases:
+            _make_base(territories[map_def.bases[p.seat]], p.seat, p.army, towers, settings)
 
-    rounds = settings.battle_rounds or DEFAULT_BATTLE_ROUNDS[n]
+    rounds = settings.battle_rounds or (
+        MAX_BATTLE_ROUNDS if settings.open_ended else DEFAULT_BATTLE_ROUNDS[n]
+    )
     return MatchState(
+        default_bases={p.seat: map_def.bases[p.seat] for p in players}
+        if settings.choose_bases
+        else {},
         match_id=match_id,
         settings=settings,
         map_id=map_def.id,
@@ -103,6 +112,15 @@ def create_match(
         battle_rounds=rounds,
         base_towers=towers,
     )
+
+
+def _make_base(
+    t: TerritoryState, seat: int, army: Army, towers: int, settings: MatchSettings
+) -> None:
+    t.owner = seat
+    t.is_base = True
+    t.towers = towers
+    t.value = A.AYYUBID_BASE_VALUE if army is Army.AYYUBID else settings.base_value
 
 
 # ==========================================================================================
@@ -182,7 +200,28 @@ def legal_picks(state: MatchState, seat: int) -> list[int]:
     if p.army is Army.WW2 and not p.first_pick_done:
         return free
     adjacent = [t for t in free if _touches(state, seat, t)]
-    return adjacent or free
+    return adjacent or _nearest_free(state, seat, free)
+
+
+def _nearest_free(state: MatchState, seat: int, free: list[int]) -> list[int]:
+    """The free territories the fewest steps away from the seat's land (BFS over the map)."""
+    frontier = owned(state, seat)
+    if not frontier:
+        return free
+    seen = set(frontier)
+    wanted = set(free)
+    while frontier:
+        hit = sorted(t for t in frontier if t in wanted)
+        if hit:
+            return hit
+        nxt = []
+        for t in frontier:
+            for n in state.neighbors[t]:
+                if n not in seen:
+                    seen.add(n)
+                    nxt.append(n)
+        frontier = nxt
+    return free
 
 
 def legal_targets(state: MatchState, seat: int) -> list[int]:
@@ -249,7 +288,99 @@ def _on_start(state: MatchState, action: StartMatch, rng: Rng, ev: list[Event]) 
             data={"players": len(state.players), "rounds": state.battle_rounds},
         )
     )
+    if state.settings.choose_bases:
+        # §6.0: in a random order, each player places their castle
+        order = [p.seat for p in state.players]
+        rng.shuffle(order)
+        state.place_order = order
+        _next_placement(state, ev)
+        return
     _start_expansion_round(state, ev)
+
+
+# ==========================================================================================
+# Castle placement (§6.0)
+# ==========================================================================================
+
+
+def legal_bases(state: MatchState) -> list[int]:
+    """Free territories that do not touch a castle (castles keep a gap between them)."""
+    bases = {t.id for t in state.territories.values() if t.is_base}
+    return sorted(
+        t.id
+        for t in state.territories.values()
+        if t.owner is None and not any(n in bases for n in state.neighbors[t.id])
+    )
+
+
+def auto_base(state: MatchState, seat: int) -> int:
+    """The map's suggested spot if still legal, else the legal spot farthest from other castles."""
+    legal = legal_bases(state) or free_territories(state)
+    want = state.default_bases.get(seat)
+    if want in legal:
+        return want  # type: ignore[return-value]
+    bases = [t.id for t in state.territories.values() if t.is_base]
+    if not bases:
+        return legal[0]
+    dist = {b: _distances(state, b) for b in bases}
+    return max(legal, key=lambda t: (min(dist[b].get(t, 99) for b in bases), -t))
+
+
+def _distances(state: MatchState, start: int) -> dict[int, int]:
+    out = {start: 0}
+    frontier = [start]
+    while frontier:
+        nxt = []
+        for t in frontier:
+            for n in state.neighbors[t]:
+                if n not in out:
+                    out[n] = out[t] + 1
+                    nxt.append(n)
+        frontier = nxt
+    return out
+
+
+def _next_placement(state: MatchState, ev: list[Event]) -> None:
+    if not state.place_order:
+        state.placer = None
+        _start_expansion_round(state, ev)
+        return
+    state.placer = state.place_order.pop(0)
+    _set_phase(
+        state,
+        Phase.BASE_PLACEMENT,
+        ev,
+        placer=state.placer,
+        options=legal_bases(state),
+        deadline_ms=state.settings.timers.base_ms,
+    )
+
+
+def _place_base(state: MatchState, seat: int, tid: int, auto: bool, ev: list[Event]) -> None:
+    p = state.players[seat]
+    t = state.territories[tid]
+    _make_base(t, seat, p.army, state.base_towers, state.settings)
+    ev.append(
+        Event(
+            type="base_placed",
+            data={
+                "seat": seat,
+                "territory": tid,
+                "auto": auto,
+                "towers": t.towers,
+                "value": t.value,
+            },
+        )
+    )
+    _next_placement(state, ev)
+
+
+def _on_place_base(state: MatchState, action: PlaceBase, rng: Rng, ev: list[Event]) -> None:
+    if state.phase is not Phase.BASE_PLACEMENT or action.seat != state.placer:
+        raise RuleError("it is not your turn to place a castle")
+    if action.territory not in legal_bases(state):
+        raise RuleError("a castle needs a free spot that does not touch another castle")
+    _place_base(state, action.seat, action.territory, False, ev)
 
 
 def _on_provide_question(
@@ -288,6 +419,7 @@ def _on_answer(state: MatchState, action: Answer, rng: Rng, ev: list[Event]) -> 
     aq = state.active
     if aq is None or state.phase not in (
         Phase.EXP_QUESTION,
+        Phase.KING_QUESTION,
         Phase.BATTLE_DUEL,
         Phase.BATTLE_TIEBREAK,
     ):
@@ -317,19 +449,27 @@ def _on_answer(state: MatchState, action: Answer, rng: Rng, ev: list[Event]) -> 
 def _on_timeout(state: MatchState, action: Timeout, rng: Rng, ev: list[Event]) -> None:
     if action.phase_id != state.phase_id:
         return  # stale timer, ignore
-    if state.phase in (Phase.EXP_QUESTION, Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK):
+    if state.phase in (
+        Phase.EXP_QUESTION,
+        Phase.KING_QUESTION,
+        Phase.BATTLE_DUEL,
+        Phase.BATTLE_TIEBREAK,
+    ):
         if state.active is None:
             return  # the question has not been delivered yet; the room retries
         _resolve_question(state, rng, ev)
+    elif state.phase is Phase.BASE_PLACEMENT:
+        seat = state.placer
+        assert seat is not None
+        _place_base(state, seat, auto_base(state, seat), True, ev)
     elif state.phase is Phase.EXP_PICKS:
         _resolve_picks(state, rng, ev)
     elif state.phase is Phase.BATTLE_TARGET:
-        targets = legal_targets(state, state.attacker)  # type: ignore[arg-type]
-        if not targets:
-            ev.append(Event(type="turn_skipped", data={"seat": state.attacker}))
-            _next_turn(state, ev, rng)
-            return
-        _start_duel(state, rng.choice(targets), ev, rng, auto=True)
+        for seat in state.planners:  # whoever did not choose gets a random legal target
+            if seat not in state.planned:
+                state.planned[seat] = rng.choice(legal_targets(state, seat))
+                state.planned_auto.append(seat)
+        _start_duels(state, ev, rng)
 
 
 def _on_pick(state: MatchState, action: PickTerritories, rng: Rng, ev: list[Event]) -> None:
@@ -350,11 +490,16 @@ def _on_pick(state: MatchState, action: PickTerritories, rng: Rng, ev: list[Even
 
 
 def _on_choose_target(state: MatchState, action: ChooseTarget, rng: Rng, ev: list[Event]) -> None:
-    if state.phase is not Phase.BATTLE_TARGET or action.seat != state.attacker:
+    if state.phase is not Phase.BATTLE_TARGET or action.seat not in state.planners:
         raise RuleError("it is not your turn to attack")
+    if action.seat in state.planned:
+        raise RuleError("you already chose a target")
     if action.territory not in legal_targets(state, action.seat):
         raise RuleError("illegal target")
-    _start_duel(state, action.territory, ev, rng, auto=False)
+    state.planned[action.seat] = action.territory
+    ev.append(Event(type="target_locked", data={"seat": action.seat}))
+    if len(state.planned) == len(state.planners):
+        _start_duels(state, ev, rng)
 
 
 def _on_powerup(state: MatchState, action: UsePowerUp, rng: Rng, ev: list[Event]) -> None:
@@ -454,6 +599,7 @@ _HANDLERS = {
     Answer: _on_answer,
     Timeout: _on_timeout,
     PickTerritories: _on_pick,
+    PlaceBase: _on_place_base,
     ChooseTarget: _on_choose_target,
     UsePowerUp: _on_powerup,
     UseAbility: _on_ability,
@@ -465,20 +611,41 @@ _HANDLERS = {
 # ==========================================================================================
 
 
-def _record_stats(state: MatchState, aq: ActiveQuestion) -> None:
-    for seat, rec in aq.answers.items():
+def _record_stats(state: MatchState, aq: ActiveQuestion) -> list[Event]:
+    """Answer stats and streaks (§6.2.6). Returns the streak events (sent after the result)."""
+    out: list[Event] = []
+    for seat in aq.participants:
         p = state.players[seat]
-        p.answered += 1
-        p.total_answer_ms += rec.elapsed_ms
-        if is_correct(aq.question, rec):
+        rec = aq.answers.get(seat)
+        if rec is not None:
+            p.answered += 1
+            p.total_answer_ms += rec.elapsed_ms
+        right = rec is not None and _right_for(state, aq, seat, rec)
+        if right:
             p.correct += 1
+            p.streak += 1
+            if p.streak == STREAK_FIRE and state.settings.battle_extras:
+                out.append(Event(type="streak", data={"seat": seat, "count": p.streak, "on": True}))
+        else:
+            if p.streak >= STREAK_FIRE and state.settings.battle_extras:
+                out.append(Event(type="streak", data={"seat": seat, "count": 0, "on": False}))
+            p.streak = 0
+    return out
+
+
+def _right_for(state: MatchState, aq: ActiveQuestion, seat: int, rec: AnswerRecord) -> bool:
+    """MCQ: the right option. Numeric: within 10 % of the answer (or ±1 for small numbers)."""
+    if aq.question.kind is QuestionKind.MCQ:
+        return is_correct(aq.question, rec)
+    ans = float(aq.question.answer or 0.0)
+    return rec.value is not None and abs(rec.value - ans) <= max(abs(ans) * 0.1, 1.0)
 
 
 def _resolve_question(state: MatchState, rng: Rng, ev: list[Event]) -> None:
     aq = state.active
     assert aq is not None
     state.active = None
-    _record_stats(state, aq)
+    streaks = _record_stats(state, aq)
     bonus: dict[int, int] = {}
     if state.duel is not None and state.players[state.duel.attacker].army is Army.MONGOL:
         bonus[state.duel.attacker] = A.MONGOL_ATTACK_TIME_BONUS_MS
@@ -496,8 +663,15 @@ def _resolve_question(state: MatchState, rng: Rng, ev: list[Event]) -> None:
             },
         )
     )
+    ev.extend(streaks)
     if state.phase is Phase.EXP_QUESTION:
         _open_picks(state, order, ev)
+    elif state.phase is Phase.KING_QUESTION:
+        _resolve_king(state, aq, order, ev)
+        if not state.settings.battle_extras or not _open_targeting(
+            state, ev, list(state.round_order)
+        ):
+            _next_turn(state, ev, rng)
     elif state.phase is Phase.BATTLE_DUEL:
         _resolve_duel(state, aq, bonus, rng, ev)
     elif state.phase is Phase.BATTLE_TIEBREAK:
@@ -519,7 +693,39 @@ def _resolve_question(state: MatchState, rng: Rng, ev: list[Event]) -> None:
 # ==========================================================================================
 
 
+TREASURE_POINTS = 300
+
+
+def _place_treasure(state: MatchState, ev: list[Event]) -> None:
+    """§6.1.8: a chest on the free territory farthest from every castle (a race to reach it)."""
+    free = free_territories(state)
+    castles = [t.id for t in state.territories.values() if t.is_base]
+    if not free or not castles:
+        return
+    dist = {c: _distances(state, c) for c in castles}
+    state.treasure = max(free, key=lambda t: (min(dist[c].get(t, 99) for c in castles), -t))
+    ev.append(Event(type="treasure_placed", data={"territory": state.treasure}))
+
+
+def _claim_treasure(state: MatchState, seat: int, ev: list[Event]) -> None:
+    p = state.players[seat]
+    p.bonus += TREASURE_POINTS
+    refill = next((x for x in PowerUp if x not in p.powerups), None)
+    if refill is not None:
+        p.powerups.append(refill)
+    data = {
+        "seat": seat,
+        "territory": state.treasure,
+        "points": TREASURE_POINTS,
+        "powerup": refill.value if refill else None,
+    }
+    state.treasure = None
+    ev.append(Event(type="treasure_found", data=data))
+
+
 def _start_expansion_round(state: MatchState, ev: list[Event]) -> None:
+    if state.expansion_round == 0:
+        _place_treasure(state, ev)
     state.expansion_round += 1
     state.ranking = []
     state.pick_quota = {}
@@ -569,6 +775,8 @@ def _resolve_picks(state: MatchState, rng: Rng, ev: list[Event]) -> None:
                     data={"seat": seat, "territory": tid, "auto": auto, "value": t.value},
                 )
             )
+            if tid == state.treasure:
+                _claim_treasure(state, seat, ev)
     state.pick_quota = {}
     state.picks = {}
     if free_territories(state):
@@ -592,7 +800,8 @@ def _start_battle(state: MatchState, ev: list[Event], rng: Rng) -> None:
     state.first_seat = min(alive, key=lambda s: (score(state, s), s))
     state.battle_round = 0
     state.turn_queue = []
-    ev.append(Event(type="battle_started", data={"rounds": state.battle_rounds}))
+    data = {"rounds": state.battle_rounds, "open_ended": state.settings.open_ended}
+    ev.append(Event(type="battle_started", data=data))
     _next_turn(state, ev, rng)
 
 
@@ -605,46 +814,147 @@ def _build_queue(state: MatchState) -> None:
     start = (seats.index(state.first_seat) + state.battle_round - 1) % len(seats)
     order = seats[start:] + seats[:start]
     state.turn_queue = [s for s in order if not state.players[s].eliminated]
+    state.round_order = list(state.turn_queue)
 
 
 def _next_turn(state: MatchState, ev: list[Event], rng: Rng) -> None:
+    """Battle flow (§6.2): every round everyone picks a target at once, then the duels play one
+    after another in the round's order; a king's question may open the round."""
     state.duel = None
     while True:
-        if len(_alive_teams(state)) <= 1:
-            _finish(state, ev)
+        dominant = dominant_team(state)
+        if len(_alive_teams(state)) <= 1 or dominant is not None:
+            _finish(state, ev, first_team=dominant)
             return
-        seat: int | None = None
         if state.extra_turn and state.attacker is not None:
             state.extra_turn = False
             if not state.players[state.attacker].eliminated:
-                seat = state.attacker
-        if seat is None:
-            if not state.turn_queue:
-                state.battle_round += 1
-                if state.battle_round > state.battle_rounds:
-                    _finish(state, ev)
+                if _open_targeting(state, ev, [state.attacker]):
                     return
-                _build_queue(state)
-                ev.append(Event(type="round_started", data={"round": state.battle_round}))
-                continue
-            seat = state.turn_queue.pop(0)
+        if state.turn_queue and not state.duel_queue:  # one attacker at a time
+            if _open_targeting(state, ev, [state.turn_queue.pop(0)]):
+                return
+            continue
+        while state.duel_queue:
+            seat, tid, auto = state.duel_queue.pop(0)
             if state.players[seat].eliminated:
                 continue
-        targets = legal_targets(state, seat)
-        if not targets:
+            if tid not in legal_targets(state, seat):
+                ev.append(Event(type="attack_cancelled", data={"seat": seat, "territory": tid}))
+                continue
+            state.attacker = seat
+            _start_duel(state, tid, ev, rng, auto=bool(auto))
+            return
+        state.battle_round += 1
+        if state.battle_round > state.battle_rounds:
+            _finish(state, ev)
+            return
+        _build_queue(state)
+        order = list(state.round_order)
+        win = round(domination_share(state), 2) if state.settings.open_ended else None
+        data = {
+            "round": state.battle_round,
+            "order": order,
+            "win_share": win,
+            "final": is_final_round(state),
+        }
+        ev.append(Event(type="round_started", data=data))
+        _underdog_shield(state, ev)
+        if state.settings.battle_extras:
+            state.turn_queue = []
+        if _start_king_question(state, ev):
+            return
+        if state.settings.battle_extras and _open_targeting(state, ev, list(state.round_order)):
+            return
+
+
+def _open_targeting(state: MatchState, ev: list[Event], seats: list[int]) -> bool:
+    """Everyone in ``seats`` picks a target at the same time. False if nobody can attack."""
+    planners = []
+    targets: dict[str, list[int]] = {}
+    for seat in seats:
+        if state.players[seat].eliminated:
+            continue
+        legal = legal_targets(state, seat)
+        if not legal:
             ev.append(Event(type="turn_skipped", data={"seat": seat}))
             continue
-        state.attacker = seat
-        _set_phase(
-            state,
-            Phase.BATTLE_TARGET,
-            ev,
-            attacker=seat,
-            round=state.battle_round,
-            targets=targets,
-            deadline_ms=state.settings.timers.target_ms,
-        )
+        planners.append(seat)
+        targets[str(seat)] = legal
+    if not planners:
+        return False
+    state.planners = planners
+    state.planned = {}
+    state.planned_auto = []
+    state.attacker = planners[0] if len(planners) == 1 else None
+    _set_phase(
+        state,
+        Phase.BATTLE_TARGET,
+        ev,
+        round=state.battle_round,
+        attackers=planners,
+        attacker=state.attacker,
+        targets=targets,
+        deadline_ms=state.settings.timers.target_ms,
+    )
+    return True
+
+
+def _start_duels(state: MatchState, ev: list[Event], rng: Rng) -> None:
+    new = [[s, state.planned[s], int(s in state.planned_auto)] for s in state.planners]
+    state.duel_queue = new + state.duel_queue
+    state.planners = []
+    state.planned = {}
+    state.planned_auto = []
+    _next_turn(state, ev, rng)
+
+
+def _underdog_shield(state: MatchState, ev: list[Event]) -> None:
+    """§6.2.7: from round 2, a last player well behind (under 70 % of the leader's score) gets a
+    free shield on their best land."""
+    if not state.settings.battle_extras or state.battle_round < 2:
         return
+    if state.settings.mode is Mode.TEAMS:
+        return
+    alive = alive_seats(state)
+    if len(alive) < 2:
+        return
+    last = min(alive, key=lambda s: (score(state, s), -s))
+    leader = max(score(state, s) for s in alive)
+    if score(state, last) >= 0.7 * leader:
+        return  # nobody is really behind
+    mine = [t for t in state.territories.values() if t.owner == last and not t.shielded]
+    if not mine:
+        return
+    best = max(mine, key=lambda t: (not t.is_base, t.value, -t.id))
+    best.shielded = True
+    ev.append(Event(type="underdog_shield", data={"seat": last, "territory": best.id}))
+
+
+def _resolve_king(state: MatchState, aq: ActiveQuestion, order: list[int], ev: list[Event]) -> None:
+    king = state.king
+    winner = next((s for s in order if is_correct(aq.question, aq.answers.get(s))), None)
+    data = {"king": king, "winner": winner, "points": 0}
+    if winner is not None and king is not None and not state.players[king].eliminated:
+        state.players[king].bonus -= KING_POINTS
+        state.players[winner].bonus += KING_POINTS
+        data["points"] = KING_POINTS
+    state.king = None
+    ev.append(Event(type="king_result", data=data))
+
+
+def _start_king_question(state: MatchState, ev: list[Event]) -> bool:
+    """§6.2.8: a question for everyone but the leader; the fastest right answer takes points."""
+    if not state.settings.battle_extras or state.settings.mode is Mode.TEAMS:
+        return False
+    alive = alive_seats(state)
+    if len(alive) < 3:
+        return False
+    king = max(alive, key=lambda s: (score(state, s), -s))
+    state.king = king
+    _set_phase(state, Phase.KING_QUESTION, ev, king=king, points=KING_POINTS)
+    _request_question(state, QuestionKind.MCQ, [s for s in alive if s != king], ev)
+    return True
 
 
 def _start_duel(state: MatchState, tid: int, ev: list[Event], rng: Rng, auto: bool) -> None:
@@ -669,7 +979,12 @@ def _start_duel(state: MatchState, tid: int, ev: list[Event], rng: Rng, auto: bo
         _finish_turn(state, attacker_won=False, ev=ev, rng=rng)
         return
     _set_phase(state, Phase.BATTLE_DUEL, ev, attacker=attacker, defender=defender, territory=tid)
-    _request_question(state, QuestionKind.MCQ, [attacker, defender], ev)
+    # everyone still in the match answers; only the attacker and the defender decide the land,
+    # the others play for spectator points (§6.2.2)
+    watchers = [
+        p.seat for p in state.players if not p.eliminated and p.seat not in (attacker, defender)
+    ]
+    _request_question(state, QuestionKind.MCQ, [attacker, defender, *watchers], ev)
 
 
 def _resolve_duel(
@@ -681,33 +996,40 @@ def _resolve_duel(
     att, dfd = duel.attacker, duel.defender
     ra, rd = aq.answers.get(att), aq.answers.get(dfd)
     a_ok, d_ok = is_correct(q, ra), is_correct(q, rd)
+    points = {
+        s: SPECTATOR_POINTS
+        for s in aq.participants
+        if s not in (att, dfd) and is_correct(q, aq.answers.get(s))
+    }
+    for s, n in points.items():
+        state.players[s].bonus += n
+    if points:
+        ev.append(
+            Event(type="bonus_points", data={"points": {str(s): n for s, n in points.items()}})
+        )
     if a_ok and d_ok:
-        ta = ra.elapsed_ms - bonus.get(att, 0)  # type: ignore[union-attr]
-        td = rd.elapsed_ms  # type: ignore[union-attr]
-        if abs(ta - td) < state.settings.tie_window_ms:
-            pa, pd = state.players[att], state.players[dfd]
-            if pa.janissary_armed and not pd.turtle_armed:
-                pa.janissary_armed = False
-                ev.append(Event(type="tie_won_by_ability", data={"seat": att}))
-                _apply_duel_outcome(state, True, rng, ev)
-                return
-            if pd.turtle_armed and not pa.janissary_armed:
-                pd.turtle_armed = False
-                ev.append(Event(type="tie_won_by_ability", data={"seat": dfd}))
-                _apply_duel_outcome(state, False, rng, ev)
-                return
-            pa.janissary_armed = pd.turtle_armed = False
-            _set_phase(
-                state,
-                Phase.BATTLE_TIEBREAK,
-                ev,
-                attacker=att,
-                defender=dfd,
-                territory=duel.territory,
-            )
-            _request_question(state, QuestionKind.NUMERIC, [att, dfd], ev)
+        # both right: no race on speed, a numeric tiebreak decides (closest wins) — §6.2.3
+        pa, pd = state.players[att], state.players[dfd]
+        if pa.janissary_armed and not pd.turtle_armed:
+            pa.janissary_armed = False
+            ev.append(Event(type="tie_won_by_ability", data={"seat": att}))
+            _apply_duel_outcome(state, True, rng, ev)
             return
-        _apply_duel_outcome(state, ta < td, rng, ev)
+        if pd.turtle_armed and not pa.janissary_armed:
+            pd.turtle_armed = False
+            ev.append(Event(type="tie_won_by_ability", data={"seat": dfd}))
+            _apply_duel_outcome(state, False, rng, ev)
+            return
+        pa.janissary_armed = pd.turtle_armed = False
+        _set_phase(
+            state,
+            Phase.BATTLE_TIEBREAK,
+            ev,
+            attacker=att,
+            defender=dfd,
+            territory=duel.territory,
+        )
+        _request_question(state, QuestionKind.NUMERIC, [att, dfd], ev)
         return
     # The attacker must answer correctly to win (DECISIONS: phase 2).
     _apply_duel_outcome(state, a_ok, rng, ev)
@@ -747,6 +1069,10 @@ def _apply_duel_outcome(
             if att.double_armed:
                 att.double_armed = False
                 gain = s.double_gain
+            if state.settings.battle_extras and att.streak >= STREAK_FIRE:
+                gain += STREAK_CAPTURE_BONUS  # on fire (§6.2.6)
+            if is_final_round(state):
+                gain *= 2  # the last round counts double (§6.2)
             t.owner = att.seat
             t.shielded = False
             t.value += gain
@@ -823,7 +1149,39 @@ def _finish_turn(state: MatchState, attacker_won: bool, ev: list[Event], rng: Rn
 # ==========================================================================================
 
 
-def standings(state: MatchState) -> list[dict]:
+def is_final_round(state: MatchState) -> bool:
+    """The last round of a fixed-rounds match: captures count double (§6.2)."""
+    return not state.settings.open_ended and state.battle_round == state.battle_rounds
+
+
+def domination_share(state: MatchState) -> float:
+    """Share of the map that wins (§6.3): 2/3 (4/5 head to head), easing by 1.5 points every
+    attack after the first 16 attacks, down to a fair-share floor — a clear leader wins sooner,
+    a close match goes on."""
+    alive = len(_alive_teams(state))
+    start = DOMINATION if alive > 2 else 0.8
+    floor = 1 / max(alive, 1) + 0.08
+    players = sum(1 for p in state.players if not p.eliminated)
+    attacks = max(0, state.battle_round - 1) * players  # roughly: full rounds played so far
+    return max(floor, start - 0.015 * max(0, attacks - 16))
+
+
+def dominant_team(state: MatchState) -> int | None:
+    """The team owning at least DOMINATION of the map, if any (§6.3)."""
+    if not state.settings.open_ended:
+        return None
+    count: dict[int, int] = {}
+    for t in state.territories.values():
+        if t.owner is not None:
+            team = state.players[t.owner].team
+            count[team] = count.get(team, 0) + 1
+    if state.battle_round <= (3 if len(_alive_teams(state)) <= 2 else 1):
+        return None  # everyone gets some attacks first (head to head: three rounds)
+    need = domination_share(state) * len(state.territories)
+    return next((team for team, n in count.items() if n >= need), None)
+
+
+def standings(state: MatchState, first_team: int | None = None) -> list[dict]:
     rows = []
     for p in state.players:
         avg = p.total_answer_ms / p.answered if p.answered else float("inf")
@@ -851,7 +1209,8 @@ def standings(state: MatchState) -> list[dict]:
     for t in teams.values():
         t["_avg"] = t["ms"] / t["answered"] if t["answered"] else float("inf")
     team_order = sorted(
-        teams.values(), key=lambda t: (-t["score"], -t["correct"], t["_avg"], t["team"])
+        teams.values(),
+        key=lambda t: (t["team"] != first_team, -t["score"], -t["correct"], t["_avg"], t["team"]),
     )
     rank_of = {t["team"]: i for i, t in enumerate(team_order)}
     rows.sort(key=lambda r: (rank_of[r["team"]], -r["score"], -r["correct"], r["_avg"], r["seat"]))
@@ -860,8 +1219,8 @@ def standings(state: MatchState) -> list[dict]:
     return rows
 
 
-def _finish(state: MatchState, ev: list[Event]) -> None:
-    rows = standings(state)
+def _finish(state: MatchState, ev: list[Event], first_team: int | None = None) -> None:
+    rows = standings(state, first_team)
     state.winner_team = rows[0]["team"]
     state.attacker = None
     state.duel = None

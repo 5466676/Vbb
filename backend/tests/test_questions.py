@@ -207,3 +207,13 @@ def test_room_settings_validate_categories_and_packs():
         RoomSettings(categories=["فلك"])
     with pytest.raises(ValidationError):
         RoomSettings(packs=[])
+
+
+async def test_the_attackers_category_is_used_when_it_has_questions(sm):
+    p = DbProvider(sm)
+    async with sm() as s:
+        for _ in range(5):
+            q = await p.next(QuestionKind.MCQ, [], [], category="رياضة")
+            assert (await s.get(Question, int(q.id[1:]))).category == "رياضة"
+    # an unknown category falls back to the room's usual filters
+    assert (await p.next(QuestionKind.MCQ, [], [], category="لا شيء")).id

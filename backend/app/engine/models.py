@@ -16,7 +16,13 @@ from app.engine.armies import Army
 # Settings and map input
 # ------------------------------------------------------------------------------------------
 
-DEFAULT_BATTLE_ROUNDS = {2: 19, 3: 13, 4: 9, 5: 8, 6: 6, 7: 5, 8: 4}  # calibrated by simulation
+# Two match lengths, chosen before the match (owner, 2026-11-07):
+# - open: no fixed length; ends when one player/team is left or one owns DOMINATION of the map
+#   (MAX_BATTLE_ROUNDS is only a safety cap);
+# - rounds: DEFAULT_BATTLE_ROUNDS[player count] battle rounds (or the host's number).
+DEFAULT_BATTLE_ROUNDS = {2: 10, 3: 7, 4: 6, 5: 6, 6: 5, 7: 4, 8: 4}
+MAX_BATTLE_ROUNDS = 60
+DOMINATION = 2 / 3
 
 
 class Mode(StrEnum):
@@ -29,14 +35,20 @@ class Timers(BaseModel):
 
     mcq_ms: int = 10_000
     numeric_ms: int = 15_000
-    pick_ms: int = 5_000
-    target_ms: int = 8_000
+    pick_ms: int = 10_000
+    base_ms: int = 12_000  # placing your castle
+    target_ms: int = 20_000  # time to think: whom to attack and with which category
     latency_grace_ms: int = 150
 
 
 class MatchSettings(BaseModel):
     mode: Mode = Mode.FFA
-    battle_rounds: int | None = None  # None = DEFAULT_BATTLE_ROUNDS[player count]
+    open_ended: bool = True  # True: ends by domination/last one standing; False: fixed rounds
+    choose_bases: bool = False  # True: players place their castles in turn (§6.0); rooms use it
+    # rooms, the offline game and the simulation turn this on; rule tests keep the plain battle:
+    # targets picked all at once, king's question, underdog shield, streak bonus (§6.2.1, 6-8)
+    battle_extras: bool = False
+    battle_rounds: int | None = None  # None = by player count (fixed) / safety cap (open)
     tie_window_ms: int = 500
     normal_value: int = 200
     base_value: int = 1000
@@ -88,6 +100,7 @@ class Question(BaseModel):
     correct_index: int | None = None  # MCQ only
     answer: float | None = None  # numeric only
     unit: str = ""  # numeric only, e.g. "متر"
+    category: str = ""  # shown to players (not secret)
 
 
 class AnswerRecord(BaseModel):
@@ -104,8 +117,10 @@ class AnswerRecord(BaseModel):
 
 class Phase(StrEnum):
     STARTING = "starting"
+    BASE_PLACEMENT = "base_placement"
     EXP_QUESTION = "expansion_question"
     EXP_PICKS = "expansion_picks"
+    KING_QUESTION = "king_question"
     BATTLE_TARGET = "battle_target"
     BATTLE_DUEL = "battle_duel"
     BATTLE_TIEBREAK = "battle_tiebreak"
@@ -137,6 +152,7 @@ class PlayerState(BaseModel):
     connected: bool = True
     eliminated: bool = False
     bonus: int = 0
+    streak: int = 0  # right answers in a row; 3+ = on fire (§6.2.6)
     powerups: list[PowerUp] = Field(default_factory=lambda: list(PowerUp))
     ability_used: bool = False
     # pending one-shot effects
@@ -180,7 +196,12 @@ class MatchState(BaseModel):
     rng_state: int
     battle_rounds: int
     base_towers: int
+    # castle placement (§6.0)
+    default_bases: dict[int, int] = Field(default_factory=dict)  # seat -> the map's suggestion
+    place_order: list[int] = Field(default_factory=list)  # who still has to place, in order
+    placer: int | None = None
     # expansion
+    treasure: int | None = None  # the territory with the chest (§6.1.8)
     expansion_round: int = 0
     ranking: list[int] = Field(default_factory=list)
     pick_quota: dict[int, int] = Field(default_factory=dict)
@@ -188,6 +209,12 @@ class MatchState(BaseModel):
     # battle
     battle_round: int = 0
     turn_queue: list[int] = Field(default_factory=list)
+    round_order: list[int] = Field(default_factory=list)  # this round's attackers, in order
+    planners: list[int] = Field(default_factory=list)  # still choosing a target (all at once)
+    planned: dict[int, int] = Field(default_factory=dict)  # seat -> chosen target
+    planned_auto: list[int] = Field(default_factory=list)  # seats whose target was auto-picked
+    duel_queue: list[list[int]] = Field(default_factory=list)  # [attacker, territory, auto]
+    king: int | None = None  # the leader, left out of this round's king's question
     attacker: int | None = None
     duel: Duel | None = None
     extra_turn: bool = False
@@ -228,6 +255,12 @@ class PickTerritories(BaseModel):
     territories: list[int]
 
 
+class PlaceBase(BaseModel):
+    type: Literal["place_base"] = "place_base"
+    seat: int
+    territory: int
+
+
 class ChooseTarget(BaseModel):
     type: Literal["choose_target"] = "choose_target"
     seat: int
@@ -263,6 +296,7 @@ Action = Annotated[
     | ProvideQuestion
     | Answer
     | PickTerritories
+    | PlaceBase
     | ChooseTarget
     | UsePowerUp
     | UseAbility

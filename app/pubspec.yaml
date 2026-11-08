@@ -42,8 +42,15 @@ flutter:
     - assets/ui/powerups/
     - assets/ui/abilities/
     - assets/audio/sfx/
+    - assets/audio/music/
+    - assets/audio/voice/
     - assets/audio/private/
+    - assets/questions/
   fonts:
     - family: Cairo
       fonts:
         - asset: assets/fonts/Cairo-Variable.ttf
+    - family: Ruqaa
+      fonts:
+        - asset: assets/fonts/ArefRuqaa-Bold.ttf
+          weight: 700

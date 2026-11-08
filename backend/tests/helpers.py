@@ -18,6 +18,7 @@ from app.engine.models import (
     MatchState,
     Mode,
     Phase,
+    PlaceBase,
     PlayerSetup,
     ProvideQuestion,
     Question,
@@ -176,10 +177,13 @@ def types(events: list[Event]) -> list[str]:
 # Full bot match with a wall-clock model
 # ------------------------------------------------------------------------------------------
 
-REVEAL_MS = 2500  # show the correct answer and ranking
-CLAIM_ANIM_MS = 1500  # territories appear after picks
-DUEL_ANIM_MS = 3500  # army marches, battle scene
-START_MS = 3000
+REVEAL_MS = 4000  # show the correct answer and ranking
+NUMERIC_REVEAL_MS = 6500  # arrows fly into the target
+CLAIM_ANIM_MS = 2500  # territories appear after picks
+DUEL_ANIM_MS = 4500  # army marches, battle scene
+START_MS = 4500
+BASE_ANIM_MS = 1800  # a castle lands
+MARCH_MS = 3500  # troops march to the target
 
 
 @dataclass
@@ -201,8 +205,9 @@ def check_invariants(state: MatchState) -> None:
             assert not state.players[t.owner].eliminated, "eliminated players own nothing"
     if state.phase in core.BATTLE_PHASES or state.phase is Phase.RESULTS:
         assert all(t.owner is not None for t in state.territories.values())
+    placing = state.phase in (Phase.STARTING, Phase.BASE_PLACEMENT)
     for p in state.players:
-        if not p.eliminated:
+        if not p.eliminated and not placing:
             assert any(t.owner == p.seat and t.is_base for t in state.territories.values())
 
 
@@ -217,6 +222,9 @@ def play_match(
     per_player: int = 5,
     towers: int | None = None,
     map_def: MapDef | None = None,
+    open_ended: bool = True,
+    choose_bases: bool = True,
+    battle_extras: bool = True,
 ) -> SimResult:
     rnd = random.Random(seed)
     team_size = n_players // 2 if mode is Mode.TEAMS else 0
@@ -228,7 +236,14 @@ def play_match(
         map_def or grid_map(n_players, per_player),
         setups(armies, teams),
         seed=seed,
-        settings=MatchSettings(mode=mode, battle_rounds=rounds, base_towers=towers),
+        settings=MatchSettings(
+            mode=mode,
+            battle_rounds=rounds,
+            base_towers=towers,
+            open_ended=open_ended,
+            choose_bases=choose_bases,
+            battle_extras=battle_extras,
+        ),
     )
     qf = QuestionFactory(seed)
     clock = START_MS
@@ -256,6 +271,8 @@ def play_match(
         if state.phase is Phase.RESULTS:
             break
         if state.pending_question is not None:
+            if state.phase is Phase.BATTLE_DUEL:
+                clock += MARCH_MS + DUEL_ANIM_MS  # each duel: troops march, then the result
             do(ProvideQuestion(question=qf.make(state.pending_question)))
             continue
         if state.active is not None:
@@ -279,7 +296,19 @@ def play_match(
             if silent and state.phase_id == phase_id:
                 do(Timeout(phase_id=phase_id))
                 longest = max(aq.limits_ms.values())
-            clock += longest + REVEAL_MS
+            numeric = aq.question.kind is QuestionKind.NUMERIC
+            clock += longest + (NUMERIC_REVEAL_MS if numeric else REVEAL_MS)
+            continue
+        if state.phase is Phase.BASE_PLACEMENT:
+            seat = state.placer
+            assert seat is not None
+            if rnd.random() < 0.1:
+                do(Timeout(phase_id=state.phase_id))
+                clock += timers.base_ms
+            else:
+                do(PlaceBase(seat=seat, territory=core.auto_base(state, seat)))
+                clock += rnd.randint(2500, 5000)
+            clock += BASE_ANIM_MS
             continue
         if state.phase is Phase.EXP_PICKS:
             phase_id = state.phase_id
@@ -291,7 +320,7 @@ def play_match(
                 if rnd.random() < 0.05:
                     think = timers.pick_ms
                     continue
-                think = max(think, rnd.randint(800, 4000))
+                think = max(think, rnd.randint(2500, 6000))
                 do(bots.picks(state, seat, state.pick_quota.get(seat, count), rnd))
                 if state.phase_id != phase_id:
                     break
@@ -300,20 +329,25 @@ def play_match(
             clock += think + CLAIM_ANIM_MS
             continue
         if state.phase is Phase.BATTLE_TARGET:
-            seat = state.attacker
-            assert seat is not None
+            # everyone in `planners` picks at once; the duels then play one after another
             phase_id = state.phase_id
-            try_extras(seat)
-            if state.phase_id != phase_id:
-                continue
-            choice = bots.target(state, seat, diffs[seat], rnd) if rnd.random() > 0.05 else None
-            if choice is None:
-                do(Timeout(phase_id=phase_id))
-                clock += timers.target_ms
-            else:
+            think = 0
+            timed_out = False
+            for seat in list(state.planners):
+                try_extras(seat)
+                if state.phase_id != phase_id:
+                    break
+                choice = bots.target(state, seat, diffs[seat], rnd) if rnd.random() > 0.05 else None
+                if choice is None:
+                    timed_out = True
+                    continue
+                think = max(think, rnd.randint(3000, 8000))
                 do(choice)
-                clock += rnd.randint(1000, 4000)
-            clock += DUEL_ANIM_MS
+                if state.phase_id != phase_id:
+                    break
+            if state.phase_id == phase_id:
+                do(Timeout(phase_id=phase_id))
+            clock += timers.target_ms if timed_out else think
             continue
         raise AssertionError(f"stuck in phase {state.phase}")
     else:

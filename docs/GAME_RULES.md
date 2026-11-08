@@ -83,6 +83,12 @@ Every player starts **every match** with **one of each**. They cannot be bought,
 LOBBY → STARTING → EXPANSION (×N, simultaneous) → BATTLE (×R rounds, turn-based) → RESULTS
 ```
 
+### 6.0 CASTLES (القلاع) — placed by the players
+Before the expansion, in a random order, each player places their castle (base): tap any free
+territory that does not touch another castle (**12 s**). On timeout the server uses the map's
+suggested spot, or the legal spot farthest from the other castles. A castle starts with the base
+value and towers of §3.
+
 ### 6.1 EXPANSION (فتح الأراضي) — simultaneous, repeat until no free territory is left
 1. One numeric question to **all** players at the same moment.
 2. Rank everyone.
@@ -91,31 +97,41 @@ LOBBY → STARTING → EXPANSION (×N, simultaneous) → BATTLE (×R rounds, tur
 4. **Picks are simultaneous** within one **5 s** window. If two players pick the same territory,
    the better-ranked player gets it; the other gets an auto-pick.
 5. A pick must touch the player's own land if any adjacent free territory exists;
-   otherwise any free territory is allowed.
+   otherwise only the free territories **nearest** to the player's land (fewest steps across the
+   map) are allowed — players grow outward from their base, never jump across the map.
 6. On timeout (or a lost conflict) the server auto-picks a legal territory.
 7. If fewer free territories remain than picks, they are handed out in rank order.
+8. **Treasure:** when the expansion starts, a chest is placed on the free territory farthest from
+   every castle. Whoever claims it gets **+300 bonus points** and **one used power-up back**.
 
 ### 6.2 BATTLE (الحرب) — turn-based duels, R rounds
 In every round each living player (or team member) gets **one turn**. Turn order rotates:
 round 1 starts with the lowest score, and each later round starts one seat further.
 
-R *(config, draft)* by player count, chosen so a match stays near 8–12 minutes:
+**Match length is chosen before the match** (owner, 2026-11-07):
+- **Open (default):** no fixed number of rounds; the match goes on until it ends by §6.3
+  (60 rounds is only a safety cap).
+- **Rounds:** R battle rounds by player count:
 
 | Players | 2 | 3 | 4 | 5 | 6 | 7 | 8 |
 |---|---|---|---|---|---|---|---|
-| R | 19 | 13 | 9 | 8 | 6 | 5 | 4 |
+| R | 10 | 7 | 6 | 6 | 5 | 4 | 4 |
 
-(Calibrated by the phase-2 simulation. 1v1 matches often end earlier because a base falls;
-see DECISIONS.md.)
+  The **last round** is announced («الجولة الأخيرة») and every capture in it gains **double**.
 
 A turn:
-1. **Choose target (8 s):** the attacker picks one enemy territory adjacent to their land.
+1. **Choose target (20 s):** the attacker picks one enemy territory adjacent to their land, and
+   the **category** of the duel question from three offered (from the match's categories).
+   On timeout a random category is used.
    On timeout the server picks one at random. If no target exists the turn is skipped.
-2. **Duel question:** one MCQ to the **attacker and the defender only**. Everyone else watches.
+2. **Duel question:** one MCQ to **everyone still in the match**. Only the attacker and the
+   defender decide the territory; every other player who answers correctly earns **+50 bonus
+   points**, so nobody just watches.
 3. **Resolve:**
    - The attacker wins only if they **answer correctly** and rank above the defender; otherwise the
      defender holds (so both wrong, or both silent, is a hold).
-   - Both correct with an answer-time gap **< 0.5 s** → tie → one numeric tiebreak question for the two of them.
+   - **Both correct → tie** (speed does not decide) → one numeric tiebreak question for the two of
+     them; the closer answer wins (then the faster).
      In the tiebreak an exact draw (same distance, same time) or two missing answers favour the defender.
      If the attacker's الإنكشارية and the defender's السلحفاة are both armed, they cancel and the tiebreak is played.
    - Captured normal territory: changes owner, value **+100**.
@@ -124,10 +140,27 @@ A turn:
    - Defender holds: territory value **+100**.
 4. Animate (army marches, short battle scene, flag raised or tower falls), then the next turn.
 
+**Battle extras (owner, 2026-11-08; on in every real match):**
+1. **Targets all at once:** at the start of each round every living player picks a target at the
+   same time (20 s). The duels then play **one after another** in the round's order. If a target is
+   no longer legal when its duel comes up (it changed hands, the attacker lost the bordering land),
+   that attack is **cancelled**. A Mongol extra attack is chosen alone and goes first.
+6. **On fire 🔥:** three right answers in a row (a numeric answer within 10 % counts) set a player
+   on fire: every capture gains **+50** more until their next wrong or missing answer.
+7. **Underdog shield:** from round 2, if the last player has less than 70 % of the leader's score,
+   they get a free shield on their most valuable territory (not the castle if they have another).
+8. **King's question 👑:** with 3+ players (not in teams), each round opens with one MCQ for
+   everyone **except the leader**; the fastest right answer takes **150 points** from the leader.
+
 ### 6.3 Score and end of match
 - **Score = sum of owned territory values + bonus points.** In team modes the team score is the sum of its members.
-- The match ends after R battle rounds, or when only one player (or team) remains.
-- Highest score wins. Ties: most correct answers, then lowest average answer time.
+- The match ends when only one player (or team) remains; in a fixed-rounds match also after R
+  rounds; in an open match also when one player (or team) **owns enough of the map**: 2/3 of all territories (4/5 head to head). After the first 16 attacks the
+  bar eases by 1.5 points per attack (counted as full rounds × living players), down to a floor of
+  1/(players or teams left) + 8 points — a clear leader wins sooner, a close match goes on.
+  The check starts after round 1 (head to head: after round 3).
+- In an open match a dominating player (or team) wins. Otherwise the highest score wins. Ties: most correct
+  answers, then lowest average answer time.
 
 ## 7. Elimination and disconnects
 - Eliminated players become spectators and can leave without penalty.
@@ -140,3 +173,15 @@ A turn:
   with a latency grace of at most **150 ms**.
 - Late and duplicate answers are rejected.
 - A question, pick window or targeting window ends **as soon as everyone involved has acted**; the timer is only the upper bound.
+
+## 9. Ranks and levels (الرتب)
+- A **cosmetic** progression: ranks and levels never change scoring, timers or matchmaking.
+- **Experience per match:** 10 for finishing, +5 per right answer, +30 for a win (team win counts).
+  Online matches count on the server (total over saved matches). Offline matches add to the
+  player's experience on their own device only.
+- **Rank** by total experience: **E** 0 · **D** 200 · **C** 600 · **B** 1500 · **A** 3500 · **S** 7000.
+- **Level** = 1 + experience ÷ 100 (rounded down).
+- Shown next to every name in the lobby and the match; bots show a rank that matches their
+  difficulty (easy D, medium C, hard A). At the end of a match the player sees the experience
+  gained, and a «RANK UP» notice when they reach a new rank.
+

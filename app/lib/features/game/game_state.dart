@@ -10,9 +10,11 @@ class Seat {
     required this.ready,
     required this.bot,
     required this.connected,
+    this.xp = 0,
   });
   final int seat;
   final String? playerId;
+  final int xp; // total experience (rank and level are derived, GAME_RULES §9)
   final String name;
   final String army;
   final bool ready;
@@ -27,6 +29,7 @@ class Seat {
     ready: (j['ready'] ?? false) as bool,
     bot: j['bot'] as String?,
     connected: (j['connected'] ?? true) as bool,
+    xp: (j['xp'] ?? 0) as int,
   );
 }
 
@@ -96,6 +99,9 @@ class PlayerView {
   final int team;
   final bool bot;
   int score;
+  int bonus = 0; // points not tied to land (army perks, right answers to other duels)
+  bool away = false; // the autopilot is playing for them
+  int xp = 0; // total experience, for the rank badge
   bool eliminated;
   bool connected;
   bool abilityUsed;
@@ -114,8 +120,10 @@ class QuestionView {
     required this.participants,
     required this.timeMs,
     required this.receivedAt,
+    this.category = '',
   });
   final String id;
+  final String category;
   final String kind; // mcq | numeric
   final String text;
   final String unit;
@@ -140,9 +148,21 @@ class QuestionView {
 }
 
 class Ticker {
-  Ticker(this.text, this.seat);
+  Ticker(this.text, this.seat, [this.kind = 'info']);
   final String text;
   final int? seat;
+  final String kind; // info | attack | capture | held | tower | out | power | round
+  final DateTime at = DateTime.now();
+}
+
+/// One map animation: `march` (attacker → target), `capture` (flag planted, colour spreads),
+/// `held` (the defender's shield flashes), `tower` (a base tower falls), `claim` (expansion pick).
+class Fx {
+  Fx(this.kind, this.territory, {this.seat, this.value = 0});
+  final String kind;
+  final int territory;
+  final int? seat;
+  final int value;
   final DateTime at = DateTime.now();
 }
 
@@ -173,29 +193,81 @@ class MatchView {
   int expansionRound = 0;
   int battleRound = 0;
   int? attacker;
+  int? placer; // castle placement: whose turn it is
+  int? treasure; // the territory with the chest, until someone takes it
+  final Set<int> ruins = {}; // fallen castles: they smoulder on the map for the rest of the match
+  List<int> placeOptions = const [];
+  List<int> roundOrder = const []; // this battle round's attackers, in turn order
+  bool finalRound = false; // fixed-rounds matches: the last round, captures count double
+  double? winShare; // open length: owning this share of the map wins (eases over time); null = fixed rounds
+  final Set<int> turnDone = {}; // seats that already had their turn this round
   int? defender;
   int? duelTerritory;
-  List<int> targets = const [];
+  List<int> targets = const []; // my legal targets while I choose
+  List<int> attackers = const []; // who is choosing a target now
+  final Set<int> targetLocked = {}; // who already chose
+  int? king; // the king's question: the leader left out of it
+  final Set<int> onFire = {}; // 3+ right answers in a row
+  final Map<int, (String, DateTime)> emotes = {}; // seat -> last quick face/phrase and when
+  List<String> offeredCategories = const []; // the attacker picks the duel's category from these
   Map<int, int> quota = const {};
   List<int> myPicks = [];
   QuestionView? question;
   final List<Ticker> ticker = [];
   int? lastCaptured;
   int? flash; // territory to highlight briefly (claim, capture, hit)
+  final List<Fx> fx = []; // short map animations, drawn by the map's effects layer
+  // a big stage announcement ("الحرب!", "الجولة 3"…); the id changes for every new one
+  String? banner;
+  String? bannerSub;
+  int bannerId = 0;
+
+  void announce(String text, [String? sub]) {
+    banner = text;
+    bannerSub = sub;
+    bannerId++;
+  }
 
   // results
   List<Map<String, dynamic>>? standings;
   int? winnerTeam;
+  int? xpBefore; // my experience before this match (set when it ends)
+  int xpGain = 0;
 
   bool get ended => standings != null;
   PlayerView? get me => mySeat == null ? null : players[mySeat!];
-  bool get myTurn => phase == 'battle_target' && attacker != null && attacker == mySeat;
+
+  /// How many turns before mine in this round: 0 = mine now, 1 = I am next, null = not this round.
+  int? turnsUntilMine() {
+    final me = mySeat;
+    if (me == null || !roundOrder.contains(me) || turnDone.contains(me)) return null;
+    if (attacker == me && phase.startsWith('battle')) return 0;
+    final waiting = [
+      for (final s in roundOrder)
+        if (!turnDone.contains(s) && s != attacker && !players[s].eliminated) s,
+    ];
+    final i = waiting.indexOf(me);
+    return i < 0 ? null : i + 1;
+  }
+
+  /// What the scoreboard shows: land value plus bonus points (the server's score).
+  int scoreOf(int seat) =>
+      territories.values.where((t) => t.owner == seat).fold(0, (a, t) => a + t.value) + players[seat].bonus;
+
+  /// Choosing a target (everyone picks at once; I'm one of them and have not locked mine yet).
+  bool get myTurn =>
+      phase == 'battle_target' && mySeat != null && attackers.contains(mySeat) && !targetLocked.contains(mySeat);
 
   Territory terr(int id) => territories.putIfAbsent(id, () => Territory(id: id));
 
-  void log(String text, [int? seat]) {
-    ticker.insert(0, Ticker(text, seat));
+  void log(String text, [int? seat, String kind = 'info']) {
+    ticker.insert(0, Ticker(text, seat, kind));
     if (ticker.length > 30) ticker.removeLast();
+  }
+
+  void effect(Fx f) {
+    fx.add(f);
+    fx.removeWhere((e) => DateTime.now().difference(e.at) > const Duration(seconds: 4));
   }
 }
 

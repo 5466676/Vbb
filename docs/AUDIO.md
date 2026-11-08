@@ -76,7 +76,7 @@ in-match tracks so they crossfade cleanly. All instrumental, no vocals.
 
 | track | length | when |
 |---|---|---|
-| `menu` | 60–90 s loop | menus, lobby |
+| `menu_1`…`menu_4` | four 22 s war loops played in turn (random start) | menus, lobby; also in the match: expansion plays `menu_2`, `menu_3`, `map`; battle plays `menu_1`, `menu_4`, `battle` |
 | `match_calm` | 90 s loop | expansion phase |
 | `match_battle` | 90 s loop | battle phase (crossfade from calm on `battle_started`) |
 | `final_rounds` | 30–45 s loop | last two battle rounds |
@@ -85,7 +85,7 @@ in-match tracks so they crossfade cleanly. All instrumental, no vocals.
 
 Prompts (English works best in these tools; paste one per track):
 
-- **menu** — *Instrumental cinematic Middle Eastern adventure theme, oud melody, qanun, ney flute,
+- **menu** (owner's pick: all four war loops in `menu_1`…`menu_4`, ElevenLabs sound generation — epic anthem, battle preparation, Middle Eastern war, modern hybrid war; the old prompt was:) *Instrumental cinematic Middle Eastern adventure theme, oud melody, qanun, ney flute,
   soft frame drums, warm strings, majestic and inviting, 90 BPM, D Hijaz, seamless loop, no vocals.*
 - **match_calm** — *Instrumental strategy game background, light darbuka and riq rhythm, plucked oud
   ostinato, low strings, curious and focused, not distracting, 90 BPM, D Hijaz, seamless loop, no vocals.*
@@ -100,53 +100,36 @@ Send the files as they come out (WAV or MP3); they get trimmed to clean loops, l
 
 ## 4. Commentator (المعلّق)
 
-Modern Standard Arabic (understood everywhere). **Owner's pick: Gemini TTS voice Enceladus** in two
-styles — *epic* (a deep, dramatic war-movie-trailer narrator) for the big moments (start, battle
-begins, tiebreak, last round, end, winner) and *herald* (a battlefield herald shouting to the army)
-for the action (duel, capture, defence, tower, shield, elimination, army attacks). ElevenLabs voices
-and a sports-commentator style were tried and rejected. Recorded by a person, or generated with a text-to-speech tool whose terms allow
-commercial use (e.g. Google AI Studio speech generation, ElevenLabs paid plan). Each line is a
-separate file `app/assets/audio/voice/<id>.ogg`; several variants of a line are played at random.
+**Owner's pick: Modern Standard Arabic, a rough war commander, Gemini TTS voice Enceladus**: a deep,
+gravelly voice shouting short orders. It replaced the Levantine set (too soft and playful for the
+neon look). Lines and the style prompt live in `tools/audio/commentator_fusha.py`; each line is
+`app/assets/audio/voice/<id>_<n>.ogg` (mono 44.1 kHz, silence-trimmed, high-passed at 100 Hz,
+about -16 LUFS), and `SoundService.say` picks a variant at random. Generated in batches of 7 lines
+per request (the free tier allows 10 requests a day), split on silences and checked line by line
+with speech-to-text. Personal use only; a commercial release needs a TTS plan whose terms allow it,
+or a recorded voice.
 
-Style prompt for a TTS tool: *"Read in Arabic as an excited football commentator in a stadium:
-fast, loud, clear, rising at the end."*
-
-### General lines
-
-| id | line | when |
-|---|---|---|
-| `start_1` / `start_2` / `start_3` | لِتبدأِ المعركة! · استعدّوا… انطلقنا! · ليبدأ صراع العقول! | `match_started` |
-| `expansion_1` / `expansion_2` | الكلّ يتسابق على الأرض! · سؤالٌ جديد، والأرضُ للأسرع! | first `expansion_question` |
-| `battle_1` / `battle_2` | انتهى التوسّع… وبدأت الحرب! · الآن تتكلّم السيوف! | `battle_started` |
-| `duel_1` / `duel_2` | مبارزة! · وجهاً لوجه! | `battle_duel` (low) |
-| `tiebreak_1` / `tiebreak_2` | تعادل! سؤالُ الحسم! · لا غالبَ ولا مغلوب… إلى سؤال الحسم! | `battle_tiebreak` |
-| `capture_1` / `capture_2` / `capture_3` | سقطت الأرض! · احتلالٌ جديد! · ضربةٌ موفّقة! | `territory_captured` |
-| `held_1` / `held_2` / `held_3` | صمدَ المدافع! · دفاعٌ أسطوري! · ارتدّ الهجوم! | `territory_held` |
-| `tower_1` / `tower_2` | سقط برج! · القلعة تهتزّ! | `tower_hit` |
-| `shield_1` | الدرع يصدّ الهجوم! | `shield_blocked` |
-| `eliminated_1` / `eliminated_2` | خرجَ من المعركة! · سقطت القلعة… وانتهى الحلم! | `player_eliminated` (high) |
-| `last_round_1` | الجولة الأخيرة! كلّ شيءٍ ممكن! | last `round_started` (high) |
-| `comeback_1` | يا لها من عودة! | a player moves from last to first in standings (low) |
-| `end_1` / `end_2` | انتهت المعركة! · وانتهى صراع العقول! | `match_ended` (high) |
-| `you_win_1` / `you_lose_1` | النصرُ لك! · حظاً أوفر في المعركة القادمة! | results screen, my result |
-
-### Lines per army (8 armies × 2)
-
-| army | `attack_<army>` (normal, on `target_chosen`) | `win_<army>` (high, on `match_ended`) |
-|---|---|---|
-| islamic | جيشُ الفتوحات يتقدّم! | النصرُ لجيش الفتوحات! |
-| ayyubid | الأيوبيّون يهاجمون! | النصرُ للأيوبيين! |
-| crusader | الصليبيّون يزحفون! | النصرُ للصليبيين! |
-| roman | الرومانُ يتقدّمون بتشكيلهم! | النصرُ للرومان! |
-| pharaoh | جيشُ الفراعنة يهاجم! | النصرُ للفراعنة! |
-| mongol | المغولُ يجتاحون! | النصرُ للمغول! |
-| ottoman | العثمانيّون يهاجمون! | النصرُ للعثمانيين! |
-| ww2 | جيشُ الحرب العالمية يتحرّك! | النصرُ لجيش الحرب العالمية! |
-
-In team matches `win_<army>` is replaced by `team_win_1`: «الفريقُ المنتصر… يا له من تعاون!».
-
-That is 45 files in total. Generate 2–3 sample lines with a few voices first and pick the voice
-before recording the rest.
+| id | line(s) |
+|---|---|
+| `start_1`…`start_2` | لِتبدأِ المعركة! · استعدّوا… إلى القتال! |
+| `castles_1` | ابنوا قلاعَكم! |
+| `expansion_1` | تقاسموا الأرض! الأسرعُ يأخذ! |
+| `your_turn_1`…`your_turn_2` | دورُك! اختر هدفك! · هجوم! |
+| `duel_1`…`duel_2` | سيفٌ بسيف! من الأقوى؟ · أجيبوا! |
+| `capture_1`…`capture_2` | سقطتِ الأرض! · أرضٌ جديدة! |
+| `held_1`…`held_2` | صمدَ المدافع! · ارتدَّ الهجوم! |
+| `tower_1` | سقطَ برج! ضربةٌ موجعة! |
+| `last_tower_1` | آخرُ برج! احذر! |
+| `eliminated_1` | خرجَ من المعركة! |
+| `tiebreak_1` | تعادل! الحسمُ بالأرقام! |
+| `final_round_1` | الجولةُ الأخيرة! كلُّ شيءٍ ممكن! |
+| `hurry_1` | أسرِع! الوقتُ ينفد! |
+| `too_slow_1` | انتهى الوقت! |
+| `treasure_1` | وجدَ الكنز! |
+| `fastest_1` | أسرعُ جواب! |
+| `lead_1` | أنت في المقدّمة! |
+| `victory_1`…`victory_2` | نصرٌ عظيم! · ارفعوا الرايات! النصرُ لنا! |
+| `defeat_1` | هُزِمنا… لكنّ الحربَ لم تنتهِ! |
 
 ## 5. Credits
 

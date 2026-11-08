@@ -9,6 +9,8 @@ from app.engine.models import (
     AnswerRecord,
     Phase,
     PickTerritories,
+    PlaceBase,
+    PowerUp,
     ProvideQuestion,
     QuestionKind,
     StartMatch,
@@ -175,12 +177,13 @@ def test_illegal_pick_is_replaced_by_a_legal_auto_pick():
     assert all(e.data["auto"] for e in ev if e.type == "territory_claimed" and e.data["seat"] == 0)
 
 
-def test_pick_anywhere_when_no_adjacent_free_land():
+def test_pick_nearest_when_no_adjacent_free_land():
     s = started(line_map(6, [0, 5]), A2)
     s.territories[1].owner = 1  # seat 0 is boxed in
+    assert core.legal_picks(s, 0) == [2]  # two steps away; 3 and 4 are further
     answer_numeric(s, {0: 100, 1: 0})
     step(s, PickTerritories(seat=0, territories=[3]))
-    assert s.territories[3].owner == 0
+    assert s.territories[2].owner == 0  # the far pick was replaced by the nearest one
 
 
 def test_pick_timeout_auto_picks_and_expansion_repeats_until_full():
@@ -207,3 +210,39 @@ def test_no_answer_ranks_last_in_expansion():
     s = started(grid_map(3), [Army.ROMAN] * 3)
     answer_numeric(s, {1: 0, 2: 5})
     assert s.ranking[-1] == 0
+
+
+def test_players_place_their_castles_in_turn():
+    s = new_match(line_map(9, [0, 8]), A2, choose_bases=True)
+    assert not any(t.is_base for t in s.territories.values())
+    ev = step(s, StartMatch())
+    assert s.phase is Phase.BASE_PLACEMENT
+    first = s.placer
+    assert first is not None and core.legal_bases(s) == list(range(9))
+    step(s, PlaceBase(seat=first, territory=4))
+    assert s.territories[4].is_base and s.territories[4].owner == first
+    second = s.placer
+    assert second is not None and second != first
+    with pytest.raises(core.RuleError):
+        step(s, PlaceBase(seat=second, territory=5))  # touches the first castle
+    assert 3 not in core.legal_bases(s) and 5 not in core.legal_bases(s)
+    ev = step(s, Timeout(phase_id=s.phase_id))  # too slow: the map's spot, 0 or 8, is taken
+    placed = [e for e in ev if e.type == "base_placed"]
+    assert placed and placed[0].data["auto"] is True
+    assert placed[0].data["territory"] in (0, 8)
+    assert s.phase is Phase.EXP_QUESTION  # everyone has a castle: expansion starts
+    assert "phase_changed" in types(ev)
+
+
+def test_the_treasure_goes_to_whoever_claims_it():
+    s = started(line_map(7, [0, 6]), A2)
+    assert s.treasure == 3  # farthest from both castles
+    s.players[0].powerups.remove(PowerUp.HINT)
+    s.territories[1].owner = 0
+    s.territories[2].owner = 0
+    answer_numeric(s, {0: 100, 1: 0})
+    ev = step(s, PickTerritories(seat=0, territories=[3]))
+    found = [e for e in ev if e.type == "treasure_found"]
+    assert found and found[0].data["seat"] == 0 and found[0].data["powerup"] == "hint"
+    assert s.players[0].bonus >= 300 and PowerUp.HINT in s.players[0].powerups
+    assert s.treasure is None

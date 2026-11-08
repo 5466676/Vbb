@@ -1,0 +1,4130 @@
+[
+ {
+  "category": "جغرافيا",
+  "difficulty": 1,
+  "text_ar": "ما أطول نهر في قارة أفريقيا؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "الكونغو",
+   "النيجر",
+   "الزامبيزي",
+   "النيل"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "جغرافيا",
+  "difficulty": 1,
+  "text_ar": "في أي قارة تقع دولة البرازيل؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "أمريكا الشمالية",
+   "أفريقيا",
+   "أمريكا الجنوبية",
+   "أوروبا"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "أي بحر يفصل بين السعودية ومصر؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "البحر المتوسط",
+   "البحر الأحمر",
+   "بحر العرب",
+   "البحر الأسود"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "ما أعلى جبل في العالم؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "كليمنجارو",
+   "إيفرست",
+   "مون بلان",
+   "الألب"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "ما أكبر دولة عربية من حيث المساحة؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "السعودية",
+   "الجزائر",
+   "السودان",
+   "مصر"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "كم عدد القارات في العالم؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 7.0,
+  "unit_ar": "قارات"
+ },
+ {
+  "category": "جغرافيا",
+  "difficulty": 3,
+  "text_ar": "كم يبلغ ارتفاع جبل إيفرست تقريباً بالمتر؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 8849.0,
+  "unit_ar": "متر"
+ },
+ {
+  "category": "جغرافيا",
+  "difficulty": 2,
+  "text_ar": "كم عدد الدول العربية الأعضاء في جامعة الدول العربية؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 22.0,
+  "unit_ar": "دولة"
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 1,
+  "text_ar": "في أي سنة هجرية وقعت غزوة بدر؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "1 هـ",
+   "2 هـ",
+   "5 هـ",
+   "8 هـ"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "من بنى مدينة بغداد؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "هارون الرشيد",
+   "المأمون",
+   "عبد الملك بن مروان",
+   "أبو جعفر المنصور"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "من القائد الذي فتح الأندلس؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "خالد بن الوليد",
+   "صلاح الدين",
+   "طارق بن زياد",
+   "عقبة بن نافع"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "في أي معركة انتصر صلاح الدين على الصليبيين عام 1187م؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "حطين",
+   "عين جالوت",
+   "اليرموك",
+   "القادسية"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 3,
+  "text_ar": "من القائد المسلم الذي انتصر في معركة عين جالوت؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "بيبرس",
+   "قطز",
+   "صلاح الدين",
+   "نور الدين زنكي"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "من أول خليفة للمسلمين بعد النبي ﷺ؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "عمر بن الخطاب",
+   "عثمان بن عفان",
+   "علي بن أبي طالب",
+   "أبو بكر الصديق"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "ما الحضارة التي بنت الأهرامات؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "المصرية القديمة",
+   "البابلية",
+   "الرومانية",
+   "الإغريقية"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 3,
+  "text_ar": "في أي عام فتح العثمانيون القسطنطينية؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "1517",
+   "1299",
+   "1453",
+   "1389"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "من أول رجل مشى على سطح القمر؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "نيل أرمسترونغ",
+   "يوري غاغارين",
+   "باز ألدرين",
+   "مايكل كولنز"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "في أي دولة قامت الثورة الفرنسية؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "فرنسا",
+   "إنجلترا",
+   "روسيا",
+   "ألمانيا"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 3,
+  "text_ar": "من الخليفة العباسي المرتبط اسمه ببيت الحكمة في بغداد؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "المنصور",
+   "المعتصم",
+   "الواثق",
+   "المأمون"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "ما اسم السور الدفاعي الشهير في الصين؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "سور برلين",
+   "سور الصين العظيم",
+   "سور هادريان",
+   "سور القدس"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "تاريخ",
+  "difficulty": 2,
+  "text_ar": "في أي عام ميلادي كانت الهجرة النبوية تقريباً؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 622.0,
+  "unit_ar": "عام"
+ },
+ {
+  "category": "علوم",
+  "difficulty": 1,
+  "text_ar": "ما الغاز الذي نتنفسه لنعيش؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "ثاني أكسيد الكربون",
+   "النيتروجين",
+   "الأكسجين",
+   "الهيليوم"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "علوم",
+  "difficulty": 1,
+  "text_ar": "ما الرمز الكيميائي للماء؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "CO2",
+   "H2O",
+   "O2",
+   "NaCl"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "ما الوحدة التي تقاس بها شدة التيار الكهربائي؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "الفولت",
+   "الواط",
+   "الأمبير",
+   "الأوم"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "عند أي درجة مئوية يغلي الماء عند مستوى سطح البحر؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "100",
+   "90",
+   "80",
+   "120"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "ما أصلب مادة طبيعية؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "الألماس",
+   "الحديد",
+   "الغرانيت",
+   "الزجاج"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "علوم",
+  "difficulty": 3,
+  "text_ar": "ما الجسيم الذي يحمل شحنة سالبة في الذرة؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "البروتون",
+   "النيوترون",
+   "الإلكترون",
+   "الفوتون"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "ما الحالة التي يكون فيها الماء عندما يتجمد؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "سائلة",
+   "غازية",
+   "بلازما",
+   "صلبة"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "كم سرعة الضوء تقريباً بالكيلومتر في الثانية؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 300000.0,
+  "unit_ar": "كم/ث"
+ },
+ {
+  "category": "علوم",
+  "difficulty": 2,
+  "text_ar": "كم عدد العناصر في الجدول الدوري الحديث؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 118.0,
+  "unit_ar": "عنصر"
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "ما البلد الذي فاز بكأس العالم لكرة القدم 2022؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "فرنسا",
+   "البرازيل",
+   "الأرجنتين",
+   "كرواتيا"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "ما الرياضة التي يشتهر بها مايكل جوردان؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "كرة القدم",
+   "التنس",
+   "كرة السلة",
+   "الملاكمة"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "كم شوطاً في مباراة كرة القدم الرسمية؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "ثلاثة",
+   "شوطان",
+   "أربعة",
+   "شوط واحد"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي فازت بأكبر عدد من بطولات كأس العالم لكرة القدم؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "ألمانيا",
+   "إيطاليا",
+   "الأرجنتين",
+   "البرازيل"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 3,
+  "text_ar": "في أي مدينة أقيمت أول دورة ألعاب أولمبية حديثة عام 1896؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "باريس",
+   "أثينا",
+   "لندن",
+   "روما"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "ما الرياضة التي تستخدم فيها كلمة «كش ملك»؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "الشطرنج",
+   "الدومينو",
+   "الطاولة",
+   "البلياردو"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 1,
+  "text_ar": "بأي عضو يُمنع لاعب كرة القدم (غير الحارس) من لمس الكرة؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "اليد",
+   "الرأس",
+   "الصدر",
+   "الركبة"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "في أي رياضة يُستخدم المضرب والريشة؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "التنس",
+   "الاسكواش",
+   "الريشة الطائرة",
+   "كرة الطاولة"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "كم دقيقة تستغرق مباراة كرة القدم الرسمية بدون وقت إضافي؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 90.0,
+  "unit_ar": "دقيقة"
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 2,
+  "text_ar": "كم عدد حلقات شعار الألعاب الأولمبية؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 5.0,
+  "unit_ar": "حلقات"
+ },
+ {
+  "category": "رياضة",
+  "difficulty": 3,
+  "text_ar": "كم لاعباً في فريق كرة السلة داخل الملعب؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 5.0,
+  "unit_ar": "لاعبين"
+ },
+ {
+  "category": "دين إسلامي",
+  "difficulty": 1,
+  "text_ar": "ما الصلاة التي تصلى عند غروب الشمس؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "العصر",
+   "العشاء",
+   "الظهر",
+   "المغرب"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "دين إسلامي",
+  "difficulty": 2,
+  "text_ar": "ما اسم الملك الذي نزل بالوحي على النبي ﷺ؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "جبريل",
+   "ميكائيل",
+   "إسرافيل",
+   "مالك"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "دين إسلامي",
+  "difficulty": 2,
+  "text_ar": "ما السورة التي تسمى «قلب القرآن»؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "الملك",
+   "يس",
+   "الرحمن",
+   "الفاتحة"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "دين إسلامي",
+  "difficulty": 2,
+  "text_ar": "ما اسم والدة النبي ﷺ؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "حليمة السعدية",
+   "خديجة بنت خويلد",
+   "آمنة بنت وهب",
+   "فاطمة بنت أسد"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "دين إسلامي",
+  "difficulty": 3,
+  "text_ar": "في أي غار نزل الوحي أول مرة؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "غار ثور",
+   "غار حراء",
+   "غار الكهف",
+   "غار أحد"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "دين إسلامي",
+  "difficulty": 1,
+  "text_ar": "كم عدد الصلوات المفروضة في اليوم؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 5.0,
+  "unit_ar": "صلوات"
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 2,
+  "text_ar": "من يلقب بـ«أمير الشعراء»؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "أحمد شوقي",
+   "المتنبي",
+   "حافظ إبراهيم",
+   "نزار قباني"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 2,
+  "text_ar": "ما مرادف كلمة «السرور»؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "الحزن",
+   "الغضب",
+   "الفرح",
+   "الخوف"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 2,
+  "text_ar": "ما عدد حروف اللغة العربية؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "28",
+   "26",
+   "29",
+   "30"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 3,
+  "text_ar": "من مؤلف كتاب «كليلة ودمنة» بالعربية؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "الجاحظ",
+   "ابن المقفع",
+   "ابن خلدون",
+   "المعري"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 2,
+  "text_ar": "ما مفرد كلمة «أقلام»؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "قلامة",
+   "أقلم",
+   "قالم",
+   "قلم"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 3,
+  "text_ar": "من الشاعر صاحب البيت «الخيل والليل والبيداء تعرفني»؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "عنترة",
+   "امرؤ القيس",
+   "أبو تمام",
+   "المتنبي"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 2,
+  "text_ar": "ما نوع كلمة «يكتب»؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "فعل مضارع",
+   "فعل ماضٍ",
+   "فعل أمر",
+   "اسم"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 2,
+  "text_ar": "ما المؤنث من كلمة «أسد»؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "أسدة",
+   "نمرة",
+   "لبؤة",
+   "غزالة"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 3,
+  "text_ar": "من مؤلف «المقدمة» الشهيرة في علم الاجتماع؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "ابن رشد",
+   "ابن خلدون",
+   "الفارابي",
+   "ابن سينا"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "لغة وأدب",
+  "difficulty": 3,
+  "text_ar": "كم عدد بحور الشعر العربي المشهورة عند الخليل والأخفش؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 16.0,
+  "unit_ar": "بحراً"
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 1,
+  "text_ar": "ما الشركة المصنعة لهاتف آيفون؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "سامسونج",
+   "هواوي",
+   "آبل",
+   "نوكيا"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "ما معنى اختصار CPU؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "وحدة الذاكرة",
+   "بطاقة الرسوميات",
+   "مزود الطاقة",
+   "وحدة المعالجة المركزية"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "من مؤسس شركة مايكروسوفت مع بول ألين؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "ستيف جوبز",
+   "بيل غيتس",
+   "مارك زوكربيرغ",
+   "إيلون ماسك"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "ما نظام التشغيل الذي تطوره غوغل للهواتف؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "iOS",
+   "ويندوز",
+   "أندرويد",
+   "لينكس ديسكتوب"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "ما الاختصار المستخدم للشبكة اللاسلكية المنزلية؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "Wi-Fi",
+   "USB",
+   "GPS",
+   "HDMI"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 3,
+  "text_ar": "ما لغة البرمجة التي يعتمد عليها تطبيق فلاتر؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "Java",
+   "Python",
+   "Swift",
+   "Dart"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "ما الشركة التي تملك منصة يوتيوب؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "ميتا",
+   "مايكروسوفت",
+   "أمازون",
+   "غوغل"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "ما وظيفة الماوس في الحاسوب؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "جهاز إخراج",
+   "جهاز تخزين",
+   "معالج",
+   "جهاز إدخال"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 3,
+  "text_ar": "ما المقصود بـ RAM؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "ذاكرة الوصول العشوائي",
+   "القرص الصلب",
+   "المعالج",
+   "الشاشة"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "تكنولوجيا",
+  "difficulty": 2,
+  "text_ar": "كم ميغابايت في الغيغابايت الواحد (بالنظام الثنائي)؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 1024.0,
+  "unit_ar": "ميغابايت"
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 1,
+  "text_ar": "كم ناتج 7 × 8؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "54",
+   "56",
+   "58",
+   "64"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 1,
+  "text_ar": "ما الجذر التربيعي للعدد 81؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "8",
+   "9",
+   "7",
+   "11"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم عدد أضلاع الشكل السداسي؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "5",
+   "7",
+   "8",
+   "6"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "ما مجموع زوايا المثلث؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "360 درجة",
+   "180 درجة",
+   "90 درجة",
+   "270 درجة"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "ما العدد الأولي من بين الأعداد التالية؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "21",
+   "27",
+   "33",
+   "17"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم يساوي 25% من 200؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "25",
+   "40",
+   "50",
+   "75"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 3,
+  "text_ar": "ما قيمة العدد π تقريباً؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "2.71",
+   "1.61",
+   "3.14",
+   "3.41"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم ضلعاً للمثمن؟",
+  "source": "claude:batch1",
+  "type": "mcq",
+  "options_ar": [
+   "8",
+   "6",
+   "10",
+   "12"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 1,
+  "text_ar": "كم ناتج 12 × 12؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 144.0,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم ناتج 1000 ÷ 8؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 125.0,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 3,
+  "text_ar": "كم ناتج 2 أس 10؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 1024.0,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم ناتج 15 × 15؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 225.0,
+  "unit_ar": ""
+ },
+ {
+  "category": "رياضيات",
+  "difficulty": 2,
+  "text_ar": "كم عدد الدقائق في يوم كامل؟",
+  "source": "claude:batch1",
+  "type": "numeric",
+  "numeric_answer": 1440.0,
+  "unit_ar": "دقيقة"
+ },
+ {
+  "category": "ثقافة وفن",
+  "difficulty": 2,
+  "text_ar": "ما الآلة الموسيقية العربية ذات الأوتار والزند القصير التي يعزف عليها بالريشة؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الناي",
+   "الطبلة",
+   "الدف",
+   "العود"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ثقافة وفن",
+  "difficulty": 2,
+  "text_ar": "في أي مدينة يوجد متحف اللوفر؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "لندن",
+   "روما",
+   "باريس",
+   "مدريد"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ثقافة وفن",
+  "difficulty": 3,
+  "text_ar": "من المؤلف الموسيقي الذي ألّف السيمفونية التاسعة وكان أصمّ في آخر حياته؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "موتسارت",
+   "بيتهوفن",
+   "باخ",
+   "شوبان"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "ثقافة وفن",
+  "difficulty": 2,
+  "text_ar": "ما الفن الذي يعتمد على تزيين الحروف العربية؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الفسيفساء",
+   "النحت",
+   "الخط العربي",
+   "الخزف"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ثقافة وفن",
+  "difficulty": 2,
+  "text_ar": "من كاتب مسرحية «روميو وجولييت»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "موليير",
+   "تشيخوف",
+   "برنارد شو",
+   "شكسبير"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ثقافة وفن",
+  "difficulty": 3,
+  "text_ar": "ما اسم الخط العربي الذي تكتب به المصاحف غالباً؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الرقعة",
+   "الديواني",
+   "النسخ",
+   "الكوفي"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "حيوانات وطبيعة",
+  "difficulty": 2,
+  "text_ar": "ما الطائر الذي لا يطير ويعيش في القطب الجنوبي؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "البطريق",
+   "النعامة",
+   "البجع",
+   "النورس"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "حيوانات وطبيعة",
+  "difficulty": 2,
+  "text_ar": "ما الحيوان الذي يعد أطول الحيوانات قامة؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الفيل",
+   "الزرافة",
+   "الجمل",
+   "النعامة"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "حيوانات وطبيعة",
+  "difficulty": 3,
+  "text_ar": "ما الحيوان الثديي الوحيد القادر على الطيران الحقيقي؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "السنجاب الطائر",
+   "الخفاش",
+   "النعامة",
+   "الببغاء"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "حيوانات وطبيعة",
+  "difficulty": 2,
+  "text_ar": "ماذا تأكل حيوانات الباندا بشكل رئيسي؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الخيزران",
+   "السمك",
+   "العسل",
+   "اللحم"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "حيوانات وطبيعة",
+  "difficulty": 2,
+  "text_ar": "ما الشجرة التي تنتج التمر؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الزيتونة",
+   "النخلة",
+   "التينة",
+   "السدرة"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "سوريا وبلاد الشام",
+  "difficulty": 2,
+  "text_ar": "ما المدينة السورية المشهورة بقلعتها الكبيرة وصابونها؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "حماة",
+   "درعا",
+   "حلب",
+   "طرطوس"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "سوريا وبلاد الشام",
+  "difficulty": 2,
+  "text_ar": "ما المدينة السورية المشهورة بالنواعير؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "حمص",
+   "حماة",
+   "إدلب",
+   "دير الزور"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "سوريا وبلاد الشام",
+  "difficulty": 2,
+  "text_ar": "ما اسم المسجد الشهير في دمشق الذي بناه الوليد بن عبد الملك؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "جامع خالد بن الوليد",
+   "الجامع الكبير",
+   "جامع التكية",
+   "الجامع الأموي"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "سوريا وبلاد الشام",
+  "difficulty": 2,
+  "text_ar": "على أي بحر تطل اللاذقية؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "البحر الأحمر",
+   "البحر المتوسط",
+   "البحر الميت",
+   "بحر قزوين"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "سوريا وبلاد الشام",
+  "difficulty": 3,
+  "text_ar": "ما المدينة الأثرية السورية التي حكمتها الملكة زنوبيا؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "بصرى",
+   "تدمر",
+   "أفاميا",
+   "إيبلا"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "سوريا وبلاد الشام",
+  "difficulty": 2,
+  "text_ar": "ما المدينة الفلسطينية التي يقع فيها المسجد الأقصى؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "غزة",
+   "القدس",
+   "نابلس",
+   "الخليل"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "سوريا وبلاد الشام",
+  "difficulty": 2,
+  "text_ar": "ما أطول نهر يمر في سوريا؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "العاصي",
+   "بردى",
+   "الخابور",
+   "الفرات"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "سوريا وبلاد الشام",
+  "difficulty": 2,
+  "text_ar": "ما النهر الذي يمر في دمشق؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "العاصي",
+   "الفرات",
+   "بردى",
+   "الليطاني"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أفلام وكرتون",
+  "difficulty": 1,
+  "text_ar": "ما اسم الفأر الشهير في أفلام والت ديزني؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "جيري",
+   "سبيدي",
+   "ميكي ماوس",
+   "ستيوارت"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أفلام وكرتون",
+  "difficulty": 1,
+  "text_ar": "ما اسم صديق «توم» في الكرتون الشهير؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "جيري",
+   "سبايك",
+   "ميكي",
+   "بلوتو"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أفلام وكرتون",
+  "difficulty": 2,
+  "text_ar": "في كرتون «كابتن ماجد»، ما الرياضة التي يلعبها ماجد؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "كرة السلة",
+   "التنس",
+   "البيسبول",
+   "كرة القدم"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أفلام وكرتون",
+  "difficulty": 2,
+  "text_ar": "ما اسم الأسد بطل فيلم «الأسد الملك»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "موفاسا",
+   "سكار",
+   "نالا",
+   "سيمبا"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أفلام وكرتون",
+  "difficulty": 2,
+  "text_ar": "ما لون الكائنات الصغيرة في كرتون «السنافر»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "أخضر",
+   "أصفر",
+   "أزرق",
+   "أحمر"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أفلام وكرتون",
+  "difficulty": 2,
+  "text_ar": "ما اسم الرجل الأخضر الضخم في فيلم ديزني الشهير؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "هالك",
+   "شريك",
+   "غرينش",
+   "يودا"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أفلام وكرتون",
+  "difficulty": 2,
+  "text_ar": "ما اسم المحقق الصغير في الأنمي الشهير «المحقق كونان»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "ران",
+   "كوغورو",
+   "هيجي",
+   "كونان"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أفلام وكرتون",
+  "difficulty": 3,
+  "text_ar": "في فيلم «Finding Nemo»، ما نوع السمكة نيمو؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "سمكة القرش",
+   "سمكة المهرج",
+   "سمكة السلمون",
+   "سمكة التونة"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أفلام وكرتون",
+  "difficulty": 2,
+  "text_ar": "ما اسم الشخصية التي تنمو أنفها عندما تكذب؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "بيتر بان",
+   "علاء الدين",
+   "بامبي",
+   "بينوكيو"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أكل وطبخ",
+  "difficulty": 1,
+  "text_ar": "ما المكون الرئيسي في طبق الحمص بالطحينة؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الفول",
+   "العدس",
+   "الحمص",
+   "الفاصولياء"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أكل وطبخ",
+  "difficulty": 2,
+  "text_ar": "من أي بلد يأتي طبق «السوشي»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الصين",
+   "تايلاند",
+   "كوريا",
+   "اليابان"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أكل وطبخ",
+  "difficulty": 2,
+  "text_ar": "من أي بلد تأتي «البيتزا» أصلاً؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "أمريكا",
+   "إيطاليا",
+   "فرنسا",
+   "اليونان"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أكل وطبخ",
+  "difficulty": 2,
+  "text_ar": "ما الحبوب التي يصنع منها البرغل؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "القمح",
+   "الأرز",
+   "الذرة",
+   "الشعير"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أكل وطبخ",
+  "difficulty": 2,
+  "text_ar": "ما الخضار الأساسية في طبق «المسقعة»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الكوسا",
+   "البطاطا",
+   "الملفوف",
+   "الباذنجان"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أكل وطبخ",
+  "difficulty": 2,
+  "text_ar": "ما الطبق الشامي المصنوع من البرغل والبقدونس والبندورة؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "التبولة",
+   "الفتوش",
+   "الكبة",
+   "المجدرة"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أكل وطبخ",
+  "difficulty": 2,
+  "text_ar": "ما المكون الرئيسي في طبق «المجدرة» مع البرغل أو الرز؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الحمص",
+   "الفول",
+   "العدس",
+   "البازلاء"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أكل وطبخ",
+  "difficulty": 3,
+  "text_ar": "ما التابل الذي يعطي الأرز لوناً أصفر ويعد أغلى التوابل؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الزعفران",
+   "الكركم",
+   "الكمون",
+   "القرفة"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 1,
+  "text_ar": "ما أكبر كوكب في المجموعة الشمسية؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "زحل",
+   "الأرض",
+   "المشتري",
+   "نبتون"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 1,
+  "text_ar": "ما الكوكب الملقب بـ«الكوكب الأحمر»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الزهرة",
+   "المريخ",
+   "عطارد",
+   "المشتري"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما الكوكب المشهور بحلقاته الواضحة؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "أورانوس",
+   "المريخ",
+   "زحل",
+   "الأرض"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما اسم أول إنسان سافر إلى الفضاء؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "نيل أرمسترونغ",
+   "جون غلين",
+   "فالنتينا تيريشكوفا",
+   "يوري غاغارين"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما اسم المجرة التي نعيش فيها؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "أندروميدا",
+   "درب التبانة",
+   "المثلث",
+   "الدب الأكبر"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "كم يوماً تقريباً تحتاج الأرض لتدور حول الشمس؟",
+  "source": "claude:batch2",
+  "type": "numeric",
+  "numeric_answer": 365.0,
+  "unit_ar": "يوماً"
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 3,
+  "text_ar": "كم دقيقة تقريباً يحتاج ضوء الشمس ليصل إلى الأرض؟",
+  "source": "claude:batch2",
+  "type": "numeric",
+  "numeric_answer": 8.0,
+  "unit_ar": "دقائق"
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 1,
+  "text_ar": "كم يوماً في الأسبوع؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "5",
+   "6",
+   "7",
+   "8"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 1,
+  "text_ar": "ما لون الإشارة الضوئية التي تعني «قف»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الأحمر",
+   "الأخضر",
+   "الأصفر",
+   "الأزرق"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "كم شهراً في السنة يحتوي على 31 يوماً؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "7",
+   "6",
+   "5",
+   "8"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "ما العملة الرسمية في اليابان؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الين",
+   "اليوان",
+   "الوون",
+   "الروبية"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "كم ضلعاً للمربع؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "3",
+   "4",
+   "5",
+   "6"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "ما العملة الرسمية في بريطانيا؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "اليورو",
+   "الجنيه الإسترليني",
+   "الدولار",
+   "الفرنك"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "في أي شهر ميلادي يكون أقصر عدد أيام؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "نيسان",
+   "حزيران",
+   "شباط",
+   "أيلول"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 1,
+  "text_ar": "كم ساعة في اليوم؟",
+  "source": "claude:batch2",
+  "type": "numeric",
+  "numeric_answer": 24.0,
+  "unit_ar": "ساعة"
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "كم سنة في القرن؟",
+  "source": "claude:batch2",
+  "type": "numeric",
+  "numeric_answer": 100.0,
+  "unit_ar": "سنة"
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «العلم في الصغر كالنقش على...»",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الماء",
+   "الرمل",
+   "الحجر",
+   "الورق"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "إنجليزي",
+  "difficulty": 1,
+  "text_ar": "ما معنى كلمة «Apple» بالعربية؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "برتقالة",
+   "موزة",
+   "تفاحة",
+   "عنب"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "إنجليزي",
+  "difficulty": 1,
+  "text_ar": "ما معنى كلمة «Book»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "قلم",
+   "كتاب",
+   "دفتر",
+   "مكتبة"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "إنجليزي",
+  "difficulty": 2,
+  "text_ar": "ما ضد كلمة «Hot»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "Warm",
+   "Cold",
+   "Big",
+   "Fast"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "إنجليزي",
+  "difficulty": 2,
+  "text_ar": "ما الماضي من الفعل «Go»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "Goed",
+   "Went",
+   "Gone",
+   "Going"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "إنجليزي",
+  "difficulty": 2,
+  "text_ar": "ما معنى كلمة «Thursday»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الثلاثاء",
+   "الأربعاء",
+   "الجمعة",
+   "الخميس"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "إنجليزي",
+  "difficulty": 3,
+  "text_ar": "ما الماضي من الفعل «Buy»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "Bought",
+   "Buyed",
+   "Brought",
+   "Buied"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على ورقة القيقب الحمراء؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "كندا",
+   "سويسرا",
+   "اليابان",
+   "تركيا"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على دائرة حمراء في وسط أبيض؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "كوريا الجنوبية",
+   "الصين",
+   "بنغلادش",
+   "اليابان"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على شجرة الأرز؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "سوريا",
+   "الأردن",
+   "لبنان",
+   "قبرص"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على هلال ونجمة أبيضين على خلفية حمراء؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "تونس",
+   "الجزائر",
+   "باكستان",
+   "تركيا"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 3,
+  "text_ar": "ما الدولة التي يحتوي علمها على نجمة داوود؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "اليونان",
+   "إسرائيل",
+   "إثيوبيا",
+   "المغرب"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي علمها أخضر بالكامل مع عبارة التوحيد وسيف؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "باكستان",
+   "ليبيا",
+   "إيران",
+   "السعودية"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما ألوان علم فرنسا؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "أخضر وأبيض وأحمر",
+   "أسود وأحمر وأصفر",
+   "أحمر وأبيض",
+   "أزرق وأبيض وأحمر"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحمل علمها نجمة خماسية خضراء على خلفية حمراء؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "تونس",
+   "فيتنام",
+   "الصين",
+   "المغرب"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 1,
+  "text_ar": "من اخترع المصباح الكهربائي المتوهج العملي؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "نيكولا تسلا",
+   "غراهام بيل",
+   "ماركوني",
+   "توماس إديسون"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من اخترع الهاتف؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "إديسون",
+   "ماركوني",
+   "فاراداي",
+   "غراهام بيل"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من العالم الذي اكتشف قانون الجاذبية بعد سقوط التفاحة كما تروي القصة؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "غاليليو",
+   "أينشتاين",
+   "كبلر",
+   "إسحاق نيوتن"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من العالم المسلم الملقب بـ«أبو الجبر»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "ابن سينا",
+   "البيروني",
+   "الخوارزمي",
+   "ابن الهيثم"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من مؤلف كتاب «القانون في الطب»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الرازي",
+   "ابن النفيس",
+   "الزهراوي",
+   "ابن سينا"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 3,
+  "text_ar": "من العالم المسلم الذي يعد رائد علم البصريات؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "جابر بن حيان",
+   "الكندي",
+   "الفارابي",
+   "ابن الهيثم"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من صنع أول طائرة ناجحة بمحرك؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الأخوان رايت",
+   "إديسون",
+   "عباس بن فرناس",
+   "دافنشي"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 3,
+  "text_ar": "ما الجنسية الأصلية للعالمة ماري كوري؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "بولندية",
+   "فرنسية",
+   "ألمانية",
+   "روسية"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 1,
+  "text_ar": "ما اسم السباك الشهير في ألعاب نينتندو؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "سونيك",
+   "ماريو",
+   "لينك",
+   "كيربي"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما لون القنفذ «سونيك»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "أحمر",
+   "أخضر",
+   "أزرق",
+   "أصفر"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "في لعبة «ماينكرافت»، ما الكائن الأخضر الذي ينفجر؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "زومبي",
+   "إندرمان",
+   "كريبر",
+   "سكيليتون"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما اسم البطل في سلسلة «The Legend of Zelda»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "زيلدا",
+   "غانون",
+   "لينك",
+   "ماريو"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما اللعبة التي تعتمد على ترتيب قطع متساقطة لإكمال الصفوف؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "باك مان",
+   "تتريس",
+   "سنيك",
+   "بونغ"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 3,
+  "text_ar": "ما لون شخصية «باك مان»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "أحمر",
+   "أصفر",
+   "أزرق",
+   "أخضر"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة الألمانية المصنعة لسيارات «الخنفساء»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "فولكس فاغن",
+   "مرسيدس",
+   "بي إم دبليو",
+   "أودي"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "من أي بلد شركة سامسونج؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "اليابان",
+   "الصين",
+   "كوريا الجنوبية",
+   "تايوان"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة التي شعارها علامة «صح» المعقوفة؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "أديداس",
+   "بوما",
+   "نايكي",
+   "ريبوك"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما البلد الأصلي لشركة إيكيا للأثاث؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الدنمارك",
+   "ألمانيا",
+   "هولندا",
+   "السويد"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة التي تصنع سيارات «كورولا»؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "هوندا",
+   "نيسان",
+   "تويوتا",
+   "كيا"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 3,
+  "text_ar": "ما الشركة التي شعارها حصان أسود يقف على قدميه الخلفيتين على خلفية صفراء؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "فيراري",
+   "بورش",
+   "لامبورغيني",
+   "موستانغ"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة التي تملك تطبيقي فيسبوك وإنستغرام؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "غوغل",
+   "مايكروسوفت",
+   "ميتا",
+   "تويتر"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 1,
+  "text_ar": "شيء كلما أخذت منه كبر، فما هو؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "البالون",
+   "الحفرة",
+   "الشمعة",
+   "الظل"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "شيء له أسنان ولا يعض، فما هو؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "المشط",
+   "المنشار",
+   "الفأر",
+   "الساعة"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "ما الشيء الذي يتكلم جميع اللغات؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "المترجم",
+   "الصدى",
+   "الكتاب",
+   "الببغاء"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "بيت بلا أبواب ولا نوافذ، فما هو؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "القبر",
+   "الصندوق",
+   "الكهف",
+   "البيضة"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "إذا كان عمر أحمد ضعف عمر أخيه الذي عمره 6 سنوات، فكم عمر أحمد؟",
+  "source": "claude:batch2",
+  "type": "numeric",
+  "numeric_answer": 12.0,
+  "unit_ar": "سنة"
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "ما العدد التالي في السلسلة: 2، 4، 8، 16، ...؟",
+  "source": "claude:batch2",
+  "type": "numeric",
+  "numeric_answer": 32.0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 3,
+  "text_ar": "ما العدد التالي في السلسلة: 1، 1، 2، 3، 5، 8، ...؟",
+  "source": "claude:batch2",
+  "type": "numeric",
+  "numeric_answer": 13.0,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 1,
+  "text_ar": "ما العضو الذي يضخ الدم في الجسم؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الرئة",
+   "الكبد",
+   "القلب",
+   "الكلية"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "ما العضو المسؤول عن التنفس؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "القلب",
+   "المعدة",
+   "الرئتان",
+   "الكليتان"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 3,
+  "text_ar": "ما العضو الذي ينتج الأنسولين؟",
+  "source": "claude:batch2",
+  "type": "mcq",
+  "options_ar": [
+   "الكبد",
+   "المعدة",
+   "الطحال",
+   "البنكرياس"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 3,
+  "text_ar": "كم حجرة في قلب الإنسان؟",
+  "source": "claude:batch2",
+  "type": "numeric",
+  "numeric_answer": 4.0,
+  "unit_ar": "حجرات"
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على نسر ذهبي فوق صبار؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "المكسيك",
+   "إسبانيا",
+   "الأرجنتين",
+   "البيرو"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على نجمة وهلال أبيضين على خلفية خضراء مع شريط أبيض؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الجزائر",
+   "تركيا",
+   "باكستان",
+   "موريتانيا"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 3,
+  "text_ar": "ما الدولة التي يحتوي علمها على رمز «الين واليانغ»؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "اليابان",
+   "الصين",
+   "كوريا الجنوبية",
+   "منغوليا"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يتكون علمها من صليب أبيض على خلفية حمراء؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "سويسرا",
+   "الدنمارك",
+   "إنجلترا",
+   "النرويج"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 3,
+  "text_ar": "ما الدولة التي علمها أحمر مع صليب أبيض ممتد حتى الأطراف؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "سويسرا",
+   "فنلندا",
+   "السويد",
+   "الدنمارك"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يتكون علمها من ثلاثة أشرطة أفقية: أسود وأحمر وذهبي؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "بلجيكا",
+   "أوغندا",
+   "اليمن",
+   "ألمانيا"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يتكون علمها من ثلاثة أشرطة عمودية: أخضر وأبيض وأحمر؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "المكسيك",
+   "أيرلندا",
+   "المجر",
+   "إيطاليا"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 3,
+  "text_ar": "ما الدولة التي علمها أخضر وأبيض وبرتقالي بأشرطة عمودية؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "ساحل العاج",
+   "الهند",
+   "النيجر",
+   "أيرلندا"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على عجلة زرقاء في الوسط؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الهند",
+   "البرازيل",
+   "الأرجنتين",
+   "سريلانكا"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على كرة أرضية زرقاء ونجوم وعبارة «نظام وتقدم»؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الأرجنتين",
+   "البرتغال",
+   "البرازيل",
+   "أوروغواي"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على شمس في الوسط بين شريطين أزرقين فاتحين؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الأرجنتين",
+   "أوروغواي",
+   "اليابان",
+   "كازاخستان"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي علمها فيه ثلاثة أشرطة أفقية (أحمر وأبيض وأسود) ونسر ذهبي؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "العراق",
+   "مصر",
+   "اليمن",
+   "سوريا"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي علمها فيه نجمتان خضراوان على أشرطة أحمر وأبيض وأسود؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "سوريا",
+   "مصر",
+   "العراق",
+   "السودان"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 3,
+  "text_ar": "ما الدولة الخليجية التي يحتوي علمها على خنجر وسيفين متقاطعين؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "اليمن",
+   "قطر",
+   "عُمان",
+   "البحرين"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما لون علم قطر الأساسي مع الأبيض؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الأحمر",
+   "العنابي",
+   "الأخضر",
+   "الأزرق"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 2,
+  "text_ar": "ما الدولة التي يحتوي علمها على شجرة الأرز بين شريطين أحمرين؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "قبرص",
+   "لبنان",
+   "كندا",
+   "فلسطين"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أعلام ودول",
+  "difficulty": 3,
+  "text_ar": "ما الدولة التي يحتوي علمها على خريطتها باللون النحاسي؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "كوسوفو",
+   "البوسنة",
+   "مالطا",
+   "قبرص"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "ما الشيء الذي يسمع بلا أذن ويتكلم بلا لسان؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الراديو",
+   "المرآة",
+   "الحاسوب",
+   "الهاتف"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "ما الشيء الذي لا يبتل حتى لو دخل الماء؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الإسفنج",
+   "الحجر",
+   "الضوء",
+   "السمك"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 3,
+  "text_ar": "ما الشيء الذي تملكه أنت ولكن يستخدمه الآخرون أكثر منك؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "هاتفك",
+   "قلمك",
+   "اسمك",
+   "بيتك"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 3,
+  "text_ar": "أب وابنه عمرهما معاً 36 سنة، وعمر الأب يساوي عمر الابن مضروباً بـ5. كم عمر الابن؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "6 سنوات",
+   "5 سنوات",
+   "7 سنوات",
+   "8 سنوات"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "كم مرة يظهر الرقم 1 في الأعداد من 1 إلى 20؟",
+  "source": "claude:batch3",
+  "type": "numeric",
+  "numeric_answer": 12.0,
+  "unit_ar": "مرة"
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "ما العدد التالي في السلسلة: 3، 6، 9، 12، ...؟",
+  "source": "claude:batch3",
+  "type": "numeric",
+  "numeric_answer": 15.0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 3,
+  "text_ar": "ما العدد التالي في السلسلة: 1، 4، 9، 16، 25، ...؟",
+  "source": "claude:batch3",
+  "type": "numeric",
+  "numeric_answer": 36.0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 2,
+  "text_ar": "إذا كان لديك 3 تفاحات وأخذت منها 2، فكم تفاحة معك؟",
+  "source": "claude:batch3",
+  "type": "numeric",
+  "numeric_answer": 2.0,
+  "unit_ar": "تفاحة"
+ },
+ {
+  "category": "ألغاز وذكاء",
+  "difficulty": 3,
+  "text_ar": "ساعة تتأخر دقيقتين كل ساعة، فكم دقيقة تتأخر في يوم كامل؟",
+  "source": "claude:batch3",
+  "type": "numeric",
+  "numeric_answer": 48.0,
+  "unit_ar": "دقيقة"
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما اسم الأخ الأخضر لماريو؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "لويجي",
+   "واريو",
+   "يوشي",
+   "تود"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما اسم الأميرة التي ينقذها ماريو غالباً؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "زيلدا",
+   "ديزي",
+   "سامس",
+   "بيتش"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما اسم الديناصور الأخضر صديق ماريو؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "يوشي",
+   "باوزر",
+   "دونكي كونغ",
+   "كيربي"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما اسم أشهر بوكيمون أصفر كهربائي؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "تشارماندر",
+   "بلبسور",
+   "بيكاتشو",
+   "سكويرتل"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما اسم لعبة الباتل رويال الشهيرة من شركة Epic Games؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "ببجي",
+   "أبكس ليجندز",
+   "فورتنايت",
+   "وارزون"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما الشركة اليابانية المصنعة لجهاز سويتش؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "سوني",
+   "سيغا",
+   "كابكوم",
+   "نينتندو"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 3,
+  "text_ar": "ما اسم الشخصية الرئيسية في سلسلة ألعاب «God of War»؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "زيوس",
+   "أتريوس",
+   "دانتي",
+   "كريتوس"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "في لعبة «ماينكرافت»، ما الأداة التي تحتاجها لكسر الحجارة بسرعة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الفأس",
+   "المعول",
+   "المجرفة",
+   "السيف"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 3,
+  "text_ar": "ما اسم الشرير الرئيسي في ألعاب سونيك؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "دكتور إيغمان",
+   "باوزر",
+   "غانون",
+   "وايلي"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما اسم لعبة كرة القدم الشهيرة من EA التي أصبح اسمها EA Sports FC؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "بيس",
+   "فيفا",
+   "روكيت ليغ",
+   "فوتبول مانجر"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما لعبة الهواتف الشهيرة التي تقطع فيها الفواكه بإصبعك؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "فروت نينجا",
+   "كاندي كراش",
+   "أنجري بيردز",
+   "صب واي سيرفرز"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما لعبة الهواتف التي تطلق فيها طيوراً غاضبة على خنازير خضراء؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "كلاش أوف كلانس",
+   "كت ذا روب",
+   "فلابي بيرد",
+   "أنجري بيردز"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 3,
+  "text_ar": "ما اسم الشخص الذي يركض على سكة القطار في لعبة «صب واي سيرفرز»؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "تريكي",
+   "فريش",
+   "سبايك",
+   "جيك"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "ألعاب فيديو",
+  "difficulty": 2,
+  "text_ar": "ما اسم الكائن الأحمر الشرير في ماريو الذي يشبه السلحفاة الضخمة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "باوزر",
+   "كوبا",
+   "غومبا",
+   "بو"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "ما العضو الذي يقوم بتنقية الدم وإنتاج البول؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الكبد",
+   "القلب",
+   "الكلية",
+   "الأمعاء"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "ما اسم الخلايا التي تحمل الأكسجين في الدم؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "خلايا الدم البيضاء",
+   "الصفائح الدموية",
+   "خلايا الدم الحمراء",
+   "البلازما"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "ما وظيفة خلايا الدم البيضاء؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الدفاع عن الجسم",
+   "نقل الأكسجين",
+   "تخثر الدم",
+   "هضم الطعام"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "ما العضو الذي يفرز العصارة الصفراوية؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "المعدة",
+   "البنكرياس",
+   "الكبد",
+   "الطحال"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "ما الفيتامين الذي يحصل عليه الجسم من أشعة الشمس؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "فيتامين أ",
+   "فيتامين ج",
+   "فيتامين د",
+   "فيتامين ب"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "ما الجزء الملون من العين؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "البؤبؤ",
+   "القزحية",
+   "الشبكية",
+   "العدسة"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "أين توجد أصغر عظمة في جسم الإنسان؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "في الأنف",
+   "في اليد",
+   "في الأذن",
+   "في القدم"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "ما المعدن الذي يقوي العظام والأسنان؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الحديد",
+   "الصوديوم",
+   "الزنك",
+   "الكالسيوم"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 2,
+  "text_ar": "ما الجهاز الذي يضم المخ والحبل الشوكي؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الجهاز العصبي",
+   "الجهاز الهضمي",
+   "الجهاز التنفسي",
+   "الجهاز الدوري"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "جسم الإنسان",
+  "difficulty": 3,
+  "text_ar": "ما اسم الأنبوب الذي ينقل الطعام من الفم إلى المعدة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "المريء",
+   "القصبة الهوائية",
+   "الأمعاء",
+   "البلعوم"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة التي تملك محرك البحث الأشهر في العالم؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "مايكروسوفت",
+   "ياهو",
+   "أمازون",
+   "غوغل"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة التي يرأسها إيلون ماسك وتصنع سيارات كهربائية؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "فورد",
+   "نيسان",
+   "ريفيان",
+   "تسلا"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "من أي بلد شركة تويوتا؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "اليابان",
+   "كوريا الجنوبية",
+   "ألمانيا",
+   "الصين"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة الألمانية صاحبة شعار النجمة الثلاثية داخل دائرة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "بي إم دبليو",
+   "أودي",
+   "بورش",
+   "مرسيدس بنز"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة التي شعارها أربع حلقات متداخلة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "أودي",
+   "مرسيدس",
+   "تويوتا",
+   "فولفو"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة الرياضية الألمانية صاحبة شعار الخطوط الثلاثة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "أديداس",
+   "نايكي",
+   "بوما",
+   "أندر آرمر"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة صاحبة متجر الإلكترونيات الذي يبيع ويوصل كل شيء ومؤسسها جيف بيزوس؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "إيباي",
+   "علي بابا",
+   "أمازون",
+   "نون"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "من أي بلد شركة علي بابا؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الصين",
+   "اليابان",
+   "سنغافورة",
+   "الهند"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 3,
+  "text_ar": "ما الشركة التي اشترت تطبيق واتساب عام 2014؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "غوغل",
+   "مايكروسوفت",
+   "فيسبوك (ميتا)",
+   "آبل"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة صاحبة نظام التشغيل «ويندوز»؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "آبل",
+   "غوغل",
+   "آي بي إم",
+   "مايكروسوفت"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 3,
+  "text_ar": "ما الشركة الإيطالية المشهورة بشعار الثور الهائج؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "فيراري",
+   "مازيراتي",
+   "فيات",
+   "لامبورغيني"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة التي تصنع المشروب الغازي «سبرايت»؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "بيبسي",
+   "كوكاكولا",
+   "ريد بول",
+   "نستله"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "شركات وماركات",
+  "difficulty": 2,
+  "text_ar": "ما الشركة السويسرية الشهيرة بالشوكولاتة والقهوة سريعة التحضير (نسكافيه)؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "ليندت",
+   "توبليرون",
+   "كادبوري",
+   "نستله"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من العالم المسلم الذي حاول الطيران قديماً في الأندلس؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "عباس بن فرناس",
+   "ابن رشد",
+   "الإدريسي",
+   "الزهراوي"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من الطبيب المسلم الذي اكتشف الدورة الدموية الصغرى؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "ابن سينا",
+   "ابن النفيس",
+   "الرازي",
+   "الزهراوي"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من الجراح الأندلسي الملقب بأبي الجراحة الحديثة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الزهراوي",
+   "ابن زهر",
+   "ابن البيطار",
+   "الرازي"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من الجغرافي المسلم الذي رسم خريطة العالم لملك صقلية؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "ابن بطوطة",
+   "الإدريسي",
+   "المسعودي",
+   "البيروني"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 3,
+  "text_ar": "من العالم الذي يلقب بأبي الكيمياء عند العرب؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "جابر بن حيان",
+   "الكندي",
+   "الخوارزمي",
+   "ابن الهيثم"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من اخترع الراديو (اللاسلكي) بحسب الشائع؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "ماركوني",
+   "إديسون",
+   "بيل",
+   "فاراداي"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من اخترع المحرك البخاري المحسن الذي أطلق الثورة الصناعية؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "إديسون",
+   "نيوتن",
+   "جيمس واط",
+   "تسلا"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 3,
+  "text_ar": "من مكتشف قوانين الوراثة باستخدام نبات البازلاء؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "داروين",
+   "واتسون",
+   "غريغور مندل",
+   "باستور"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من اخترع الطباعة بالحروف المتحركة في أوروبا؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "دافنشي",
+   "غاليليو",
+   "غوتنبرغ",
+   "كوبرنيكوس"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من العالم الإيطالي الذي طور التلسكوب ورصد أقمار المشتري؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "كوبرنيكوس",
+   "غاليليو",
+   "كبلر",
+   "برونو"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 3,
+  "text_ar": "من العالم الذي طور لقاح الجدري أول مرة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "لويس باستور",
+   "ألكسندر فلمنغ",
+   "إدوارد جينر",
+   "روبرت كوخ"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من الرحالة المغربي الذي جاب العالم في القرن الرابع عشر؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "ابن جبير",
+   "ابن خلدون",
+   "الإدريسي",
+   "ابن بطوطة"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "علماء واختراعات",
+  "difficulty": 2,
+  "text_ar": "من اخترع الديناميت؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "إديسون",
+   "ألفريد نوبل",
+   "تسلا",
+   "فاراداي"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما اسم القمر الطبيعي الوحيد للأرض؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "فوبوس",
+   "تيتان",
+   "القمر",
+   "أوروبا"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما الكوكب الذي يدور على جنبه تقريباً؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "نبتون",
+   "أورانوس",
+   "زحل",
+   "المريخ"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما النجم الأقرب إلى الأرض؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الشمس",
+   "سيريوس",
+   "القطب الشمالي",
+   "ألفا قنطورس"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما اسم الجسم الجليدي الذي يظهر بذيل لامع عند اقترابه من الشمس؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "المذنب",
+   "النيزك",
+   "الكويكب",
+   "القمر"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما الكوكب الذي صنّف كوكباً قزماً عام 2006؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "نبتون",
+   "سيريس",
+   "إيريس",
+   "بلوتو"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 3,
+  "text_ar": "ما أكبر أقمار زحل؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "غانيميد",
+   "أوروبا",
+   "تيتان",
+   "فوبوس"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما اسم المحطة الفضائية التي تدور حول الأرض ويعيش فيها رواد من دول عدة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "محطة الفضاء الدولية",
+   "مير",
+   "سكاي لاب",
+   "تيانغونغ"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما اسم التلسكوب الفضائي الذي أطلق عام 2021 خلفاً لهابل؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "كبلر",
+   "سبيتزر",
+   "جيمس ويب",
+   "تشاندرا"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما الظاهرة التي يحجب فيها القمر ضوء الشمس عن الأرض؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "خسوف القمر",
+   "الشفق القطبي",
+   "الاعتدال",
+   "كسوف الشمس"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 3,
+  "text_ar": "ما اسم أول قمر صناعي أطلقه الإنسان؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "أبولو 11",
+   "سبوتنيك 1",
+   "فوياجر 1",
+   "هابل"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "ما اسم مهمة ناسا التي هبط فيها الإنسان على القمر أول مرة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "أبولو 13",
+   "جيميني 4",
+   "أرتميس 1",
+   "أبولو 11"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 2,
+  "text_ar": "كم ساعة تقريباً يستغرق دوران الأرض حول نفسها؟",
+  "source": "claude:batch3",
+  "type": "numeric",
+  "numeric_answer": 24.0,
+  "unit_ar": "ساعة"
+ },
+ {
+  "category": "فضاء وفلك",
+  "difficulty": 3,
+  "text_ar": "كم يبعد القمر عن الأرض تقريباً بالكيلومتر؟",
+  "source": "claude:batch3",
+  "type": "numeric",
+  "numeric_answer": 384000.0,
+  "unit_ar": "كم"
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "ما اسم الأداة التي تستخدم لقياس درجة الحرارة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "البارومتر",
+   "المسطرة",
+   "ميزان الحرارة",
+   "البوصلة"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "ما الأداة التي تحدد الاتجاهات بواسطة الإبرة المغناطيسية؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الساعة",
+   "المنظار",
+   "الميزان",
+   "البوصلة"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "ما الذكرى التي يحتفل بها بعد 25 سنة زواج؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "الفضية",
+   "الذهبية",
+   "الماسية",
+   "البرونزية"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "ما اسم أعلى برج في العالم الموجود في دبي؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "برج العرب",
+   "برج المملكة",
+   "برج إيفل",
+   "برج خليفة"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "ما اسم الساعة الشهيرة في لندن؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "ساعة البرج",
+   "رولكس",
+   "بيغ بن",
+   "غرينتش"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "ما العملة الرسمية في الولايات المتحدة؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "اليورو",
+   "الدولار",
+   "الجنيه",
+   "البيزو"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 3,
+  "text_ar": "ما اسم أكبر مكتبة في العالم من حيث عدد المواد؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "مكتبة الكونغرس",
+   "مكتبة الإسكندرية",
+   "المكتبة البريطانية",
+   "مكتبة باريس الوطنية"
+  ],
+  "correct_index": 0,
+  "unit_ar": ""
+ },
+ {
+  "category": "معلومات عامة",
+  "difficulty": 2,
+  "text_ar": "ما عدد ألوان قوس قزح؟",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "خمسة",
+   "ستة",
+   "سبعة",
+   "ثمانية"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «اللي ما بيعرف الصقر...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "بيطيّره",
+   "بيصيده",
+   "بيبيعه",
+   "بيشويه"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «يا داخل بين البصلة وقشرتها...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "ما بتطلع منها",
+   "ما ينوبك إلا ريحتها",
+   "بتبكي",
+   "بتتعب"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «القرد بعين أمه...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "أسد",
+   "حصان",
+   "طاووس",
+   "غزال"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «اللي استحوا...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "راحوا",
+   "سكتوا",
+   "هربوا",
+   "ماتوا"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «جار قريب ولا...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "صديق غريب",
+   "ابن عم",
+   "أخ بعيد",
+   "قريب بعيد"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «إذا كان حبيبك عسل...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "كُله كله",
+   "احفظه",
+   "لا تلحسه كله",
+   "شاركه"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 3,
+  "text_ar": "أكمل المثل: «أول الرقص...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "طبلة",
+   "غناء",
+   "حنجلة",
+   "تصفيق"
+  ],
+  "correct_index": 2,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «يا رايح كتّر...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "المصاري",
+   "الزيارات",
+   "الكلام",
+   "الملايح"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «الباب اللي بيجيك منه الريح...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "افتحه",
+   "سدّه واستريح",
+   "اتركه",
+   "اكسره"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «اطبخي يا جارية...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "اغسلي الصحون",
+   "كلّف يا سيدي",
+   "نظفي البيت",
+   "حضري السفرة"
+  ],
+  "correct_index": 1,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «كل شي بوقته...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "غالي",
+   "رخيص",
+   "صعب",
+   "حلو"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ },
+ {
+  "category": "أمثال",
+  "difficulty": 2,
+  "text_ar": "أكمل المثل: «ما بتعرف خيري...»",
+  "source": "claude:batch3",
+  "type": "mcq",
+  "options_ar": [
+   "لتشوف شري",
+   "لتسافر",
+   "لتكبر",
+   "لتجرب غيري"
+  ],
+  "correct_index": 3,
+  "unit_ar": ""
+ }
+]

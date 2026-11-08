@@ -1,237 +1,387 @@
 [
- {
-  "file": "sfx/answer_locked.ogg",
-  "source": "kenney_interfaceSounds/Audio/select_001.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/army_select.ogg",
-  "source": "RPGsounds_Kenney/OGG/drawKnife3.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/base_guarded.ogg",
-  "source": "100-CC0-SFX_0/gong_01.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/battle_drums.ogg",
-  "source": "single/horde_war_drums_by_william_hector.wav",
-  "license": "CC0"
- },
- {
-  "file": "sfx/battle_impact.ogg",
-  "source": "single/medieval-weapons-impacts.ogg @ 13.1s",
-  "license": "CC0"
- },
- {
-  "file": "sfx/battle_start.ogg",
-  "source": "single/horde_war_drums… (first 3 s)",
-  "license": "CC0"
- },
- {
-  "file": "sfx/claim.ogg",
-  "source": "RPGsounds_Kenney/OGG/dropLeather.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/coins.ogg",
-  "source": "RPGsounds_Kenney/OGG/handleCoins.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/correct.ogg",
-  "source": "jingleSounds_Kenney/OGG/jingles_STEEL/jingles_STEEL00.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/eliminated.ogg",
-  "source": "single/mystery_sting.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/march.ogg",
-  "source": "RPGsounds_Kenney/OGG/footstep00.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/match_found.ogg",
-  "source": "kenney_interfaceSounds/Audio/bong_001.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/other_answered.ogg",
-  "source": "kenney_interfaceSounds/Audio/drop_001.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/powerup.ogg",
-  "source": "kenney_interfaceSounds/Audio/glass_004.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/question_show.ogg",
-  "source": "RPGsounds_Kenney/OGG/bookFlip1.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/ready.ogg",
-  "source": "kenney_interfaceSounds/Audio/confirmation_001.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/sword_clash.ogg",
-  "source": "sword_clash_-_starninjas_0/sword_clash.1.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/sword_swing.ogg",
-  "source": "sword_-_starninjas_1/sword - StarNinjas/sword.2.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/tick.ogg",
-  "source": "UI_SFX_Set/rollover1.wav",
-  "license": "CC0"
- },
- {
-  "file": "sfx/tower_hit.ogg",
-  "source": "100-CC0-SFX_0/slam_02.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/ui_back.ogg",
-  "source": "kenney_interfaceSounds/Audio/close_001.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/ui_error.ogg",
-  "source": "kenney_interfaceSounds/Audio/error_003.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/ui_tap.ogg",
-  "source": "UI_SFX_Set/click2.wav",
-  "license": "CC0"
- },
- {
-  "file": "sfx/ui_toggle.ogg",
-  "source": "kenney_interfaceSounds/Audio/toggle_002.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/wrong.ogg",
-  "source": "kenney_interfaceSounds/Audio/error_005.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/ability.ogg",
-  "source": "100-CC0-SFX_0/gong_01.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/double.ogg",
-  "source": "jingleSounds_Kenney/OGG/jingles_SAX/jingles_SAX06.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/hint.ogg",
-  "source": "magic/magic_words.wav",
-  "license": "CC0"
- },
- {
-  "file": "sfx/menu_open.ogg",
-  "source": "book_flips_-_starninjas/book_flip.3.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/player_back.ogg",
-  "source": "kenney_interfaceSounds/Audio/maximize_003.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/player_left.ogg",
-  "source": "ui_ogg/ui_ogg/negative_sound2.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/remove_two.ogg",
-  "source": "swishes/swishes/swish-7.wav",
-  "license": "CC0"
- },
- {
-  "file": "sfx/round_start.ogg",
-  "source": "100-CC0-SFX_0/gong_02.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/shield.ogg",
-  "source": "impact_-_starninjas/impact.9.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/time_up.ogg",
-  "source": "ui_ogg/ui_ogg/alarm.ogg",
-  "license": "CC0"
- },
- {
-  "file": "sfx/capture_generic.ogg",
-  "source": "ElevenLabs: A large army of soldiers shouting a short battle cry together on a battlefield, deep male voices, no words",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/countdown.ogg",
-  "source": "ElevenLabs: Tense cinematic build: low drums getting faster for three beats, ending with a big impact and horn",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/defeat.ogg",
-  "source": "ElevenLabs: Sad distant war horn over a slow low drum, an army retreating, mournful",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/extra_turn.ogg",
-  "source": "ElevenLabs: Quick sword unsheathing followed by a short battle shout from one warrior",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/tiebreak.ogg",
-  "source": "ElevenLabs: Tense cinematic riser with war drums and a sharp sword unsheathing at the end",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/victory.ogg",
-  "source": "ElevenLabs: Victorious army roar: hundreds of soldiers cheer and bang swords on shields, a war horn sounds at the end",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/your_turn.ogg",
-  "source": "ElevenLabs: A single short low war horn call",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/capture_crusader.ogg",
-  "source": "ElevenLabs: Medieval European knights charge: armored horses galloping, chain mail clanking, knights roar a wordless battle cry, a trumpet call",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/capture_mongol.ogg",
-  "source": "ElevenLabs: Mongol horde cavalry war cry: many horses galloping, riders shouting high-pitched wordless ululations, horse neighs, arrows whistling, short and sharp, two seconds",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/capture_pharaoh.ogg",
-  "source": "ElevenLabs: Ancient Egyptian army charge: war chariot wheels rumbling, horses, soldiers shouting a wordless cry, a ram's horn and sistrum rattle",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/capture_roman.ogg",
-  "source": "ElevenLabs: Roman legion: soldiers shout a short unified 'Ha!' together and strike their shields with swords in rhythm, then a Roman cornu horn blast",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- },
- {
-  "file": "sfx/capture_ww2.ogg",
-  "source": "ElevenLabs: World War Two infantry charge: soldiers shouting a wordless 'hurrah!' together as they run, boots on mud, distant artillery booms",
-  "license": "generated with ElevenLabs (owner's account, personal use)"
- }
+  {
+    "file": "sfx/army_select.ogg",
+    "source": "RPGsounds_Kenney/OGG/drawKnife3.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/base_guarded.ogg",
+    "source": "100-CC0-SFX_0/gong_01.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/battle_drums.ogg",
+    "source": "single/horde_war_drums_by_william_hector.wav",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/battle_impact.ogg",
+    "source": "single/medieval-weapons-impacts.ogg @ 13.1s",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/battle_start.ogg",
+    "source": "single/horde_war_drums… (first 3 s)",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/coins.ogg",
+    "source": "RPGsounds_Kenney/OGG/handleCoins.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/eliminated.ogg",
+    "source": "single/mystery_sting.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/march.ogg",
+    "source": "RPGsounds_Kenney/OGG/footstep00.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/match_found.ogg",
+    "source": "kenney_interfaceSounds/Audio/bong_001.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/ready.ogg",
+    "source": "kenney_interfaceSounds/Audio/confirmation_001.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/sword_clash.ogg",
+    "source": "sword_clash_-_starninjas_0/sword_clash.1.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/sword_swing.ogg",
+    "source": "sword_-_starninjas_1/sword - StarNinjas/sword.2.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/tower_hit.ogg",
+    "source": "100-CC0-SFX_0/slam_02.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/ability.ogg",
+    "source": "100-CC0-SFX_0/gong_01.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/double.ogg",
+    "source": "jingleSounds_Kenney/OGG/jingles_SAX/jingles_SAX06.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/hint.ogg",
+    "source": "magic/magic_words.wav",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/player_back.ogg",
+    "source": "kenney_interfaceSounds/Audio/maximize_003.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/player_left.ogg",
+    "source": "ui_ogg/ui_ogg/negative_sound2.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/remove_two.ogg",
+    "source": "swishes/swishes/swish-7.wav",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/shield.ogg",
+    "source": "impact_-_starninjas/impact.9.ogg",
+    "license": "CC0"
+  },
+  {
+    "file": "sfx/capture_generic.ogg",
+    "source": "ElevenLabs: A large army of soldiers shouting a short battle cry together on a battlefield, deep male voices, no words",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/countdown.ogg",
+    "source": "ElevenLabs: Tense cinematic build: low drums getting faster for three beats, ending with a big impact and horn",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/defeat.ogg",
+    "source": "ElevenLabs: Sad distant war horn over a slow low drum, an army retreating, mournful",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/extra_turn.ogg",
+    "source": "ElevenLabs: Quick sword unsheathing followed by a short battle shout from one warrior",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/tiebreak.ogg",
+    "source": "ElevenLabs: Tense cinematic riser with war drums and a sharp sword unsheathing at the end",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/victory.ogg",
+    "source": "ElevenLabs: Victorious army roar: hundreds of soldiers cheer and bang swords on shields, a war horn sounds at the end",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/capture_crusader.ogg",
+    "source": "ElevenLabs: Medieval European knights charge: armored horses galloping, chain mail clanking, knights roar a wordless battle cry, a trumpet call",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/capture_mongol.ogg",
+    "source": "ElevenLabs: Mongol horde cavalry war cry: many horses galloping, riders shouting high-pitched wordless ululations, horse neighs, arrows whistling, short and sharp, two seconds",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/capture_pharaoh.ogg",
+    "source": "ElevenLabs: Ancient Egyptian army charge: war chariot wheels rumbling, horses, soldiers shouting a wordless cry, a ram's horn and sistrum rattle",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/capture_roman.ogg",
+    "source": "ElevenLabs: Roman legion: soldiers shout a short unified 'Ha!' together and strike their shields with swords in rhythm, then a Roman cornu horn blast",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/capture_ww2.ogg",
+    "source": "ElevenLabs: World War Two infantry charge: soldiers shouting a wordless 'hurrah!' together as they run, boots on mud, distant artillery booms",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "voice/start_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «لِتبدأِ المعركة!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/start_2.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «استعدّوا… إلى القتال!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/castles_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «ابنوا قلاعَكم!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/expansion_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «تقاسموا الأرض! الأسرعُ يأخذ!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/your_turn_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «دورُك! اختر هدفك!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/your_turn_2.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «هجوم!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/duel_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «سيفٌ بسيف! من الأقوى؟»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/duel_2.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أجيبوا!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/capture_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «سقطتِ الأرض!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/capture_2.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أرضٌ جديدة!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/held_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «صمدَ المدافع!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/held_2.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «ارتدَّ الهجوم!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/tower_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «سقطَ برج! ضربةٌ موجعة!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/last_tower_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «آخرُ برج! احذر!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/eliminated_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «خرجَ من المعركة!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/tiebreak_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «تعادل! الحسمُ بالأرقام!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/final_round_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «الجولةُ الأخيرة! كلُّ شيءٍ ممكن!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/hurry_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أسرِع! الوقتُ ينفد!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/too_slow_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «انتهى الوقت!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/treasure_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «وجدَ الكنز!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/fastest_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أسرعُ جواب!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/lead_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «أنت في المقدّمة!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/victory_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «نصرٌ عظيم!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/victory_2.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «ارفعوا الرايات! النصرُ لنا!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "voice/defeat_1.ogg",
+    "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «هُزِمنا… لكنّ الحربَ لم تنتهِ!»",
+    "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "music/menu_1.ogg",
+    "source": "ElevenLabs sound generation (22 s loop): Epic war anthem loop: taiko war drums, heroic brass, male choir, marching army",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "music/menu_2.ogg",
+    "source": "ElevenLabs sound generation (22 s loop): Dark battle-preparation loop: heavy slow war drums, low cellos, distant war horns, swords sharpened",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "music/menu_3.ogg",
+    "source": "ElevenLabs sound generation (22 s loop): Middle Eastern epic war loop: frame drums and darbuka, aggressive strings, war-horn melody",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "music/menu_4.ogg",
+    "source": "ElevenLabs sound generation (22 s loop): Modern epic war loop: hybrid drums, dark synth bass, brass stabs, distant soldiers",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/ui_tap.ogg",
+    "source": "ElevenLabs sound generation: Short crisp futuristic UI click, a soft digital tick with a tiny metallic edge, game menu button",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/ui_back.ogg",
+    "source": "ElevenLabs sound generation: Short futuristic UI back sound, a quick descending digital blip, soft",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/ui_toggle.ogg",
+    "source": "ElevenLabs sound generation: Short futuristic UI toggle switch, two quick digital clicks, light",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/ui_error.ogg",
+    "source": "ElevenLabs sound generation: Short futuristic UI error buzz, low double digital beep, denied",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/menu_open.ogg",
+    "source": "ElevenLabs sound generation: Holographic game window opening: a quick rising digital whoosh with a soft shimmering chime",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/question_show.ogg",
+    "source": "ElevenLabs sound generation: A glowing system notification window pops up: bright digital chime with a deep sub hit, video game quest alert",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/tick.ogg",
+    "source": "ElevenLabs sound generation: Single tense clock tick, deep and digital, short metallic click",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/answer_locked.ogg",
+    "source": "ElevenLabs sound generation: Answer locked in: a solid digital lock click with a short energy hum",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/other_answered.ogg",
+    "source": "ElevenLabs sound generation: Very soft short digital blip, subtle notification",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/correct.ogg",
+    "source": "ElevenLabs sound generation: Correct answer in a game: a bright rising digital chime with a powerful energy whoosh and a short sword ring, triumphant",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/wrong.ogg",
+    "source": "ElevenLabs sound generation: Wrong answer in a game: a low descending digital buzz with a dull metallic thud, failure",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/time_up.ogg",
+    "source": "ElevenLabs sound generation: Time is up: a deep heavy digital alarm hit with a war drum, game timer ended",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/claim.ogg",
+    "source": "ElevenLabs sound generation: Claiming territory: an energy surge with a war drum hit and a short horn, power captured",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/round_start.ogg",
+    "source": "ElevenLabs sound generation: New round begins: a big cinematic war drum hit with a rising digital energy swell, epic",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/powerup.ogg",
+    "source": "ElevenLabs sound generation: Power-up activated: magical energy charging up with a bright digital sparkle, game skill",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/your_turn.ogg",
+    "source": "ElevenLabs sound generation: Your turn: a short commanding war horn blast layered with a deep digital pulse",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "sfx/rank_up.ogg",
+    "source": "ElevenLabs sound generation: Level up rank up in a game: a powerful rising energy surge, a heavy bass impact and a bright triumphant shimmering chime, epic system notification",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  }
 ]

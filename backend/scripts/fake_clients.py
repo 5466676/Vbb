@@ -133,7 +133,7 @@ class FakeClient:
             self.owners = {x["id"]: None for x in self.template["territories"]}
             for seat, base in enumerate(p["bases"][: len(p["players"])]):
                 self.owners[base] = seat
-        elif t == "territory_claimed":
+        elif t in ("territory_claimed", "base_placed"):
             self.owners[p["territory"]] = p["seat"]
         elif t == "territory_captured":
             self.owners[p["territory"]] = p["attacker"]
@@ -170,6 +170,10 @@ class FakeClient:
         elif t == "full_state" and (q := (p.get("match") or {}).get("question")):
             if q["participant"] and not q["answered"]:
                 self._later(self._answer(q))
+        elif (
+            t == "phase_changed" and p["phase"] == "base_placement" and p.get("placer") == self.seat
+        ):
+            self._later(self._place(p.get("options", []), p.get("opens_in_ms", 0)))
         elif t == "phase_changed" and p["phase"] == "expansion_picks":
             quota = p.get("quota", {}).get(str(self.seat), 0)
             if quota:
@@ -177,9 +181,11 @@ class FakeClient:
         elif (
             t == "phase_changed"
             and p["phase"] == "battle_target"
-            and p.get("attacker") == self.seat
+            and self.seat in p.get("attackers", [])
         ):
-            self._later(self._target(p["targets"], p.get("opens_in_ms", 0)))
+            mine = (p.get("targets") or {}).get(str(self.seat), [])
+            if mine:
+                self._later(self._target(mine, p.get("opens_in_ms", 0)))
 
     async def _answer(self, q: dict) -> None:
         await asyncio.sleep(self.rnd.uniform(0.05, 0.5) * q["time_ms"] / 1000)
@@ -189,6 +195,11 @@ class FakeClient:
             await self.send("answer", {"question_id": q["id"], "choice": self.rnd.randrange(4)})
         else:
             await self.send("answer", {"question_id": q["id"], "value": self.rnd.randint(0, 3000)})
+
+    async def _place(self, options: list[int], opens_in_ms: int) -> None:
+        await asyncio.sleep(opens_in_ms / 1000 + 0.02)
+        if options:
+            await self.send("place_base", {"territory": self.rnd.choice(options)})
 
     async def _pick(self, quota: int, opens_in_ms: int) -> None:
         await asyncio.sleep(opens_in_ms / 1000 + 0.02)

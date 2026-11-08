@@ -37,7 +37,8 @@ cd backend && alembic upgrade head && python -m app.questions.seed
 # import a question pack (CSV/JSON); X-Admin-Key = HARB_ADMIN_KEY
 curl -H "X-Admin-Key: $KEY" -F file=@pack.csv "localhost:8000/admin/questions/import-file?pack=general&license=CC0"
 # home server (SQLite + in-process Redis, Tailscale Funnel on 443)
-./home-server.sh start            # stop | status | logs
+./home-server.sh start            # stop | status | logs (Mac/Linux)
+# Windows: double-click start-server.bat / stop-server.bat (home-server.ps1 start|stop|status|logs)
 # map templates (offline; needs the maps extra)
 cd backend && pip install -e ".[maps]" && python -m maps.generate --preview /tmp/maps
 # full stack

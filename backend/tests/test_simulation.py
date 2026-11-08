@@ -15,11 +15,11 @@ from tests.helpers import play_match
 MATCHES = 500
 CONFIGS = [(n, Mode.FFA) for n in range(2, 9)] + [(n, Mode.TEAMS) for n in (4, 6, 8)]
 
-# Accepted mean length in minutes. 1v1 matches often end early by elimination (see
-# DECISIONS.md, phase 2); the brief's 8-12 minute target is enforced from 3 players up.
-MEAN_BOUNDS = {2: (6.0, 12.0)}
-DEFAULT_BOUNDS = (8.0, 12.0)
-HARD_MAX_MIN = 15.0
+# No fixed match length (owner, 2026-11-07): a match ends when one player/team is left or one
+# dominates the map (GAME_RULES §6.3). Bot matches land around 8-25 minutes on average.
+MEAN_BOUNDS = {2: (4.0, 15.0)}
+DEFAULT_BOUNDS = (8.0, 36.0)
+HARD_MAX_MIN = 120.0
 
 
 @pytest.mark.parametrize(("players", "mode"), CONFIGS, ids=[f"{m.value}{n}" for n, m in CONFIGS])

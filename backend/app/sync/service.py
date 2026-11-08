@@ -22,6 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db import upsert
 from app.models import Action, MatchResult, Question
 from app.models.question import SOLO_PACK
+from app.ranks import level_of, rank_of, total_xp
 
 MAX_ACTIONS_PER_SYNC = 500
 MAX_FUTURE = timedelta(minutes=5)  # device clocks drift a little
@@ -262,6 +263,7 @@ async def player_stats(s: AsyncSession, pid: str) -> dict:
                 func.count(),
                 func.coalesce(func.sum(cast(MatchResult.won, Integer)), 0),
                 func.coalesce(func.sum(MatchResult.score), 0),
+                func.coalesce(func.sum(MatchResult.correct), 0),
             ).where(MatchResult.player_id == pid)
         )
     ).one()
@@ -275,6 +277,9 @@ async def player_stats(s: AsyncSession, pid: str) -> dict:
             "accuracy": round(correct / answered, 3) if answered else 0.0,
         },
         "online": {"matches": int(online[0]), "wins": int(online[1]), "score": int(online[2])},
+        "xp": (xp := total_xp(int(online[0]), int(online[3]), int(online[1]))),
+        "rank": rank_of(xp),
+        "level": level_of(xp),
     }
 
 
