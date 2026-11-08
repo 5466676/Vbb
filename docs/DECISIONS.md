@@ -576,3 +576,8 @@ they stay small and exact):
 - Top bar: varnished plank gradient with a light top edge; player cards on paper gradient with a
   gold thread beside the banner tab.
 - Question screen: the owner rejected the first four options; four new ones are on a picker page.
+
+## Levantine commentator complete
+- All 25 Shami lines (Gemini TTS, voice Enceladus) are in `app/assets/audio/voice/`. The last 21
+  were made in 3 batched requests (split on silences, each piece checked with speech-to-text) to
+  stay inside the free daily quota. AUDIO.md §4 now documents the Levantine set.
