@@ -642,3 +642,16 @@ they stay small and exact):
   (`tools/art/neon_commanders.py`). Soldiers, marching troops and castles on the map use
   `NeonSprite`: a thin outline in the owner's colour (tinted silhouette behind, no blur) and a
   slight cool grade. Portrait rings take the seat colour.
+
+## No repeats and more questions
+- Offline: `LocalGame` takes the device's set of asked question ids (`seen_questions` in
+  settings, saved when a match ends or stops), so questions do not come back until a category
+  runs out. Online rooms already avoid questions any player saw in the last 30 days.
+- 288 new checked questions in `seed/extra_bank.json`, built from compact sources in
+  `backend/scripts/qsrc/*.txt` by `scripts.build_extra_questions` (correct option moved to a
+  stable pseudo-random position; texts already in the seed are skipped — 89 were). Weak
+  categories got the most (flags, inventors, video games, brands, space, riddles, body).
+  `scripts.export_solo` rebuilds the app's offline pack from the seed's solo third and keeps
+  existing ids (531 questions now, 96 new).
+- Test fix: the leaderboard test now waits for the results sink (it is saved just after
+  `match_ended` is broadcast; the old test read too early once seeding took longer).

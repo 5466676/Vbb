@@ -68,7 +68,7 @@ async def test_health_and_question_download(api):
     h = (await api.get("/health")).json()
     assert h["status"] == "ok" and h["server_time_ms"] > 0
     qs = await solo_questions(api)
-    assert 400 <= len(qs) <= 470  # a third of the built-in bank is the offline pack
+    assert 500 <= len(qs) <= 560  # a third of the built-in bank is the offline pack
     assert {q["kind"] for q in qs} == {"mcq", "numeric"}
     assert all("text" in q and q["version"] > 0 for q in qs)
     general = (await api.get("/admin/questions?pack=general&limit=1", headers=ADMIN)).json()
@@ -264,7 +264,12 @@ async def test_online_matches_feed_the_leaderboard(home_server):
     url = await home_server()
     clients = await play_room(url, 2, timeout=60)
     async with httpx.AsyncClient(base_url=url) as http:
-        board = (await http.get("/leaderboard")).json()
+        # results are saved just after match_ended is broadcast: give the sink a moment
+        for _ in range(50):
+            board = (await http.get("/leaderboard")).json()
+            if board["rows"]:
+                break
+            await asyncio.sleep(0.1)
         assert len(board["rows"]) == 2
         top = board["rows"][0]
         assert top["rank"] == 1 and top["matches"] == 1 and top["wins"] == 1

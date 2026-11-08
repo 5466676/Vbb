@@ -168,7 +168,7 @@ async def import_questions(
 
 
 # built-in question files, imported in this order on every start (duplicates are skipped)
-SEED_FILES = [SEED_FILE, SEED_DIR / "owner_bank.json"]
+SEED_FILES = [SEED_FILE, SEED_DIR / "owner_bank.json", SEED_DIR / "extra_bank.json"]
 
 
 def seed_packs() -> dict[str, list[dict[str, Any]]]:
