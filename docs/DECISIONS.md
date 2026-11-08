@@ -622,3 +622,9 @@ they stay small and exact):
   chimes and energy layered with war drums/horns): taps, menus, question, tick, lock, correct,
   wrong, time up, claim, round start, your turn, power-up, and a new `rank_up`. Battle sounds
   (swords, drums, captures per army) stay. Peaks set per role (UI −9 dB … big moments −3 dB).
+
+## Home server on Windows
+- `home-server.ps1` mirrors `home-server.sh` for Windows (venv, install, `home.env` with fresh
+  secrets, migrate, seed, one uvicorn worker in the background, Tailscale Funnel on 443), with
+  `start-server.bat` / `stop-server.bat` to double-click. Needs Python 3.12+ and Tailscale.
+  Not run on Windows yet (no PowerShell in the build container); the owner tests it first.
