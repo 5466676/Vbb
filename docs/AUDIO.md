@@ -76,7 +76,7 @@ in-match tracks so they crossfade cleanly. All instrumental, no vocals.
 
 | track | length | when |
 |---|---|---|
-| `menu` | 60–90 s loop | menus, lobby |
+| `menu_1`…`menu_4` | four 22 s war loops played in turn (random start) | menus, lobby |
 | `match_calm` | 90 s loop | expansion phase |
 | `match_battle` | 90 s loop | battle phase (crossfade from calm on `battle_started`) |
 | `final_rounds` | 30–45 s loop | last two battle rounds |
@@ -85,7 +85,7 @@ in-match tracks so they crossfade cleanly. All instrumental, no vocals.
 
 Prompts (English works best in these tools; paste one per track):
 
-- **menu** — *Instrumental cinematic Middle Eastern adventure theme, oud melody, qanun, ney flute,
+- **menu** (owner's pick: all four war loops in `menu_1`…`menu_4`, ElevenLabs sound generation — epic anthem, battle preparation, Middle Eastern war, modern hybrid war; the old prompt was:) *Instrumental cinematic Middle Eastern adventure theme, oud melody, qanun, ney flute,
   soft frame drums, warm strings, majestic and inviting, 90 BPM, D Hijaz, seamless loop, no vocals.*
 - **match_calm** — *Instrumental strategy game background, light darbuka and riq rhythm, plucked oud
   ostinato, low strings, curious and focused, not distracting, 90 BPM, D Hijaz, seamless loop, no vocals.*

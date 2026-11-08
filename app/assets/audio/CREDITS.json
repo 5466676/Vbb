@@ -358,5 +358,25 @@
     "file": "voice/defeat_1.ogg",
     "source": "Gemini TTS, voice Enceladus, rough war-commander style, Modern Standard Arabic: «هُزِمنا… لكنّ الحربَ لم تنتهِ!»",
     "license": "generated with Gemini TTS, voice Enceladus, personal use"
+  },
+  {
+    "file": "music/menu_1.ogg",
+    "source": "ElevenLabs sound generation (22 s loop): Epic war anthem loop: taiko war drums, heroic brass, male choir, marching army",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "music/menu_2.ogg",
+    "source": "ElevenLabs sound generation (22 s loop): Dark battle-preparation loop: heavy slow war drums, low cellos, distant war horns, swords sharpened",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "music/menu_3.ogg",
+    "source": "ElevenLabs sound generation (22 s loop): Middle Eastern epic war loop: frame drums and darbuka, aggressive strings, war-horn melody",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
+  },
+  {
+    "file": "music/menu_4.ogg",
+    "source": "ElevenLabs sound generation (22 s loop): Modern epic war loop: hybrid drums, dark synth bass, brass stabs, distant soldiers",
+    "license": "generated with ElevenLabs (owner's account, personal use)"
   }
 ]

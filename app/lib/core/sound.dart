@@ -112,6 +112,11 @@ class SoundService {
   final _decks = <AudioPlayer>[];
   int _deck = 0;
   String? _track;
+  int _part = 0;
+  StreamSubscription<void>? _partEnd;
+
+  /// Tracks made of several pieces (`<track>_<n>.ogg`) play them in turn, starting at a random one.
+  static const _musicParts = {'menu': 4};
 
   /// Play a looping music bed ('menu', 'map', 'battle') or stop (null), crossfading 1.5 s.
   /// Calling it again with the same track does nothing.
@@ -127,9 +132,24 @@ class SoundService {
       final vol = muted ? 0.0 : settings.musicVolume * 0.7;
       _fade(old, to: 0, then: old.stop);
       if (track == null || vol <= 0) return;
-      await next.setReleaseMode(ReleaseMode.loop);
+      await _partEnd?.cancel();
+      _partEnd = null;
       await next.setVolume(0);
-      await next.play(AssetSource('audio/music/$track.ogg'));
+      final parts = _musicParts[track];
+      if (parts == null) {
+        await next.setReleaseMode(ReleaseMode.loop);
+        await next.play(AssetSource('audio/music/$track.ogg'));
+      } else {
+        // a playlist: each piece once, then the next, round and round
+        _part = _rnd.nextInt(parts);
+        await next.setReleaseMode(ReleaseMode.stop);
+        await next.play(AssetSource('audio/music/${track}_${_part + 1}.ogg'));
+        _partEnd = next.onPlayerComplete.listen((_) {
+          if (_track != track) return;
+          _part = (_part + 1) % parts;
+          next.play(AssetSource('audio/music/${track}_${_part + 1}.ogg')).catchError((_) {});
+        });
+      }
       _fade(next, to: vol);
     } catch (_) {
       _track = null; // e.g. the browser blocks audio before the first tap: try again next time

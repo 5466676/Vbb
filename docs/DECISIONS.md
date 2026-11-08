@@ -596,3 +596,8 @@ they stay small and exact):
 - Commentator: all 25 lines regenerated in Modern Standard Arabic, rough war-commander style,
   voice Enceladus (`tools/audio/commentator_fusha.py`), checked with speech-to-text. UI strings
   stay in the current spoken style (owner's answer: Fusha for the commentator only).
+
+## War-style menu music
+- The owner wanted the opening music war-like and kept all four candidates: `music/menu_1..4.ogg`
+  (epic anthem, battle preparation, Middle Eastern war, modern hybrid war). `SoundService.music`
+  plays a multi-part track as a playlist: a random piece first, then each in turn.
