@@ -782,6 +782,10 @@ class GameController extends Notifier<GameState> {
     m.xpGain = gain;
     me.xp += gain;
     _settings.setXp(me.xp);
+    // the results panel fills its bar for 1.6 s, then shows «RANK UP»
+    if (rankOf(me.xp) != rankOf(m.xpBefore!)) {
+      Future.delayed(const Duration(milliseconds: 3400), () => sound.play('rank_up'));
+    }
   }
 }
 

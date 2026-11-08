@@ -616,3 +616,9 @@ they stay small and exact):
   to it; online it takes the larger of the server's and its own). Rank badges in the top bar and
   the lobby, my rank and level on the home screen, and an experience panel with «RANK UP» on the
   results screen.
+
+## Neon sound effects
+- 17 interface and feedback sounds regenerated with ElevenLabs to match the neon look (digital
+  chimes and energy layered with war drums/horns): taps, menus, question, tick, lock, correct,
+  wrong, time up, claim, round start, your turn, power-up, and a new `rank_up`. Battle sounds
+  (swords, drums, captures per army) stay. Peaks set per role (UI −9 dB … big moments −3 dB).

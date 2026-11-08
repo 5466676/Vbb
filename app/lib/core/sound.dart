@@ -61,6 +61,7 @@ class SoundService {
     'player_back',
     'menu_open',
     'capture_generic',
+    'rank_up',
     'battle_drums',
     'capture_crusader',
     'capture_roman',
