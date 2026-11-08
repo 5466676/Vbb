@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/ranks.dart';
 import '../../core/api.dart';
 import '../../core/armies.dart';
 import '../../core/settings_store.dart';
@@ -269,6 +270,7 @@ class GameController extends Notifier<GameState> {
     );
     match.mySeat = room?.seats.indexWhere((s) => s.playerId == myId);
     if (match.mySeat == -1) match.mySeat = null;
+    _fillXp(match);
     for (var seat = 0; seat < match.bases.length; seat++) {
       match.terr(match.bases[seat])
         ..owner = seat
@@ -314,6 +316,7 @@ class GameController extends Notifier<GameState> {
       bases: old?.bases ?? const [],
     );
     match.mySeat = mj['your_seat'] as int?;
+    _fillXp(match, room: room);
     for (final t in mj['territories'] as List) {
       match.territories[t['id'] as int] = Territory(
         id: t['id'] as int,
@@ -744,6 +747,7 @@ class GameController extends Notifier<GameState> {
       case 'match_ended':
         m.standings = [for (final s in p['standings'] as List) (s as Map).cast<String, dynamic>()];
         m.winnerTeam = p['winner_team'] as int?;
+        _awardXp(m);
         m.phase = 'results';
         m.question = null;
         final myTeam = m.me?.team;
@@ -753,6 +757,31 @@ class GameController extends Notifier<GameState> {
           () => sound.say(myTeam != null && myTeam == m.winnerTeam ? 'victory' : 'defeat'),
         );
     }
+  }
+
+  /// Rank badges: each seat's experience from the room (the server's count), bots by difficulty,
+  /// and for me the larger of the server's and this device's count.
+  void _fillXp(MatchView m, {RoomView? room}) {
+    final seats = room?.seats ?? state.room?.seats ?? const <Seat>[];
+    for (final p in m.players) {
+      final s = p.seat < seats.length ? seats[p.seat] : null;
+      var xp = s?.xp ?? 0;
+      if (xp == 0 && (s?.bot != null || (s == null && p.bot))) xp = botXp[s?.bot] ?? botXp['medium']!;
+      if (p.seat == m.mySeat) xp = max(xp, _settings.xp);
+      p.xp = xp;
+    }
+  }
+
+  /// The match is over: add my experience (GAME_RULES §9) and keep it for the results screen.
+  void _awardXp(MatchView m) {
+    final me = m.me;
+    if (me == null || m.xpBefore != null) return;
+    final row = m.standings?.firstWhere((r) => r['seat'] == me.seat, orElse: () => const {}) ?? const {};
+    final gain = matchXp((row['correct'] ?? 0) as int, me.team == m.winnerTeam);
+    m.xpBefore = me.xp;
+    m.xpGain = gain;
+    me.xp += gain;
+    _settings.setXp(me.xp);
   }
 }
 

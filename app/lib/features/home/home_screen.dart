@@ -8,6 +8,7 @@ import '../../app/theme.dart';
 import '../../app/ui_kit.dart';
 import '../../core/api.dart';
 import '../../core/armies.dart';
+import '../../core/ranks.dart';
 import '../../core/settings_store.dart';
 import '../../core/sound.dart';
 import '../game/game_controller.dart';
@@ -189,6 +190,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           const RuqaaTitle('حرب العقول', size: 40),
+                          const SizedBox(height: 6),
+                          _MyRank(
+                            // rebuilt when a match ends (the experience is saved then)
+                            xp: (
+                              ref.watch(gameProvider.select((g) => g.match?.xpBefore)),
+                              ref.read(settingsProvider).xp,
+                            ).$2,
+                          ),
                           const SizedBox(height: 10),
                           WarButton(
                             label: 'العب ضد البوتات (بلا نت)',
@@ -496,4 +505,50 @@ class _Step extends StatelessWidget {
     width: 42,
     child: WarButton(label: '', icon: icon, height: 40, onPressed: onTap),
   );
+}
+
+/// My rank, level and the way to the next rank (GAME_RULES §9).
+class _MyRank extends StatelessWidget {
+  const _MyRank({required this.xp});
+  final int xp;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = rankColor(rankOf(xp));
+    return Row(
+      children: [
+        RankBadge(xp, size: 30),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'رتبة ${rankOf(xp)} • المستوى ${levelOf(xp)}',
+                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13, height: 1.3),
+              ),
+              const SizedBox(height: 3),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: Container(
+                  height: 6,
+                  color: AppColors.panelDeep,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: FractionallySizedBox(
+                    widthFactor: rankProgress(xp),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [AppColors.violet, c]),
+                        boxShadow: [BoxShadow(color: c, blurRadius: 4)],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 }

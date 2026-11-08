@@ -10,9 +10,11 @@ class Seat {
     required this.ready,
     required this.bot,
     required this.connected,
+    this.xp = 0,
   });
   final int seat;
   final String? playerId;
+  final int xp; // total experience (rank and level are derived, GAME_RULES §9)
   final String name;
   final String army;
   final bool ready;
@@ -27,6 +29,7 @@ class Seat {
     ready: (j['ready'] ?? false) as bool,
     bot: j['bot'] as String?,
     connected: (j['connected'] ?? true) as bool,
+    xp: (j['xp'] ?? 0) as int,
   );
 }
 
@@ -98,6 +101,7 @@ class PlayerView {
   int score;
   int bonus = 0; // points not tied to land (army perks, right answers to other duels)
   bool away = false; // the autopilot is playing for them
+  int xp = 0; // total experience, for the rank badge
   bool eliminated;
   bool connected;
   bool abilityUsed;
@@ -227,6 +231,8 @@ class MatchView {
   // results
   List<Map<String, dynamic>>? standings;
   int? winnerTeam;
+  int? xpBefore; // my experience before this match (set when it ends)
+  int xpGain = 0;
 
   bool get ended => standings != null;
   PlayerView? get me => mySeat == null ? null : players[mySeat!];

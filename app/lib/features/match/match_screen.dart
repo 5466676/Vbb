@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
+import '../../app/ui_kit.dart' show RankBadge;
 import '../../core/armies.dart';
 import '../../core/map_template.dart';
 import '../game/game_controller.dart';
@@ -825,6 +826,8 @@ class _TopBar extends StatelessWidget {
                   children: [
                     Row(
                       children: [
+                        RankBadge(p.xp, size: 15),
+                        const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             p.name,

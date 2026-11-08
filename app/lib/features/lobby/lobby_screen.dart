@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/theme.dart';
+import '../../app/ui_kit.dart' show RankBadge;
 import '../../core/armies.dart';
 import '../game/game_controller.dart';
 import '../game/game_state.dart';
@@ -191,9 +192,18 @@ class _SeatRow extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '${seat.name}${isHost ? ' 👑' : ''}${seat.bot != null ? ' 🤖 ${_bot(seat.bot!)}' : ''}',
-                  style: const TextStyle(fontWeight: FontWeight.w800),
+                Row(
+                  children: [
+                    RankBadge(seat.xp, size: 17),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(
+                        '${seat.name}${isHost ? ' 👑' : ''}${seat.bot != null ? ' 🤖 ${_bot(seat.bot!)}' : ''}',
+                        style: const TextStyle(fontWeight: FontWeight.w800),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
                 ),
                 Text(army.name, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
               ],

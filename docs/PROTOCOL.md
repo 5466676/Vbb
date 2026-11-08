@@ -77,7 +77,7 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `queued` | `{"mode", "size"}` |
 | `quick_match_cancelled` | `{}` |
 | `match_found` | `{"code"}` — you are already seated; the room starts by itself |
-| `room_state` | `{"code", "host", "status": lobby\|playing\|ended, "settings", "seats": [{"seat", "player_id"\|null, "name", "army", "ready", "bot"\|null, "connected"}], "votes": {player_id: kind}, "quick"}` |
+| `room_state` | `{"code", "host", "status": lobby\|playing\|ended, "settings", "seats": [{"seat", "player_id"\|null, "name", "army", "ready", "bot"\|null, "connected", "away", "xp", "rank": E\|D\|C\|B\|A\|S, "level"}], "votes": {player_id: kind}, "quick"}` |
 | `left_room` | `{"code"}` |
 
 ### Match
@@ -172,7 +172,7 @@ Auth: `Authorization: Bearer <token>` from `POST /auth/guest` (the device sends 
 | `GET /health` | – | `{"status": "ok", "version", "server_time_ms"}` — cheap "is the server on?" check |
 | `GET /questions?since=<version>&limit=≤1000` | – | `{"version", "more", "items": [question]}` — offline (solo-pack) questions changed after `since`, in version order. Keep the returned `version`; repeat while `more`. |
 | `POST /sync` | token | `{"actions": [action, ≤500], "questions_since"?: int}` → `{"results": [{"id", "status", "reason"?, "correct"?, "points"?}], "stats", "server_time", "questions"? }` |
-| `GET /me/stats` | token | `stats` |
+| `GET /me/stats` | token | `stats` — `{"solo", "online", "xp", "rank", "level"}` (GAME_RULES §9) |
 | `GET /leaderboard?period=all\|week&limit=≤200` | optional token | `{"period", "rows": [{"rank", "player", "name", "matches", "wins", "score"}], "me"?}` |
 | `POST /auth/account` | token | `{"username": 3–20 letters/digits/_, "pin": 4–8 digits}` → `{"username"}` (lower-cased). 409 `username_taken` |
 | `POST /auth/restore` | – | `{"username", "pin", "device_id"}` → `{"token", "player_id", "name"}`; this device now owns the account. 401 `bad_login`, 429 `locked` |

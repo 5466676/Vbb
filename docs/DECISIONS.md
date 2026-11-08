@@ -603,3 +603,16 @@ they stay small and exact):
   plays a multi-part track as a playlist: a random piece first, then each in turn.
 - Owner: use them in the match too. Expansion plays menu_2, menu_3 and map in turn; battle plays
   menu_1, menu_4 and battle; the final round keeps its own bed.
+
+## Ranks E→S and levels (owner's request)
+- Cosmetic progression (GAME_RULES §9): experience 10 per finished match, +5 per right answer,
+  +30 for a win; ranks E/D/C/B/A/S at 0/200/600/1500/3500/7000; level = 1 + xp ÷ 100.
+- Server: `app/ranks.py` (pure). The hub looks a player's total up once per socket from saved
+  online matches (`db_xp_lookup`, failures never block a connection) and passes it with `join`;
+  seats carry `xp`, and `room_state` seats add `xp`, `rank`, `level`. Bots show a rank by
+  difficulty. `/me/stats` adds `xp`, `rank`, `level`. No new table: totals are linear in the
+  existing MatchResult columns.
+- App: `core/ranks.dart` mirrors the formula. The device keeps its own total (offline matches add
+  to it; online it takes the larger of the server's and its own). Rank badges in the top bar and
+  the lobby, my rank and level on the home screen, and an experience panel with «RANK UP» on the
+  results screen.

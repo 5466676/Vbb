@@ -15,6 +15,7 @@ from app.bots.simple import Difficulty
 from app.config import Settings
 from app.engine.armies import Army
 from app.engine.models import Mode
+from app.ranks import BOT_XP
 from app.rooms import store
 from app.rooms.actor import BOT_NAMES, START_PAUSE_MS
 from app.rooms.bus import Bus
@@ -72,6 +73,7 @@ class Matchmaker:
                 name=e["name"] or "لاعب",
                 army=Army(e["army"]) if e.get("army") else self.rnd.choice(list(Army)),
                 ready=True,
+                xp=int(e.get("xp", 0)),
             )
             for e in entries
         ]
@@ -83,6 +85,7 @@ class Matchmaker:
                     army=self.rnd.choice(list(Army)),
                     ready=True,
                     bot=Difficulty.MEDIUM,
+                    xp=BOT_XP[Difficulty.MEDIUM],
                 )
             )
         self.rnd.shuffle(seats)

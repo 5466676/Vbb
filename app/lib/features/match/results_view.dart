@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/theme.dart';
 import '../../app/ui_kit.dart';
 import '../../core/armies.dart';
+import '../../core/ranks.dart';
 import '../game/game_controller.dart';
 import '../game/game_state.dart';
 
@@ -65,6 +66,7 @@ class ResultsView extends ConsumerWidget {
                   ),
                 ),
               ],
+              if (m.xpBefore != null) ...[const SizedBox(height: 10), _XpPanel(before: m.xpBefore!, gain: m.xpGain)],
               const SizedBox(height: 12),
               Row(
                 mainAxisSize: MainAxisSize.min,
@@ -239,4 +241,104 @@ class _CountUp extends StatelessWidget {
     curve: Curves.easeOutCubic,
     builder: (context, v, _) => Text('${v.round()}', style: style),
   );
+}
+
+/// Experience from this match: the bar fills, the level ticks up, and a «RANK UP» notice glows
+/// when a new rank is reached (GAME_RULES §9).
+class _XpPanel extends StatelessWidget {
+  const _XpPanel({required this.before, required this.gain});
+  final int before, gain;
+
+  @override
+  Widget build(BuildContext context) {
+    final after = before + gain;
+    final up = rankOf(after) != rankOf(before);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 1600),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, _) {
+        final xp = before + (gain * t).round();
+        final c = rankColor(rankOf(xp));
+        return Container(
+          width: 420,
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
+          decoration: AppColors.window(edge: up && t >= 1 ? rankColor(rankOf(after)) : AppColors.neon),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (up)
+                AnimatedOpacity(
+                  opacity: t >= 1 ? 1 : 0,
+                  duration: const Duration(milliseconds: 400),
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        RankBadge(before, size: 34),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            'RANK UP',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w900,
+                              fontSize: 26,
+                              letterSpacing: 2,
+                              shadows: [
+                                Shadow(color: c, blurRadius: 16),
+                                Shadow(color: c, blurRadius: 4),
+                              ],
+                            ),
+                          ),
+                        ),
+                        RankBadge(after, size: 34),
+                      ],
+                    ),
+                  ),
+                ),
+              Row(
+                children: [
+                  RankBadge(xp, size: 26),
+                  const SizedBox(width: 10),
+                  Text('المستوى ${levelOf(xp)}', style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                  const Spacer(),
+                  Text(
+                    '+${(gain * t).round()} خبرة',
+                    style: const TextStyle(color: AppColors.good, fontWeight: FontWeight.w900, fontSize: 16),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: Container(
+                  height: 8,
+                  color: AppColors.panelDeep,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: FractionallySizedBox(
+                    widthFactor: rankProgress(xp),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: [AppColors.violet, c]),
+                        boxShadow: [BoxShadow(color: c, blurRadius: 6)],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                toNextRank(xp) == 0 ? 'وصلت لأعلى رتبة!' : 'باقي ${toNextRank(xp)} خبرة للرتبة ${_next(xp)}',
+                style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  static String _next(int xp) => ranks.firstWhere((r) => r.$2 > xp, orElse: () => ranks.last).$1;
 }

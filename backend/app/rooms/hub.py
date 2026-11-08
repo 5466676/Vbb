@@ -12,6 +12,7 @@ import contextlib
 import json
 import logging
 import time
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -45,6 +46,7 @@ class Connection:
     send_lock: asyncio.Lock = field(default_factory=asyncio.Lock)
     player_sub: int | None = None
     closed: bool = False
+    xp: int = 0  # total experience, looked up once when the socket opens
 
     async def send(self, type_: str, payload: dict[str, Any]) -> None:
         async with self.send_lock:
@@ -64,8 +66,16 @@ class Connection:
 
 
 class Hub:
-    def __init__(self, redis: Redis, bus: Bus, manager: RoomManager, settings: Settings) -> None:
+    def __init__(
+        self,
+        redis: Redis,
+        bus: Bus,
+        manager: RoomManager,
+        settings: Settings,
+        xp_lookup: Callable[[str], Awaitable[int]] | None = None,
+    ) -> None:
         self.redis = redis
+        self.xp_lookup = xp_lookup
         self.bus = bus
         self.manager = manager
         self.settings = settings
@@ -93,6 +103,11 @@ class Hub:
             with contextlib.suppress(Exception):
                 await old.ws.close(code=4001, reason="replaced by a new connection")
         conn = Connection(ws=ws, pid=pid, name=name, tokens=self.settings.rate_burst)
+        if self.xp_lookup:
+            try:
+                conn.xp = await self.xp_lookup(pid)
+            except Exception:  # ranks are cosmetic: never block a connection on them
+                log.warning("xp lookup failed for %s", pid, exc_info=True)
         self.conns[pid] = conn
         conn.player_sub = await self.bus.subscribe(
             store.ch_player(pid), lambda d, c=conn: self._on_player(c, d)
@@ -236,13 +251,21 @@ class Hub:
         await store.save_room(self.redis, RoomData(code=code, host=None))
         await self._attach(conn, code)
         await self.manager.send(
-            code, {"kind": "join", "pid": conn.pid, "name": conn.name, "army": p.get("army")}
+            code,
+            {
+                "kind": "join",
+                "pid": conn.pid,
+                "name": conn.name,
+                "army": p.get("army"),
+                "xp": conn.xp,
+            },
         )
 
     async def _join_room(self, conn: Connection, code: str, army: str | None, seq: int) -> None:
         if conn.room == code:
             await self.manager.send(
-                code, {"kind": "join", "pid": conn.pid, "name": conn.name, "army": army}
+                code,
+                {"kind": "join", "pid": conn.pid, "name": conn.name, "army": army, "xp": conn.xp},
             )
             return
         if await self._busy(conn, seq):
@@ -254,7 +277,7 @@ class Hub:
             return
         await self._attach(conn, code)
         await self.manager.send(
-            code, {"kind": "join", "pid": conn.pid, "name": conn.name, "army": army}
+            code, {"kind": "join", "pid": conn.pid, "name": conn.name, "army": army, "xp": conn.xp}
         )
 
     async def _quick_match(self, conn: Connection, p: dict[str, Any], seq: int) -> None:
@@ -274,7 +297,13 @@ class Hub:
             return
         army = p.get("army") if p.get("army") in {a.value for a in Army} else None
         await self._dequeue(conn.pid)
-        entry = {"pid": conn.pid, "name": conn.name, "army": army, "t": int(time.time() * 1000)}
+        entry = {
+            "pid": conn.pid,
+            "name": conn.name,
+            "army": army,
+            "xp": conn.xp,
+            "t": int(time.time() * 1000),
+        }
         await self.redis.rpush(store.k_queue(mode, size), json.dumps(entry, ensure_ascii=False))
         await conn.send("queued", {"mode": mode.value, "size": size})
 

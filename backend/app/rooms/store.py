@@ -97,6 +97,7 @@ class Seat(BaseModel):
     connected: bool = True
     left: bool = False  # left during a match: a bot keeps playing
     away: bool = False  # missed a move: the autopilot plays (no power-ups) until they act again
+    xp: int = 0  # total experience when the seat was taken (rank and level are derived)
 
 
 class Timer(BaseModel):

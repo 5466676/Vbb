@@ -49,6 +49,7 @@ from app.engine.models import (
 from app.maps import MapKind, load_template, map_for, template_id
 from app.models.question import CATEGORIES
 from app.questions.provider import ProviderFactory, QuestionProvider, SampleProvider
+from app.ranks import BOT_XP, level_of, rank_of
 from app.rooms import store
 from app.rooms.bus import Bus
 from app.rooms.store import RoomData, RoomStatus, Seat
@@ -276,6 +277,9 @@ class RoomActor:
                     "bot": s.bot.value if s.bot else None,
                     "connected": s.connected,
                     "away": s.away,
+                    "xp": s.xp,
+                    "rank": rank_of(s.xp),
+                    "level": level_of(s.xp),
                 }
                 for i, s in enumerate(r.seats)
             ],
@@ -294,7 +298,9 @@ class RoomActor:
         kind = item["kind"]
         try:
             if kind == "join":
-                await self._join(pid, item.get("name", ""), item.get("army"))
+                await self._join(
+                    pid, item.get("name", ""), item.get("army"), int(item.get("xp", 0))
+                )
             elif kind == "connected":
                 await self._connected(pid, True)
             elif kind == "disconnected":
@@ -373,7 +379,7 @@ class RoomActor:
 
     # ------------------------------------------------------------------ lobby
 
-    async def _join(self, pid: str, name: str, army: str | None) -> None:
+    async def _join(self, pid: str, name: str, army: str | None, xp: int = 0) -> None:
         r = self.room
         assert r is not None
         seat = r.seat_of(pid)
@@ -386,7 +392,7 @@ class RoomActor:
         if len(r.seats) >= r.settings.max_players:
             raise RoomError("full", "the room is full")
         chosen = Army(army) if army in {a.value for a in Army} else self.rnd.choice(list(Army))
-        r.seats.append(Seat(player_id=pid, name=name or "لاعب", army=chosen))
+        r.seats.append(Seat(player_id=pid, name=name or "لاعب", army=chosen, xp=max(0, xp)))
         if r.host is None:
             r.host = pid
         await self.redis.set(store.k_player_room(pid), self.code)
@@ -471,7 +477,9 @@ class RoomActor:
         assert self.room is not None
         taken = {s.name for s in self.room.seats}
         name = next((n for n in BOT_NAMES if n not in taken), "بوت")
-        return Seat(name=name, army=self.rnd.choice(list(Army)), ready=True, bot=level)
+        return Seat(
+            name=name, army=self.rnd.choice(list(Army)), ready=True, bot=level, xp=BOT_XP[level]
+        )
 
     async def _start_match(self) -> None:
         r = self.room

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/ranks.dart';
 import 'theme.dart';
 
 /// Game-styled building blocks in the neon «system window» look: glowing-edge buttons and
@@ -347,6 +348,40 @@ class GameScaffold extends StatelessWidget {
               Expanded(child: child),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A rank letter (E → S) in a small glowing square, in the rank's own colour.
+class RankBadge extends StatelessWidget {
+  const RankBadge(this.xp, {super.key, this.size = 18});
+  final int xp;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = rankOf(xp);
+    final c = rankColor(r);
+    return Container(
+      width: size,
+      height: size,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.panelDeep,
+        borderRadius: BorderRadius.circular(size * 0.18),
+        border: Border.all(color: c, width: size > 30 ? 2.4 : 1.3),
+        boxShadow: [BoxShadow(color: c.withValues(alpha: 0.6), blurRadius: size * 0.4)],
+      ),
+      child: Text(
+        r,
+        style: TextStyle(
+          color: c,
+          fontWeight: FontWeight.w900,
+          fontSize: size * 0.62,
+          height: 1,
+          shadows: [Shadow(color: c, blurRadius: size * 0.3)],
         ),
       ),
     );

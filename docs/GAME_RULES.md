@@ -173,3 +173,15 @@ A turn:
   with a latency grace of at most **150 ms**.
 - Late and duplicate answers are rejected.
 - A question, pick window or targeting window ends **as soon as everyone involved has acted**; the timer is only the upper bound.
+
+## 9. Ranks and levels (الرتب)
+- A **cosmetic** progression: ranks and levels never change scoring, timers or matchmaking.
+- **Experience per match:** 10 for finishing, +5 per right answer, +30 for a win (team win counts).
+  Online matches count on the server (total over saved matches). Offline matches add to the
+  player's experience on their own device only.
+- **Rank** by total experience: **E** 0 · **D** 200 · **C** 600 · **B** 1500 · **A** 3500 · **S** 7000.
+- **Level** = 1 + experience ÷ 100 (rounded down).
+- Shown next to every name in the lobby and the match; bots show a rank that matches their
+  difficulty (easy D, medium C, hard A). At the end of a match the player sees the experience
+  gained, and a «RANK UP» notice when they reach a new rank.
+

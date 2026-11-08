@@ -45,6 +45,10 @@ class SettingsStore {
     await _p.remove('player_id');
   }
 
+  /// Total experience on this device (offline matches, and online ones as the server counts them).
+  int get xp => _p.getInt('xp') ?? 0;
+  Future<void> setXp(int v) => _p.setInt('xp', v);
+
   String get army => _p.getString('army') ?? 'islamic';
   Future<void> setArmy(String v) => _p.setString('army', v);
 

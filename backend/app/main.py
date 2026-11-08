@@ -24,7 +24,7 @@ from app.rooms.bus import Bus
 from app.rooms.hub import Hub
 from app.rooms.manager import RoomManager
 from app.rooms.matchmaker import Matchmaker
-from app.sync.results import db_results_sink
+from app.sync.results import db_results_sink, db_xp_lookup
 
 
 def make_redis(url: str) -> Redis:
@@ -67,7 +67,7 @@ def create_app(
         bus = Bus(redis)
         await bus.start()
         manager = RoomManager(redis, bus, settings, factory, db_results_sink(sessionmaker))
-        hub = Hub(redis, bus, manager, settings)
+        hub = Hub(redis, bus, manager, settings, db_xp_lookup(sessionmaker))
         app.state.hub = hub
         app.state.redis = redis
         app.state.manager = manager
