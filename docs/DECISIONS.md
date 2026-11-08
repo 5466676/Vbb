@@ -655,3 +655,11 @@ they stay small and exact):
   existing ids (531 questions now, 96 new).
 - Test fix: the leaderboard test now waits for the results sink (it is saved just after
   `match_ended` is broadcast; the old test read too early once seeding took longer).
+
+## Smoothness and motion
+- Results screen scales down to fit a short landscape phone (no clipped buttons).
+- Short vibrations on the moments that matter (your turn, right/wrong, tower hit, elimination,
+  victory, rank up, taps) through `SoundService.play`.
+- Motion: the screen edge breathes in cyan while it is my move (`_TurnGlow`, four edge
+  gradients); a scan line sweeps across when a new stage sign drops (`_ScanWipe`); slow motes of
+  light drift over the map (`_Motes`, own repaint layer).

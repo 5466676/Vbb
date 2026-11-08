@@ -173,6 +173,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                               ),
                             ),
                           ),
+                          const Positioned.fill(child: _Motes()),
                           // dark edges frame the battlefield
                           const Positioned.fill(
                             child: IgnorePointer(
@@ -280,7 +281,11 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                                       decoration: Toon.chunky(Toon.gold, radius: 16),
                                       child: const Text(
                                         '🤖 عم نلعب عنك — اكبس لترجع',
-                                        style: TextStyle(color: Toon.ink, fontWeight: FontWeight.w900, fontSize: 16),
+                                        style: TextStyle(
+                                          color: Color(0xFF05070F),
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 16,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -288,6 +293,10 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                               ),
                             ),
                           Positioned(left: 0, right: 0, top: 0, height: 56, child: _EmoteBubbles(match: m)),
+                          // your move: the screen's edge breathes in cyan
+                          Positioned.fill(child: _TurnGlow(active: m.myTurn && !asking && !m.ended)),
+                          // a new stage: a bright scan line sweeps across before the sign drops
+                          if (m.banner != null) Positioned.fill(child: _ScanWipe(key: ValueKey('wipe${m.bannerId}'))),
                           if (m.banner != null)
                             Positioned.fill(
                               child: StageSign(key: ValueKey('sign${m.bannerId}'), text: m.banner!, sub: m.bannerSub),
@@ -1401,4 +1410,187 @@ class _EmoteBubbles extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The screen's edge glows and breathes while it is my move (no blur: four edge gradients).
+class _TurnGlow extends StatefulWidget {
+  const _TurnGlow({required this.active});
+  final bool active;
+
+  @override
+  State<_TurnGlow> createState() => _TurnGlowState();
+}
+
+class _TurnGlowState extends State<_TurnGlow> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400));
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.active) _c.repeat(reverse: true);
+  }
+
+  @override
+  void didUpdateWidget(_TurnGlow old) {
+    super.didUpdateWidget(old);
+    if (widget.active && !_c.isAnimating) _c.repeat(reverse: true);
+    if (!widget.active && _c.isAnimating) _c.stop();
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: RepaintBoundary(
+        child: AnimatedOpacity(
+          opacity: widget.active ? 1 : 0,
+          duration: const Duration(milliseconds: 400),
+          child: AnimatedBuilder(
+            animation: _c,
+            builder: (context, _) =>
+                CustomPaint(painter: _EdgeGlowPainter(0.35 + 0.45 * Curves.easeInOut.transform(_c.value))),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EdgeGlowPainter extends CustomPainter {
+  _EdgeGlowPainter(this.k);
+  final double k;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = min(size.width, size.height) * 0.09;
+    final c = AppColors.neon.withValues(alpha: 0.55 * k);
+    const clear = Color(0x003FD0FF);
+    void edge(Rect r, Alignment from) => canvas.drawRect(
+      r,
+      Paint()..shader = LinearGradient(begin: from, end: -from, colors: [c, clear]).createShader(r),
+    );
+    edge(Rect.fromLTWH(0, 0, size.width, w), Alignment.topCenter);
+    edge(Rect.fromLTWH(0, size.height - w, size.width, w), Alignment.bottomCenter);
+    edge(Rect.fromLTWH(0, 0, w, size.height), Alignment.centerLeft);
+    edge(Rect.fromLTWH(size.width - w, 0, w, size.height), Alignment.centerRight);
+  }
+
+  @override
+  bool shouldRepaint(_EdgeGlowPainter old) => old.k != k;
+}
+
+/// A new stage: a bright vertical scan line sweeps right to left (the reading direction) with a
+/// fading trail and a faint flash, once.
+class _ScanWipe extends StatefulWidget {
+  const _ScanWipe({super.key});
+
+  @override
+  State<_ScanWipe> createState() => _ScanWipeState();
+}
+
+class _ScanWipeState extends State<_ScanWipe> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 750))
+    ..forward();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: _c,
+        builder: (context, _) => _c.value >= 1
+            ? const SizedBox.shrink()
+            : CustomPaint(painter: _ScanPainter(Curves.easeInOut.transform(_c.value))),
+      ),
+    );
+  }
+}
+
+class _ScanPainter extends CustomPainter {
+  _ScanPainter(this.t);
+  final double t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final x = size.width * (1.1 - 1.2 * t);
+    // a faint flash of the whole screen at the start
+    canvas.drawRect(Offset.zero & size, Paint()..color = AppColors.neon.withValues(alpha: 0.10 * (1 - t)));
+    final trail = Rect.fromLTWH(x, 0, size.width * 0.35, size.height);
+    canvas.drawRect(
+      trail,
+      Paint()
+        ..shader = LinearGradient(colors: [AppColors.neon.withValues(alpha: 0.28), const Color(0x003FD0FF)])
+            .createShader(trail),
+    );
+    canvas.drawRect(Rect.fromLTWH(x - 2, 0, 4, size.height), Paint()..color = Colors.white.withValues(alpha: 0.9));
+    canvas.drawRect(Rect.fromLTWH(x - 8, 0, 16, size.height), Paint()..color = AppColors.neon.withValues(alpha: 0.35));
+  }
+
+  @override
+  bool shouldRepaint(_ScanPainter old) => old.t != t;
+}
+
+/// Slow drifting motes of light over the map: a few dozen dots that twinkle (its own layer).
+class _Motes extends StatefulWidget {
+  const _Motes();
+
+  @override
+  State<_Motes> createState() => _MotesState();
+}
+
+class _MotesState extends State<_Motes> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(seconds: 60))..repeat();
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: RepaintBoundary(
+        child: AnimatedBuilder(
+          animation: _c,
+          builder: (context, _) => CustomPaint(painter: _MotesPainter(_c.value * 60)),
+        ),
+      ),
+    );
+  }
+}
+
+class _MotesPainter extends CustomPainter {
+  _MotesPainter(this.t);
+  final double t; // seconds
+
+  static final _seeds = [
+    for (var i = 0; i < 36; i++)
+      (Random(i * 7919).nextDouble(), Random(i * 104729).nextDouble(), 0.4 + Random(i * 31).nextDouble()),
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint();
+    for (final (i, (x0, y0, s)) in _seeds.indexed) {
+      final y = ((y0 - t * 0.008 * s) % 1.0) * size.height; // rise slowly
+      final x = (x0 + 0.015 * sin(t * 0.4 * s + i)) * size.width;
+      final a = 0.25 + 0.35 * (0.5 + 0.5 * sin(t * 1.7 * s + i * 1.3));
+      p.color = (i % 5 == 0 ? AppColors.violet : AppColors.neon).withValues(alpha: a);
+      canvas.drawCircle(Offset(x, y), 1.1 + s, p);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_MotesPainter old) => old.t != t;
 }

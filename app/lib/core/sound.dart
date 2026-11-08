@@ -5,6 +5,7 @@ import 'dart:io' show Platform;
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart' show HapticFeedback;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'armies.dart';
@@ -82,7 +83,20 @@ class SoundService {
     }
   }
 
+  /// A short vibration with the moments that matter (Android; nothing on the web).
+  static const _haptics = {
+    'your_turn': HapticFeedback.mediumImpact,
+    'wrong': HapticFeedback.mediumImpact,
+    'correct': HapticFeedback.lightImpact,
+    'tower_hit': HapticFeedback.heavyImpact,
+    'eliminated': HapticFeedback.heavyImpact,
+    'victory': HapticFeedback.heavyImpact,
+    'rank_up': HapticFeedback.heavyImpact,
+    'ui_tap': HapticFeedback.selectionClick,
+  };
+
   Future<void> play(String id, {double volume = 1}) async {
+    if (!_testing) _haptics[id]?.call();
     if (muted || settings.sfxVolume <= 0) return;
     final asset = _sfx.contains(id) ? 'audio/sfx/$id.ogg' : null;
     if (asset == null) return;

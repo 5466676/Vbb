@@ -32,9 +32,11 @@ class ResultsView extends ConsumerWidget {
           colorFilter: const ColorFilter.mode(Color(0xCC05070F), BlendMode.srcATop),
         ),
       ),
-      child: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(12),
+      // the whole page always fits the screen (scaled down on a short landscape phone)
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
