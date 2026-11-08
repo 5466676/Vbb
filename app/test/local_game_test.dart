@@ -27,6 +27,7 @@ Map<String, dynamic> _simulate(int n, int seed, {bool teams = false}) {
     setups: setups,
     teams: teams,
     rng: r,
+    battleExtras: seed.isEven, // both battles: plain, and with the extras
   );
   final events = <Ev>[...m.start()];
   var q = 0;
@@ -73,8 +74,10 @@ Map<String, dynamic> _simulate(int n, int seed, {bool teams = false}) {
           events.addAll(m.pick(s, botPicks(m, s, m.pickQuota[s]!, r)));
         }
       } else if (m.phase == 'battle_target') {
-        final t = botTarget(m, m.attacker!, level, r);
-        events.addAll(t == null || r.nextDouble() < 0.1 ? m.timeout(m.phaseId) : m.chooseTarget(m.attacker!, t));
+        final open = [for (final s in m.planners) if (!m.planned.containsKey(s)) s];
+        final s = open[r.nextInt(open.length)];
+        final t = botTarget(m, s, level, r);
+        events.addAll(t == null || r.nextDouble() < 0.1 ? m.timeout(m.phaseId) : m.chooseTarget(s, t));
       }
     } on RuleError {
       // a bot tried something illegal: fine, the engine refused it

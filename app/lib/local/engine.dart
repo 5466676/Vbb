@@ -34,6 +34,7 @@ const domination = 2 / 3;
 class Settings {
   bool openEnded = true;
   bool chooseBases = false; // players place their castles in turn (GAME_RULES §6.0)
+  bool battleExtras = false; // targets all at once, king's question, underdog shield, streaks
   int baseMs = 12000;
   int mcqMs = 10000;
   int numericMs = 15000;
@@ -88,6 +89,7 @@ class PlayerState {
   final bool isBot;
   bool connected = true;
   bool eliminated = false;
+  int streak = 0; // right answers in a row
   int bonus = 0;
   List<String> powerups = ['remove_two', 'hint', 'shield', 'double'];
   bool abilityUsed = false;
@@ -126,7 +128,11 @@ class PlayerSetup {
   final bool isBot;
 }
 
-const battlePhases = {'battle_target', 'battle_duel', 'battle_tiebreak'};
+const battlePhases = {'king_question', 'battle_target', 'battle_duel', 'battle_tiebreak'};
+const questionPhases = {'expansion_question', 'king_question', 'battle_duel', 'battle_tiebreak'};
+const streakFire = 3; // right answers in a row to be on fire
+const streakCaptureBonus = 50;
+const kingPoints = 150;
 
 class MatchState {
   MatchState._(this.settings, this.mapId, this.neighbors, this.territories, this.players, this.battleRounds, this.baseTowers, this.rng);
@@ -149,6 +155,11 @@ class MatchState {
   int battleRound = 0;
   List<int> turnQueue = [];
   List<int> roundOrder = []; // this round's attackers, in order
+  List<int> planners = []; // still choosing a target (all at once)
+  Map<int, int> planned = {};
+  Set<int> plannedAuto = {};
+  List<(int, int, bool)> duelQueue = [];
+  int? king;
   int? attacker;
   Duel? duel;
   bool extraTurn = false;
@@ -167,11 +178,13 @@ class MatchState {
     required bool teams,
     bool openEnded = true,
     bool chooseBases = false,
+    bool battleExtras = false,
     Random? rng,
   }) {
     final s = Settings()
       ..openEnded = openEnded
-      ..chooseBases = chooseBases;
+      ..chooseBases = chooseBases
+      ..battleExtras = battleExtras;
     final n = setups.length;
     if (n < 2 || n > 8) throw RuleError('a match needs 2-8 players');
     final terr = {for (final id in neighbors.keys) id: TerritoryState(id, s.normalValue)};
@@ -267,6 +280,7 @@ class MatchState {
 
   // ------------------------------------------------------------------ queries
 
+  bool get teamsMode => players.map((p) => p.team).toSet().length < players.length;
   List<int> aliveSeats() => [for (final p in players) if (!p.eliminated) p.seat];
   List<int> owned(int seat) => [for (final t in territories.values) if (t.owner == seat) t.id];
   List<int> freeTerritories() => ([for (final t in territories.values) if (t.owner == null) t.id])..sort();
@@ -370,7 +384,7 @@ class MatchState {
   List<Ev> answer(int seat, {int? choice, double? value, required int elapsedMs}) {
     final ev = <Ev>[];
     final aq = active;
-    if (aq == null || !{'expansion_question', 'battle_duel', 'battle_tiebreak'}.contains(phase)) {
+    if (aq == null || !questionPhases.contains(phase)) {
       throw RuleError('no question is open');
     }
     if (!aq.participants.contains(seat)) throw RuleError('you are not answering this question');
@@ -391,7 +405,7 @@ class MatchState {
   List<Ev> timeout(int forPhaseId) {
     final ev = <Ev>[];
     if (forPhaseId != phaseId) return ev;
-    if ({'expansion_question', 'battle_duel', 'battle_tiebreak'}.contains(phase)) {
+    if (questionPhases.contains(phase)) {
       if (active == null) return ev;
       _resolveQuestion(ev);
     } else if (phase == 'base_placement') {
@@ -399,13 +413,14 @@ class MatchState {
     } else if (phase == 'expansion_picks') {
       _resolvePicks(ev);
     } else if (phase == 'battle_target') {
-      final targets = legalTargets(attacker!);
-      if (targets.isEmpty) {
-        ev.add(Ev('turn_skipped', {'seat': attacker}));
-        _nextTurn(ev);
-      } else {
-        _startDuel(targets[rng.nextInt(targets.length)], ev, auto: true);
+      for (final seat in planners) {
+        if (!planned.containsKey(seat)) {
+          final legal = legalTargets(seat);
+          planned[seat] = legal[rng.nextInt(legal.length)];
+          plannedAuto.add(seat);
+        }
       }
+      _startDuels(ev);
     }
     return ev;
   }
@@ -430,9 +445,12 @@ class MatchState {
 
   List<Ev> chooseTarget(int seat, int territory) {
     final ev = <Ev>[];
-    if (phase != 'battle_target' || seat != attacker) throw RuleError('it is not your turn to attack');
+    if (phase != 'battle_target' || !planners.contains(seat)) throw RuleError('it is not your turn to attack');
+    if (planned.containsKey(seat)) throw RuleError('you already chose a target');
     if (!legalTargets(seat).contains(territory)) throw RuleError('illegal target');
-    _startDuel(territory, ev, auto: false);
+    planned[seat] = territory;
+    ev.add(Ev('target_locked', {'seat': seat}));
+    if (planned.length == planners.length) _startDuels(ev);
     return ev;
   }
 
@@ -549,14 +567,36 @@ class MatchState {
     return [for (final e in indexed) e.$2];
   }
 
+  /// MCQ: the right option. Numeric: within 10 % of the answer (or ±1 for small numbers).
+  bool _rightFor(Question q, AnswerRecord r) {
+    if (q.kind == 'mcq') return isCorrect(q, r);
+    final ans = q.answer ?? 0;
+    return r.value != null && (r.value! - ans).abs() <= max(ans.abs() * 0.1, 1.0);
+  }
+
   void _resolveQuestion(List<Ev> ev) {
     final aq = active!;
     active = null;
-    for (final r in aq.answers.values) {
-      final p = players[r.seat];
-      p.answered++;
-      p.totalAnswerMs += r.elapsedMs;
-      if (isCorrect(aq.question, r)) p.correct++;
+    final streaks = <Ev>[];
+    for (final seat in aq.participants) {
+      final p = players[seat];
+      final r = aq.answers[seat];
+      if (r != null) {
+        p.answered++;
+        p.totalAnswerMs += r.elapsedMs;
+      }
+      if (r != null && _rightFor(aq.question, r)) {
+        p.correct++;
+        p.streak++;
+        if (p.streak == streakFire && settings.battleExtras) {
+          streaks.add(Ev('streak', {'seat': seat, 'count': p.streak, 'on': true}));
+        }
+      } else {
+        if (p.streak >= streakFire && settings.battleExtras) {
+          streaks.add(Ev('streak', {'seat': seat, 'count': 0, 'on': false}));
+        }
+        p.streak = 0;
+      }
     }
     final bonus = <int, int>{};
     if (duel != null && players[duel!.attacker].army == 'mongol') bonus[duel!.attacker] = mongolAttackTimeBonusMs;
@@ -569,8 +609,12 @@ class MatchState {
       'ranking': order,
       'answers': {for (final e in aq.answers.entries) '${e.key}': e.value.toJson()},
     }));
+    ev.addAll(streaks);
     if (phase == 'expansion_question') {
       _openPicks(order, ev);
+    } else if (phase == 'king_question') {
+      _resolveKing(aq, order, ev);
+      if (!settings.battleExtras || !_openTargeting(ev, [...roundOrder])) _nextTurn(ev);
     } else if (phase == 'battle_duel') {
       _resolveDuel(aq, bonus, ev);
     } else if (phase == 'battle_tiebreak') {
@@ -736,32 +780,128 @@ class MatchState {
     while (true) {
       final dominant = dominantTeam();
       if (_aliveTeams().length <= 1 || dominant != null) return _finish(ev, firstTeam: dominant);
-      int? seat;
       if (extraTurn && attacker != null) {
         extraTurn = false;
-        if (!players[attacker!].eliminated) seat = attacker;
+        if (!players[attacker!].eliminated && _openTargeting(ev, [attacker!])) return;
       }
-      if (seat == null) {
-        if (turnQueue.isEmpty) {
-          battleRound++;
-          if (battleRound > battleRounds) return _finish(ev);
-          _buildQueue();
-          final win = settings.openEnded ? (dominationShare() * 100).round() / 100 : null;
-          ev.add(Ev('round_started', {'round': battleRound, 'order': [...roundOrder], 'win_share': win, 'final': isFinalRound}));
+      if (turnQueue.isNotEmpty && duelQueue.isEmpty) {
+        // one attacker at a time (plain battle)
+        if (_openTargeting(ev, [turnQueue.removeAt(0)])) return;
+        continue;
+      }
+      while (duelQueue.isNotEmpty) {
+        final (seat, tid, auto) = duelQueue.removeAt(0);
+        if (players[seat].eliminated) continue;
+        if (!legalTargets(seat).contains(tid)) {
+          ev.add(Ev('attack_cancelled', {'seat': seat, 'territory': tid}));
           continue;
         }
-        seat = turnQueue.removeAt(0);
-        if (players[seat].eliminated) continue;
+        attacker = seat;
+        _startDuel(tid, ev, auto: auto);
+        return;
       }
-      final targets = legalTargets(seat);
-      if (targets.isEmpty) {
+      battleRound++;
+      if (battleRound > battleRounds) return _finish(ev);
+      _buildQueue();
+      final win = settings.openEnded ? (dominationShare() * 100).round() / 100 : null;
+      ev.add(Ev('round_started', {'round': battleRound, 'order': [...roundOrder], 'win_share': win, 'final': isFinalRound}));
+      _underdogShield(ev);
+      if (settings.battleExtras) turnQueue = [];
+      if (_startKingQuestion(ev)) return;
+      if (settings.battleExtras && _openTargeting(ev, [...roundOrder])) return;
+    }
+  }
+
+  /// Everyone in [seats] picks a target at the same time. False if nobody can attack.
+  bool _openTargeting(List<Ev> ev, List<int> seats) {
+    final ps = <int>[];
+    final targets = <String, List<int>>{};
+    for (final seat in seats) {
+      if (players[seat].eliminated) continue;
+      final legal = legalTargets(seat);
+      if (legal.isEmpty) {
         ev.add(Ev('turn_skipped', {'seat': seat}));
         continue;
       }
-      attacker = seat;
-      _setPhase('battle_target', ev, {'attacker': seat, 'round': battleRound, 'targets': targets, 'deadline_ms': settings.targetMs});
-      return;
+      ps.add(seat);
+      targets['$seat'] = legal;
     }
+    if (ps.isEmpty) return false;
+    planners = ps;
+    planned = {};
+    plannedAuto = {};
+    attacker = ps.length == 1 ? ps.first : null;
+    _setPhase('battle_target', ev, {
+      'round': battleRound,
+      'attackers': ps,
+      'attacker': attacker,
+      'targets': targets,
+      'deadline_ms': settings.targetMs,
+    });
+    return true;
+  }
+
+  void _startDuels(List<Ev> ev) {
+    duelQueue = [for (final s in planners) (s, planned[s]!, plannedAuto.contains(s)), ...duelQueue];
+    planners = [];
+    planned = {};
+    plannedAuto = {};
+    _nextTurn(ev);
+  }
+
+  /// From round 2, a last player well behind (under 70 % of the leader) gets a free shield.
+  void _underdogShield(List<Ev> ev) {
+    if (!settings.battleExtras || battleRound < 2 || teamsMode) return;
+    final alive = aliveSeats();
+    if (alive.length < 2) return;
+    var last = alive.first;
+    for (final s in alive) {
+      if (score(s) < score(last) || (score(s) == score(last) && s > last)) last = s;
+    }
+    final leader = alive.map(score).reduce(max);
+    if (score(last) >= 0.7 * leader) return;
+    final mine = [for (final t in territories.values) if (t.owner == last && !t.shielded) t];
+    if (mine.isEmpty) return;
+    mine.sort((a, b) {
+      if (a.isBase != b.isBase) return a.isBase ? 1 : -1;
+      if (a.value != b.value) return b.value.compareTo(a.value);
+      return a.id.compareTo(b.id);
+    });
+    mine.first.shielded = true;
+    ev.add(Ev('underdog_shield', {'seat': last, 'territory': mine.first.id}));
+  }
+
+  /// A question for everyone but the leader; the fastest right answer takes points from them.
+  bool _startKingQuestion(List<Ev> ev) {
+    if (!settings.battleExtras || teamsMode) return false;
+    final alive = aliveSeats();
+    if (alive.length < 3) return false;
+    var k = alive.first;
+    for (final s in alive) {
+      if (score(s) > score(k) || (score(s) == score(k) && s < k)) k = s;
+    }
+    king = k;
+    _setPhase('king_question', ev, {'king': k, 'points': kingPoints});
+    _requestQuestion('mcq', [for (final s in alive) if (s != k) s], ev);
+    return true;
+  }
+
+  void _resolveKing(ActiveQuestion aq, List<int> order, List<Ev> ev) {
+    int? winner;
+    for (final s in order) {
+      if (isCorrect(aq.question, aq.answers[s])) {
+        winner = s;
+        break;
+      }
+    }
+    final data = <String, dynamic>{'king': king, 'winner': winner, 'points': 0};
+    if (winner != null && king != null && !players[king!].eliminated) {
+      players[king!].bonus -= kingPoints;
+      players[winner].bonus += kingPoints;
+      data['points'] = kingPoints;
+    }
+    king = null;
+    ev.add(Ev('king_result', data));
   }
 
   void _startDuel(int tid, List<Ev> ev, {required bool auto}) {
@@ -842,6 +982,7 @@ class MatchState {
           att.doubleArmed = false;
           gain = settings.doubleGain;
         }
+        if (settings.battleExtras && att.streak >= streakFire) gain += streakCaptureBonus; // on fire
         if (isFinalRound) gain *= 2; // the last round counts double
         t
           ..owner = att.seat

@@ -122,7 +122,7 @@ class RoomData(BaseModel):
     question_sent_ms: int | None = None
     used_questions: list[str] = Field(default_factory=list)
     offered_categories: list[str] = Field(default_factory=list)  # the attacker's choices now
-    duel_category: str | None = None  # the attacker's pick for the current duel
+    duel_categories: dict[int, str] = Field(default_factory=dict)  # attacker -> picked category
     timers: dict[str, Timer] = Field(default_factory=dict)
 
     def seat_of(self, pid: str) -> int | None:

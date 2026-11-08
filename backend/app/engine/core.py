@@ -52,7 +52,10 @@ class RuleError(ValueError):
 
 
 SPECTATOR_POINTS = 50  # a right answer to someone else's duel question (§6.2.2)
-BATTLE_PHASES = (Phase.BATTLE_TARGET, Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK)
+BATTLE_PHASES = (Phase.KING_QUESTION, Phase.BATTLE_TARGET, Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK)
+STREAK_FIRE = 3  # right answers in a row to be on fire
+STREAK_CAPTURE_BONUS = 50  # extra value on every capture while on fire
+KING_POINTS = 150  # the king's question: taken from the leader
 
 # ==========================================================================================
 # Creation
@@ -416,6 +419,7 @@ def _on_answer(state: MatchState, action: Answer, rng: Rng, ev: list[Event]) -> 
     aq = state.active
     if aq is None or state.phase not in (
         Phase.EXP_QUESTION,
+        Phase.KING_QUESTION,
         Phase.BATTLE_DUEL,
         Phase.BATTLE_TIEBREAK,
     ):
@@ -445,7 +449,12 @@ def _on_answer(state: MatchState, action: Answer, rng: Rng, ev: list[Event]) -> 
 def _on_timeout(state: MatchState, action: Timeout, rng: Rng, ev: list[Event]) -> None:
     if action.phase_id != state.phase_id:
         return  # stale timer, ignore
-    if state.phase in (Phase.EXP_QUESTION, Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK):
+    if state.phase in (
+        Phase.EXP_QUESTION,
+        Phase.KING_QUESTION,
+        Phase.BATTLE_DUEL,
+        Phase.BATTLE_TIEBREAK,
+    ):
         if state.active is None:
             return  # the question has not been delivered yet; the room retries
         _resolve_question(state, rng, ev)
@@ -456,12 +465,11 @@ def _on_timeout(state: MatchState, action: Timeout, rng: Rng, ev: list[Event]) -
     elif state.phase is Phase.EXP_PICKS:
         _resolve_picks(state, rng, ev)
     elif state.phase is Phase.BATTLE_TARGET:
-        targets = legal_targets(state, state.attacker)  # type: ignore[arg-type]
-        if not targets:
-            ev.append(Event(type="turn_skipped", data={"seat": state.attacker}))
-            _next_turn(state, ev, rng)
-            return
-        _start_duel(state, rng.choice(targets), ev, rng, auto=True)
+        for seat in state.planners:  # whoever did not choose gets a random legal target
+            if seat not in state.planned:
+                state.planned[seat] = rng.choice(legal_targets(state, seat))
+                state.planned_auto.append(seat)
+        _start_duels(state, ev, rng)
 
 
 def _on_pick(state: MatchState, action: PickTerritories, rng: Rng, ev: list[Event]) -> None:
@@ -482,11 +490,16 @@ def _on_pick(state: MatchState, action: PickTerritories, rng: Rng, ev: list[Even
 
 
 def _on_choose_target(state: MatchState, action: ChooseTarget, rng: Rng, ev: list[Event]) -> None:
-    if state.phase is not Phase.BATTLE_TARGET or action.seat != state.attacker:
+    if state.phase is not Phase.BATTLE_TARGET or action.seat not in state.planners:
         raise RuleError("it is not your turn to attack")
+    if action.seat in state.planned:
+        raise RuleError("you already chose a target")
     if action.territory not in legal_targets(state, action.seat):
         raise RuleError("illegal target")
-    _start_duel(state, action.territory, ev, rng, auto=False)
+    state.planned[action.seat] = action.territory
+    ev.append(Event(type="target_locked", data={"seat": action.seat}))
+    if len(state.planned) == len(state.planners):
+        _start_duels(state, ev, rng)
 
 
 def _on_powerup(state: MatchState, action: UsePowerUp, rng: Rng, ev: list[Event]) -> None:
@@ -598,20 +611,41 @@ _HANDLERS = {
 # ==========================================================================================
 
 
-def _record_stats(state: MatchState, aq: ActiveQuestion) -> None:
-    for seat, rec in aq.answers.items():
+def _record_stats(state: MatchState, aq: ActiveQuestion) -> list[Event]:
+    """Answer stats and streaks (§6.2.6). Returns the streak events (sent after the result)."""
+    out: list[Event] = []
+    for seat in aq.participants:
         p = state.players[seat]
-        p.answered += 1
-        p.total_answer_ms += rec.elapsed_ms
-        if is_correct(aq.question, rec):
+        rec = aq.answers.get(seat)
+        if rec is not None:
+            p.answered += 1
+            p.total_answer_ms += rec.elapsed_ms
+        right = rec is not None and _right_for(state, aq, seat, rec)
+        if right:
             p.correct += 1
+            p.streak += 1
+            if p.streak == STREAK_FIRE and state.settings.battle_extras:
+                out.append(Event(type="streak", data={"seat": seat, "count": p.streak, "on": True}))
+        else:
+            if p.streak >= STREAK_FIRE and state.settings.battle_extras:
+                out.append(Event(type="streak", data={"seat": seat, "count": 0, "on": False}))
+            p.streak = 0
+    return out
+
+
+def _right_for(state: MatchState, aq: ActiveQuestion, seat: int, rec: AnswerRecord) -> bool:
+    """MCQ: the right option. Numeric: within 10 % of the answer (or ±1 for small numbers)."""
+    if aq.question.kind is QuestionKind.MCQ:
+        return is_correct(aq.question, rec)
+    ans = float(aq.question.answer or 0.0)
+    return rec.value is not None and abs(rec.value - ans) <= max(abs(ans) * 0.1, 1.0)
 
 
 def _resolve_question(state: MatchState, rng: Rng, ev: list[Event]) -> None:
     aq = state.active
     assert aq is not None
     state.active = None
-    _record_stats(state, aq)
+    streaks = _record_stats(state, aq)
     bonus: dict[int, int] = {}
     if state.duel is not None and state.players[state.duel.attacker].army is Army.MONGOL:
         bonus[state.duel.attacker] = A.MONGOL_ATTACK_TIME_BONUS_MS
@@ -629,8 +663,15 @@ def _resolve_question(state: MatchState, rng: Rng, ev: list[Event]) -> None:
             },
         )
     )
+    ev.extend(streaks)
     if state.phase is Phase.EXP_QUESTION:
         _open_picks(state, order, ev)
+    elif state.phase is Phase.KING_QUESTION:
+        _resolve_king(state, aq, order, ev)
+        if not state.settings.battle_extras or not _open_targeting(
+            state, ev, list(state.round_order)
+        ):
+            _next_turn(state, ev, rng)
     elif state.phase is Phase.BATTLE_DUEL:
         _resolve_duel(state, aq, bonus, rng, ev)
     elif state.phase is Phase.BATTLE_TIEBREAK:
@@ -777,52 +818,143 @@ def _build_queue(state: MatchState) -> None:
 
 
 def _next_turn(state: MatchState, ev: list[Event], rng: Rng) -> None:
+    """Battle flow (§6.2): every round everyone picks a target at once, then the duels play one
+    after another in the round's order; a king's question may open the round."""
     state.duel = None
     while True:
         dominant = dominant_team(state)
         if len(_alive_teams(state)) <= 1 or dominant is not None:
             _finish(state, ev, first_team=dominant)
             return
-        seat: int | None = None
         if state.extra_turn and state.attacker is not None:
             state.extra_turn = False
             if not state.players[state.attacker].eliminated:
-                seat = state.attacker
-        if seat is None:
-            if not state.turn_queue:
-                state.battle_round += 1
-                if state.battle_round > state.battle_rounds:
-                    _finish(state, ev)
+                if _open_targeting(state, ev, [state.attacker]):
                     return
-                _build_queue(state)
-                order = list(state.round_order)
-                win = round(domination_share(state), 2) if state.settings.open_ended else None
-                data = {
-                    "round": state.battle_round,
-                    "order": order,
-                    "win_share": win,
-                    "final": is_final_round(state),
-                }
-                ev.append(Event(type="round_started", data=data))
-                continue
-            seat = state.turn_queue.pop(0)
+        if state.turn_queue and not state.duel_queue:  # one attacker at a time
+            if _open_targeting(state, ev, [state.turn_queue.pop(0)]):
+                return
+            continue
+        while state.duel_queue:
+            seat, tid, auto = state.duel_queue.pop(0)
             if state.players[seat].eliminated:
                 continue
-        targets = legal_targets(state, seat)
-        if not targets:
+            if tid not in legal_targets(state, seat):
+                ev.append(Event(type="attack_cancelled", data={"seat": seat, "territory": tid}))
+                continue
+            state.attacker = seat
+            _start_duel(state, tid, ev, rng, auto=bool(auto))
+            return
+        state.battle_round += 1
+        if state.battle_round > state.battle_rounds:
+            _finish(state, ev)
+            return
+        _build_queue(state)
+        order = list(state.round_order)
+        win = round(domination_share(state), 2) if state.settings.open_ended else None
+        data = {
+            "round": state.battle_round,
+            "order": order,
+            "win_share": win,
+            "final": is_final_round(state),
+        }
+        ev.append(Event(type="round_started", data=data))
+        _underdog_shield(state, ev)
+        if state.settings.battle_extras:
+            state.turn_queue = []
+        if _start_king_question(state, ev):
+            return
+        if state.settings.battle_extras and _open_targeting(state, ev, list(state.round_order)):
+            return
+
+
+def _open_targeting(state: MatchState, ev: list[Event], seats: list[int]) -> bool:
+    """Everyone in ``seats`` picks a target at the same time. False if nobody can attack."""
+    planners = []
+    targets: dict[str, list[int]] = {}
+    for seat in seats:
+        if state.players[seat].eliminated:
+            continue
+        legal = legal_targets(state, seat)
+        if not legal:
             ev.append(Event(type="turn_skipped", data={"seat": seat}))
             continue
-        state.attacker = seat
-        _set_phase(
-            state,
-            Phase.BATTLE_TARGET,
-            ev,
-            attacker=seat,
-            round=state.battle_round,
-            targets=targets,
-            deadline_ms=state.settings.timers.target_ms,
-        )
+        planners.append(seat)
+        targets[str(seat)] = legal
+    if not planners:
+        return False
+    state.planners = planners
+    state.planned = {}
+    state.planned_auto = []
+    state.attacker = planners[0] if len(planners) == 1 else None
+    _set_phase(
+        state,
+        Phase.BATTLE_TARGET,
+        ev,
+        round=state.battle_round,
+        attackers=planners,
+        attacker=state.attacker,
+        targets=targets,
+        deadline_ms=state.settings.timers.target_ms,
+    )
+    return True
+
+
+def _start_duels(state: MatchState, ev: list[Event], rng: Rng) -> None:
+    new = [[s, state.planned[s], int(s in state.planned_auto)] for s in state.planners]
+    state.duel_queue = new + state.duel_queue
+    state.planners = []
+    state.planned = {}
+    state.planned_auto = []
+    _next_turn(state, ev, rng)
+
+
+def _underdog_shield(state: MatchState, ev: list[Event]) -> None:
+    """§6.2.7: from round 2, a last player well behind (under 70 % of the leader's score) gets a
+    free shield on their best land."""
+    if not state.settings.battle_extras or state.battle_round < 2:
         return
+    if state.settings.mode is Mode.TEAMS:
+        return
+    alive = alive_seats(state)
+    if len(alive) < 2:
+        return
+    last = min(alive, key=lambda s: (score(state, s), -s))
+    leader = max(score(state, s) for s in alive)
+    if score(state, last) >= 0.7 * leader:
+        return  # nobody is really behind
+    mine = [t for t in state.territories.values() if t.owner == last and not t.shielded]
+    if not mine:
+        return
+    best = max(mine, key=lambda t: (not t.is_base, t.value, -t.id))
+    best.shielded = True
+    ev.append(Event(type="underdog_shield", data={"seat": last, "territory": best.id}))
+
+
+def _resolve_king(state: MatchState, aq: ActiveQuestion, order: list[int], ev: list[Event]) -> None:
+    king = state.king
+    winner = next((s for s in order if is_correct(aq.question, aq.answers.get(s))), None)
+    data = {"king": king, "winner": winner, "points": 0}
+    if winner is not None and king is not None and not state.players[king].eliminated:
+        state.players[king].bonus -= KING_POINTS
+        state.players[winner].bonus += KING_POINTS
+        data["points"] = KING_POINTS
+    state.king = None
+    ev.append(Event(type="king_result", data=data))
+
+
+def _start_king_question(state: MatchState, ev: list[Event]) -> bool:
+    """§6.2.8: a question for everyone but the leader; the fastest right answer takes points."""
+    if not state.settings.battle_extras or state.settings.mode is Mode.TEAMS:
+        return False
+    alive = alive_seats(state)
+    if len(alive) < 3:
+        return False
+    king = max(alive, key=lambda s: (score(state, s), -s))
+    state.king = king
+    _set_phase(state, Phase.KING_QUESTION, ev, king=king, points=KING_POINTS)
+    _request_question(state, QuestionKind.MCQ, [s for s in alive if s != king], ev)
+    return True
 
 
 def _start_duel(state: MatchState, tid: int, ev: list[Event], rng: Rng, auto: bool) -> None:
@@ -937,6 +1069,8 @@ def _apply_duel_outcome(
             if att.double_armed:
                 att.double_armed = False
                 gain = s.double_gain
+            if state.settings.battle_extras and att.streak >= STREAK_FIRE:
+                gain += STREAK_CAPTURE_BONUS  # on fire (§6.2.6)
             if is_final_round(state):
                 gain *= 2  # the last round counts double (§6.2)
             t.owner = att.seat

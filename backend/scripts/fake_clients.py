@@ -181,9 +181,11 @@ class FakeClient:
         elif (
             t == "phase_changed"
             and p["phase"] == "battle_target"
-            and p.get("attacker") == self.seat
+            and self.seat in p.get("attackers", [])
         ):
-            self._later(self._target(p["targets"], p.get("opens_in_ms", 0)))
+            mine = (p.get("targets") or {}).get(str(self.seat), [])
+            if mine:
+                self._later(self._target(mine, p.get("opens_in_ms", 0)))
 
     async def _answer(self, q: dict) -> None:
         await asyncio.sleep(self.rnd.uniform(0.05, 0.5) * q["time_ms"] / 1000)

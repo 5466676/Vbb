@@ -45,6 +45,9 @@ class MatchSettings(BaseModel):
     mode: Mode = Mode.FFA
     open_ended: bool = True  # True: ends by domination/last one standing; False: fixed rounds
     choose_bases: bool = False  # True: players place their castles in turn (§6.0); rooms use it
+    # rooms, the offline game and the simulation turn this on; rule tests keep the plain battle:
+    # targets picked all at once, king's question, underdog shield, streak bonus (§6.2.1, 6-8)
+    battle_extras: bool = False
     battle_rounds: int | None = None  # None = by player count (fixed) / safety cap (open)
     tie_window_ms: int = 500
     normal_value: int = 200
@@ -117,6 +120,7 @@ class Phase(StrEnum):
     BASE_PLACEMENT = "base_placement"
     EXP_QUESTION = "expansion_question"
     EXP_PICKS = "expansion_picks"
+    KING_QUESTION = "king_question"
     BATTLE_TARGET = "battle_target"
     BATTLE_DUEL = "battle_duel"
     BATTLE_TIEBREAK = "battle_tiebreak"
@@ -148,6 +152,7 @@ class PlayerState(BaseModel):
     connected: bool = True
     eliminated: bool = False
     bonus: int = 0
+    streak: int = 0  # right answers in a row; 3+ = on fire (§6.2.6)
     powerups: list[PowerUp] = Field(default_factory=lambda: list(PowerUp))
     ability_used: bool = False
     # pending one-shot effects
@@ -205,6 +210,11 @@ class MatchState(BaseModel):
     battle_round: int = 0
     turn_queue: list[int] = Field(default_factory=list)
     round_order: list[int] = Field(default_factory=list)  # this round's attackers, in order
+    planners: list[int] = Field(default_factory=list)  # still choosing a target (all at once)
+    planned: dict[int, int] = Field(default_factory=dict)  # seat -> chosen target
+    planned_auto: list[int] = Field(default_factory=list)  # seats whose target was auto-picked
+    duel_queue: list[list[int]] = Field(default_factory=list)  # [attacker, territory, auto]
+    king: int | None = None  # the leader, left out of this round's king's question
     attacker: int | None = None
     duel: Duel | None = None
     extra_turn: bool = False

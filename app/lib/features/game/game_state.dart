@@ -199,7 +199,11 @@ class MatchView {
   final Set<int> turnDone = {}; // seats that already had their turn this round
   int? defender;
   int? duelTerritory;
-  List<int> targets = const [];
+  List<int> targets = const []; // my legal targets while I choose
+  List<int> attackers = const []; // who is choosing a target now
+  final Set<int> targetLocked = {}; // who already chose
+  int? king; // the king's question: the leader left out of it
+  final Set<int> onFire = {}; // 3+ right answers in a row
   List<String> offeredCategories = const []; // the attacker picks the duel's category from these
   Map<int, int> quota = const {};
   List<int> myPicks = [];
@@ -243,7 +247,9 @@ class MatchView {
   int scoreOf(int seat) =>
       territories.values.where((t) => t.owner == seat).fold(0, (a, t) => a + t.value) + players[seat].bonus;
 
-  bool get myTurn => phase == 'battle_target' && attacker != null && attacker == mySeat;
+  /// Choosing a target (everyone picks at once; I'm one of them and have not locked mine yet).
+  bool get myTurn =>
+      phase == 'battle_target' && mySeat != null && attackers.contains(mySeat) && !targetLocked.contains(mySeat);
 
   Territory terr(int id) => territories.putIfAbsent(id, () => Territory(id: id));
 

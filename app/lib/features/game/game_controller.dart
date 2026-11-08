@@ -427,9 +427,17 @@ class GameController extends Notifier<GameState> {
             final prev = m.attacker;
             m.attacker = p['attacker'] as int?;
             if (prev != null && prev != m.attacker) m.turnDone.add(prev);
-            if (m.turnsUntilMine() == 1) sound.play('ready'); // you're next
+            m.king = null;
             m.battleRound = (p['round'] ?? m.battleRound) as int;
-            m.targets = [for (final t in (p['targets'] as List? ?? [])) t as int];
+            // everyone in `attackers` picks at once; `targets` maps each of them to their options
+            m.attackers = [
+              for (final s in (p['attackers'] as List? ?? [if (p['attacker'] != null) p['attacker']])) s as int,
+            ];
+            m.targetLocked.clear();
+            final t = p['targets'];
+            m.targets = t is Map
+                ? [for (final x in (t['${m.mySeat}'] as List? ?? [])) x as int]
+                : [for (final x in (t as List? ?? [])) x as int];
             m.offeredCategories = [for (final c in (p['categories'] as List? ?? [])) '$c'];
             m.defender = null;
             m.duelTerritory = null;
@@ -438,6 +446,16 @@ class GameController extends Notifier<GameState> {
               sound.play('your_turn');
               sound.say('your_turn', chance: 0.6);
             }
+          case 'king_question':
+            m.king = p['king'] as int?;
+            final mine = m.king == m.mySeat;
+            m.announce(
+              'سؤال الملك',
+              mine
+                  ? 'إنت بالمقدمة! الباقيين عم يجاوبوا ليسرقوا منك ${p['points']}'
+                  : 'أسرع جواب صح بياخد ${p['points']} نقطة من ${_name(m, m.king)}',
+            );
+            sound.play('tiebreak');
           case 'battle_duel' || 'battle_tiebreak':
             m.attacker = p['attacker'] as int?;
             m.defender = p['defender'] as int?;
@@ -576,7 +594,47 @@ class GameController extends Notifier<GameState> {
       case 'turn_skipped':
         if (p['seat'] is int) m.turnDone.add(p['seat'] as int);
         m.log('${_name(m, p['seat'] as int?)} ما عندو هدف', p['seat'] as int?);
+      case 'target_locked':
+        m.targetLocked.add(p['seat'] as int);
+        if (p['seat'] != m.mySeat) sound.play('other_answered');
+      case 'attack_cancelled':
+        final seat = p['seat'] as int;
+        m.turnDone.add(seat);
+        m.log('هجوم ${_name(m, seat)} انلغى: الأرض اتغيّرت', seat, 'held');
+      case 'king_result':
+        final winner = p['winner'] as int?;
+        final king = p['king'] as int?;
+        final pts = (p['points'] ?? 0) as int;
+        if (winner != null && pts > 0) {
+          m.players[winner].bonus += pts;
+          if (king != null) m.players[king].bonus -= pts;
+          m.log('${_name(m, winner)} سرق $pts من الملك ${_name(m, king)}! 👑', winner, 'power');
+          sound.play('coins');
+        } else {
+          m.log('الملك ${_name(m, king)} نجي: ما حدا جاوب صح', king, 'held');
+        }
+        m.king = null;
+      case 'streak':
+        final seat = p['seat'] as int;
+        if ((p['on'] ?? false) == true) {
+          m.onFire.add(seat);
+          m.log(seat == m.mySeat ? 'إنت مولّع 🔥 كل احتلال +50' : '${_name(m, seat)} مولّع 🔥', seat, 'power');
+          if (seat == m.mySeat) sound.play('extra_turn');
+        } else {
+          m.onFire.remove(seat);
+        }
+      case 'underdog_shield':
+        final seat = p['seat'] as int;
+        m.terr(p['territory'] as int).shielded = true;
+        m.log(
+          seat == m.mySeat ? 'أخدت درع مجاني لأنك ورا الكل 🛡' : '${_name(m, seat)} أخد درع مجاني (الأخير)',
+          seat,
+          'held',
+        );
+        if (seat == m.mySeat) sound.play('shield');
       case 'target_chosen':
+        final prevAttacker = m.attacker;
+        if (prevAttacker != null && prevAttacker != p['attacker']) m.turnDone.add(prevAttacker);
         m.attacker = p['attacker'] as int?;
         m.defender = p['defender'] as int?;
         m.duelTerritory = p['territory'] as int?;

@@ -140,6 +140,18 @@ A turn:
    - Defender holds: territory value **+100**.
 4. Animate (army marches, short battle scene, flag raised or tower falls), then the next turn.
 
+**Battle extras (owner, 2026-11-08; on in every real match):**
+1. **Targets all at once:** at the start of each round every living player picks a target at the
+   same time (20 s). The duels then play **one after another** in the round's order. If a target is
+   no longer legal when its duel comes up (it changed hands, the attacker lost the bordering land),
+   that attack is **cancelled**. A Mongol extra attack is chosen alone and goes first.
+6. **On fire 🔥:** three right answers in a row (a numeric answer within 10 % counts) set a player
+   on fire: every capture gains **+50** more until their next wrong or missing answer.
+7. **Underdog shield:** from round 2, if the last player has less than 70 % of the leader's score,
+   they get a free shield on their most valuable territory (not the castle if they have another).
+8. **King's question 👑:** with 3+ players (not in teams), each round opens with one MCQ for
+   everyone **except the leader**; the fastest right answer takes **150 points** from the leader.
+
 ### 6.3 Score and end of match
 - **Score = sum of owned territory values + bonus points.** In team modes the team score is the sum of its members.
 - The match ends when only one player (or team) remains; in a fixed-rounds match also after R

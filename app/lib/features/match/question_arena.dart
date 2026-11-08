@@ -271,6 +271,18 @@ class _QuestionArenaState extends State<QuestionArena> {
         Expanded(
           child: Column(
             children: [
+              if (m.phase == 'king_question')
+                Text(
+                  m.king == m.mySeat
+                      ? '👑 إنت الملك: إذا حدا جاوب صح بياخد منك 150'
+                      : '👑 سؤال الملك: أسرع جواب صح بياخد 150 من ${m.king == null ? '' : m.players[m.king!].name}',
+                  style: const TextStyle(
+                    color: Color(0xFF8A5A00),
+                    fontWeight: FontWeight.w900,
+                    fontSize: 13,
+                    height: 1.2,
+                  ),
+                ),
               if (duel)
                 Text(
                   m.phase == 'battle_tiebreak'

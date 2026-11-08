@@ -5,6 +5,7 @@ import pytest
 from app.engine import core
 from app.engine.armies import Army
 from app.engine.models import (
+    ActiveQuestion,
     Answer,
     ChooseTarget,
     Phase,
@@ -279,3 +280,54 @@ def test_the_last_round_of_a_fixed_match_doubles_captures():
     assert [e.data["final"] for e in ev if e.type == "round_started"] == [True]
     duel(s, 3, att_ms=3000, def_ms=1000)
     assert s.territories[3].owner == 0 and s.territories[3].value == 400  # 200 + 2 x 100
+
+
+def _extras_match():
+    s = new_match(line_map(9, [0, 4, 8]), [R, R, R], battle_extras=True)
+    to_battle(s, {1: 0, 2: 0, 3: 1, 5: 1, 6: 2, 7: 2})
+    return s
+
+
+def test_everyone_picks_a_target_at_once_then_duels_run_in_order():
+    s = _extras_match()
+    assert s.phase is Phase.KING_QUESTION or s.phase is Phase.BATTLE_TARGET
+    if s.phase is Phase.KING_QUESTION:
+        step(s, ProvideQuestion(question=mcq(correct=0)))
+        step(s, Timeout(phase_id=s.phase_id))
+    assert s.phase is Phase.BATTLE_TARGET and len(s.planners) == 3
+    order = list(s.planners)
+    for seat in order[:-1]:
+        ev = step(s, ChooseTarget(seat=seat, territory=core.legal_targets(s, seat)[0]))
+        assert types(ev) == ["target_locked"] and s.phase is Phase.BATTLE_TARGET
+    last = order[-1]
+    ev = step(s, ChooseTarget(seat=last, territory=core.legal_targets(s, last)[0]))
+    assert s.phase is Phase.BATTLE_DUEL and s.duel.attacker == order[0]
+    assert len(s.duel_queue) == 2
+
+
+def test_kings_question_takes_points_from_the_leader():
+    s2 = _extras_match()
+    assert s2.phase is Phase.KING_QUESTION and s2.king is not None
+    king = s2.king
+    step(s2, ProvideQuestion(question=mcq(correct=2)))
+    others = [p for p in s2.active.participants]
+    assert king not in others
+    ev = step(s2, Answer(seat=others[0], choice=2, elapsed_ms=900))
+    ev += step(s2, Answer(seat=others[1], choice=0, elapsed_ms=500))
+    res = next(e for e in ev if e.type == "king_result")
+    assert res.data == {"king": king, "winner": others[0], "points": core.KING_POINTS}
+    assert s2.players[king].bonus == -core.KING_POINTS
+    assert s2.phase is Phase.BATTLE_TARGET
+
+
+def test_three_right_answers_in_a_row_set_a_player_on_fire():
+    s = _extras_match()
+    p = s.players[1]
+    p.streak = 2
+    aq_seat = 1
+    aq = ActiveQuestion(
+        question=mcq(correct=1), participants=[aq_seat], limits_ms={aq_seat: 10_000}
+    )
+    aq.answers[aq_seat] = core.AnswerRecord(seat=aq_seat, choice=1, elapsed_ms=100)
+    out = core._record_stats(s, aq)
+    assert p.streak == 3 and out and out[0].data == {"seat": 1, "count": 3, "on": True}

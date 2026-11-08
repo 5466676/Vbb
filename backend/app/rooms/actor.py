@@ -340,8 +340,8 @@ class RoomActor:
             return [m.placer]
         if m.phase is Phase.EXP_PICKS:
             return [s for s in m.pick_quota if s not in m.picks]
-        if m.phase is Phase.BATTLE_TARGET and m.attacker is not None:
-            return [m.attacker]
+        if m.phase is Phase.BATTLE_TARGET:
+            return [x for x in m.planners if x not in m.planned]
         return []
 
     async def _set_away(self, seat: int, away: bool) -> None:
@@ -493,6 +493,7 @@ class RoomActor:
                 battle_rounds=r.settings.battle_rounds,
                 open_ended=r.settings.length == "open",
                 choose_bases=True,
+                battle_extras=True,
             ),
         )
         r.status = RoomStatus.PLAYING
@@ -583,7 +584,7 @@ class RoomActor:
         if type_ == "choose_target":
             category = p.get("category")
             if category in r.offered_categories:
-                r.duel_category = category
+                r.duel_categories[seat] = category
             return ChooseTarget(seat=seat, territory=int(p.get("territory", -1)))
         if type_ == "use_powerup":
             try:
@@ -680,7 +681,7 @@ class RoomActor:
                 # the attacker also picks the duel's category from three (§6.2.1)
                 pool = list(r.settings.categories or CATEGORIES)
                 r.offered_categories = self.rnd.sample(pool, min(3, len(pool)))
-                r.duel_category = None
+                r.duel_categories = {}
                 data["categories"] = r.offered_categories
             data["opens_in_ms"] = int(pause * self.settings.time_scale)
             if deadline is not None:
@@ -780,7 +781,9 @@ class RoomActor:
             if m.pending_question is None:
                 return
             category = (
-                r.duel_category if m.phase in (Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK) else None
+                r.duel_categories.get(m.duel.attacker)
+                if m.duel is not None and m.phase in (Phase.BATTLE_DUEL, Phase.BATTLE_TIEBREAK)
+                else None
             )
             q = await self.provider().next(
                 m.pending_question, r.humans(), r.used_questions, category
@@ -832,7 +835,7 @@ class RoomActor:
                 delay = pause + self.rnd.randint(2500, 5000)
             elif m.phase is Phase.EXP_PICKS and seat in m.pick_quota and seat not in m.picks:
                 delay = pause + self.rnd.randint(2500, 6000)
-            elif m.phase is Phase.BATTLE_TARGET and m.attacker == seat:
+            elif m.phase is Phase.BATTLE_TARGET and seat in m.planners and seat not in m.planned:
                 delay = pause + self.rnd.randint(3000, 8000)
             if delay is not None:
                 self._schedule(name, delay, seat=seat, phase_id=m.phase_id)
@@ -857,11 +860,11 @@ class RoomActor:
             await self._apply(PlaceBase(seat=seat, territory=core.auto_base(m, seat)))
         elif m.phase is Phase.EXP_PICKS and seat in m.pick_quota and seat not in m.picks:
             await self._apply(bots.picks(m, seat, m.pick_quota[seat], self.rnd))
-        elif m.phase is Phase.BATTLE_TARGET and m.attacker == seat:
+        elif m.phase is Phase.BATTLE_TARGET and seat in m.planners and seat not in m.planned:
             choice = bots.target(m, seat, level, self.rnd)
             if choice is not None:
                 if r.offered_categories:
-                    r.duel_category = self.rnd.choice(r.offered_categories)
+                    r.duel_categories[seat] = self.rnd.choice(r.offered_categories)
                 await self._apply(choice)
 
     # ------------------------------------------------------------------ full state

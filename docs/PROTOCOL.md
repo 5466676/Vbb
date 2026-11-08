@@ -91,6 +91,11 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `pick_locked` | `{"seat"}` |
 | `base_placed` | `{"seat", "territory", "auto", "towers", "value"}` — a player's castle is built (§6.0) |
 | `autopilot` | `{"seat", "on"}` — a person let the clock run out: a bot plays for them (no power-ups) until they act or send `back`; `room_state` seats carry `away` |
+| `target_locked` | `{"seat"}` — that player has chosen (the target is revealed by `target_chosen` when their duel starts) |
+| `attack_cancelled` | `{"seat", "territory"}` — the target was no longer legal when its turn came |
+| `king_result` | `{"king", "winner", "points"}` — `winner` null when nobody was right |
+| `streak` | `{"seat", "count", "on"}` — 3 right answers in a row (on fire: +50 per capture) or the streak ended |
+| `underdog_shield` | `{"seat", "territory"}` — a free shield for a player well behind |
 | `treasure_placed` | `{"territory"}` — a chest on the free territory farthest from every castle (start of the expansion) |
 | `treasure_found` | `{"seat", "territory", "points": 300, "powerup"}` — whoever claims it gets +300 bonus and one used power-up back (`null` if none was used) |
 | `territory_claimed` | `{"seat", "territory", "auto", "value"}` |
@@ -121,7 +126,8 @@ protocol change. Payload fields are JSON; `seat` is the 0-based seat index of a 
 | `base_placement` | `placer`, `options: [id]` (free spots not touching a castle), `deadline_ms` (12 s) |
 | `expansion_question` | `expansion_round` (a `question` follows) |
 | `expansion_picks` | `quota: {seat: picks}`, `ranking`, `deadline_ms` (10 s) |
-| `battle_target` | `attacker`, `round`, `targets: [id]`, `categories: [3 names]` (the attacker picks the duel's category), `deadline_ms` (20 s) |
+| `king_question` | `king`, `points` — an MCQ for everyone but the leader follows |
+| `battle_target` | `attackers: [seat]` (all pick at once; `attacker` is set only when one picks alone), `round`, `targets: {seat: [id]}`, `categories: [3 names]` (the attacker picks the duel's category), `deadline_ms` (20 s) |
 | `battle_duel` | `attacker`, `defender`, `territory` (an MCQ follows for everyone still in; only these two decide the land) |
 | `battle_tiebreak` | `attacker`, `defender`, `territory` (a numeric question follows) |
 | `results` | — (`match_ended` follows) |

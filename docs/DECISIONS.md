@@ -546,3 +546,17 @@ owner's approval:
   smoulder for the rest of the match. Numeric reveals hold 6.5 s and the cards carry I/II/III.
 - Late answers to a question that has just closed are ignored instead of answered with an error
   (a normal race now that the autopilot may answer first).
+
+## Battle extras: all pick at once, king's question, streaks, underdog shield (2026-11-08)
+
+Owner-picked mechanics (GAME_RULES §6.2 "Battle extras"), behind `MatchSettings.battle_extras`
+(rooms, the offline game and the simulation turn it on; the rule tests keep the plain battle so
+they stay small and exact):
+- **Targets all at once** cuts waiting: one 20 s choosing phase per round (`battle_target` carries
+  `attackers` and per-seat `targets`), then the duels run in round order; targets that became
+  illegal are cancelled (`attack_cancelled`). Each attacker picks their own duel category.
+- **King's question 👑** (3+ players, not teams): an MCQ for all but the leader at the start of
+  every round; the fastest right answer takes 150 of the leader's points.
+- **On fire 🔥** after 3 right answers in a row: +50 on every capture until a miss.
+- **Underdog shield:** from round 2, a last player under 70 % of the leader's score gets a free
+  shield on their best land.

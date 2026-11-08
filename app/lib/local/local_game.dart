@@ -55,7 +55,7 @@ class LocalGame implements GameTransport {
   final _used = <String>{};
   List<Map<String, dynamic>> _all = [];
   List<String> _offered = []; // categories offered to the attacker now
-  String? _duelCategory;
+  final Map<int, String> _duelCategories = {}; // attacker -> picked category
   List<Map<String, dynamic>> _pool = [];
   DateTime? _questionSentAt;
   bool _closed = false;
@@ -124,6 +124,7 @@ class LocalGame implements GameTransport {
       teams: teams,
       openEnded: openEnded,
       chooseBases: true,
+      battleExtras: true,
       rng: _rnd,
     );
     for (final s in _template.seaLinks) {
@@ -183,7 +184,7 @@ class LocalGame implements GameTransport {
         case 'place_base':
           _after(_m.placeBase(0, p['territory'] as int));
         case 'choose_target':
-          if (_offered.contains(p['category'])) _duelCategory = p['category'] as String;
+          if (_offered.contains(p['category'])) _duelCategories[0] = p['category'] as String;
           _after(_m.chooseTarget(0, p['territory'] as int));
         case 'use_powerup':
           _after(_m.usePowerup(0, p['powerup'] as String, territory: p['territory'] as int?));
@@ -209,7 +210,7 @@ class LocalGame implements GameTransport {
     if (aq != null) return aq.participants.contains(0) && !aq.answers.containsKey(0);
     if (_m.phase == 'base_placement') return _m.placer == 0;
     if (_m.phase == 'expansion_picks') return _m.pickQuota.containsKey(0) && !_m.picks.containsKey(0);
-    if (_m.phase == 'battle_target') return _m.attacker == 0;
+    if (_m.phase == 'battle_target') return _m.planners.contains(0) && !_m.planned.containsKey(0);
     return false;
   }
 
@@ -291,7 +292,7 @@ class LocalGame implements GameTransport {
           // the attacker also picks the duel's category, from three that have questions
           final cats = {for (final q in _pool) if (q['kind'] == 'mcq') q['category'] as String}.toList()..shuffle(_rnd);
           _offered = cats.take(3).toList();
-          _duelCategory = null;
+          _duelCategories.clear();
           d['categories'] = _offered;
         }
         _out('phase_changed', d);
@@ -324,8 +325,9 @@ class LocalGame implements GameTransport {
     if (kind == null) return;
     // the attacker's category for a duel, else the match's categories; any category if empty
     final duel = _m.phase == 'battle_duel' || _m.phase == 'battle_tiebreak';
-    final picked = duel && _duelCategory != null
-        ? [for (final q in _pool) if (q['category'] == _duelCategory && q['kind'] == kind && !_used.contains(q['id'])) q]
+    final cat = duel ? _duelCategories[_m.duel?.attacker] : null;
+    final picked = cat != null
+        ? [for (final q in _pool) if (q['category'] == cat && q['kind'] == kind && !_used.contains(q['id'])) q]
         : const <Map<String, dynamic>>[];
     final pool = picked.isNotEmpty ? picked : (_pool.any((x) => x['kind'] == kind) ? _pool : _all);
     var q = pool.firstWhere((x) => x['kind'] == kind && !_used.contains(x['id']), orElse: () => {});
@@ -375,7 +377,7 @@ class LocalGame implements GameTransport {
         delay = pause + randInt(_rnd, 2500, 5000);
       } else if (_m.phase == 'expansion_picks' && _m.pickQuota.containsKey(p.seat) && !_m.picks.containsKey(p.seat)) {
         delay = pause + randInt(_rnd, 2500, 6000);
-      } else if (_m.phase == 'battle_target' && _m.attacker == p.seat) {
+      } else if (_m.phase == 'battle_target' && _m.planners.contains(p.seat) && !_m.planned.containsKey(p.seat)) {
         delay = pause + randInt(_rnd, 3000, 8000);
       }
       if (delay != null) {
@@ -404,10 +406,10 @@ class LocalGame implements GameTransport {
       _after(_m.placeBase(seat, _m.autoBase(seat)));
     } else if (_m.phase == 'expansion_picks' && _m.pickQuota.containsKey(seat) && !_m.picks.containsKey(seat)) {
       _after(_m.pick(seat, botPicks(_m, seat, _m.pickQuota[seat]!, _rnd)));
-    } else if (_m.phase == 'battle_target' && _m.attacker == seat) {
+    } else if (_m.phase == 'battle_target' && _m.planners.contains(seat) && !_m.planned.containsKey(seat)) {
       final t = botTarget(_m, seat, level, _rnd);
       if (t != null) {
-        if (_offered.isNotEmpty) _duelCategory = _offered[_rnd.nextInt(_offered.length)];
+        if (_offered.isNotEmpty) _duelCategories[seat] = _offered[_rnd.nextInt(_offered.length)];
         _after(_m.chooseTarget(seat, t));
       }
     }

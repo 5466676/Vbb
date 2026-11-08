@@ -354,7 +354,15 @@ class _PhaseBanner extends StatelessWidget {
           (m.quota[m.mySeat] ?? 0) > 0
               ? 'اختار ${m.quota[m.mySeat]} أرض (${m.myPicks.length}/${m.quota[m.mySeat]})'
               : 'الباقين عم يختاروا أراضيهم…',
-        'battle_target' => m.myTurn ? 'دورك! اختار أرض لتهاجمها' : 'دور ${name(m.attacker)} بالهجوم',
+        'battle_target' =>
+          m.myTurn
+              ? 'دورك! اختار أرض لتهاجمها'
+              : m.attackers.length == 1
+              ? 'دور ${name(m.attackers.first)} بالهجوم'
+              : m.attackers.contains(m.mySeat)
+              ? 'اخترت هدفك… ناطرين الباقي (${m.targetLocked.length}/${m.attackers.length})'
+              : 'الكل عم يختار أهدافهم… (${m.targetLocked.length}/${m.attackers.length})',
+        'king_question' => m.king == m.mySeat ? '👑 إنت الملك! الباقيين عم يجاوبوا' : '👑 سؤال الملك: الأسرع بياخد 150',
         'battle_duel' => 'مبارزة: ${name(m.attacker)} ضد ${name(m.defender)}',
         'battle_tiebreak' => 'تعادل! سؤال الحسم',
         'results' => 'انتهت المعركة',
@@ -752,6 +760,8 @@ class _TopBar extends StatelessWidget {
                             ),
                           ),
                         ),
+                        if (m.onFire.contains(p.seat)) const Text('🔥', style: TextStyle(fontSize: 12, height: 1)),
+                        if (m.king == p.seat) const Text('👑', style: TextStyle(fontSize: 12, height: 1)),
                         if (p.bot || p.away) const Icon(Icons.smart_toy_outlined, size: 12, color: Color(0xFF8A5528)),
                         if (!p.connected) const Icon(Icons.wifi_off, size: 12, color: AppColors.bad),
                       ],
