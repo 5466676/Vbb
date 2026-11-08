@@ -264,11 +264,11 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: const Color(0xFFFFC233),
-              border: Border.all(color: const Color(0xFFFFF4C2), width: 1.6),
-              boxShadow: const [BoxShadow(color: Color(0xAAFFE08A), blurRadius: 10, spreadRadius: 2)],
+              color: AppColors.panelDeep,
+              border: Border.all(color: AppColors.gold, width: 1.8),
+              boxShadow: const [BoxShadow(color: Color(0xCCFFCF4A), blurRadius: 14, spreadRadius: 1)],
             ),
-            child: Icon(Icons.inventory_2, size: d * 0.6, color: const Color(0xFF6E3B12)),
+            child: Icon(Icons.inventory_2, size: d * 0.6, color: AppColors.gold),
           ),
         ),
       ),
@@ -316,12 +316,14 @@ class _MapViewState extends State<MapView> with SingleTickerProviderStateMixin {
                   child: Stack(
                     alignment: Alignment.bottomCenter,
                     children: [
+                      // a glowing pad in the owner's colour under the troops
                       Container(
                         width: soldierH * 0.9,
                         height: soldierH * 0.18,
                         decoration: BoxDecoration(
-                          color: const Color(0x55000000),
+                          color: AppColors.seat(terr.owner).withValues(alpha: 0.3),
                           borderRadius: BorderRadius.circular(soldierH),
+                          border: Border.all(color: AppColors.seat(terr.owner).withValues(alpha: 0.8), width: 1),
                         ),
                       ),
                       Image.asset(
@@ -397,35 +399,37 @@ class _BannerPainter extends CustomPainter {
       ..lineTo(w / 2, h - notch)
       ..lineTo(0, h)
       ..close();
-    final hsl = HSLColor.fromColor(color);
-    canvas.drawPath(path.shift(const Offset(0, 1.5)), Paint()..color = const Color(0x66000000));
+    // neon tag: the seat colour sunk into navy, a glowing edge and a bright top bar
     canvas.drawPath(
       path,
       Paint()
         ..shader = LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [
-            hsl.withLightness((hsl.lightness + 0.08).clamp(0, 1)).toColor(),
-            hsl.withLightness(hsl.lightness * 0.7).toColor(),
-          ],
+          colors: [Color.lerp(color, AppColors.panelDeep, 0.35)!, Color.lerp(color, AppColors.panelDeep, 0.7)!],
         ).createShader(Offset.zero & size),
     );
-    // gold pole on top and an ink edge
-    canvas.drawLine(
-      const Offset(-2, 0.8),
-      Offset(w + 2, 0.8),
+    canvas.drawPath(
+      path,
       Paint()
-        ..color = const Color(0xFFE2B85A)
-        ..strokeWidth = 2.2
-        ..strokeCap = StrokeCap.round,
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..color = color.withValues(alpha: 0.3),
     );
     canvas.drawPath(
       path,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1
-        ..color = const Color(0xAA1A0F06),
+        ..color = Color.lerp(color, Colors.white, 0.4)!,
+    );
+    canvas.drawLine(
+      const Offset(-1, 0.8),
+      Offset(w + 1, 0.8),
+      Paint()
+        ..color = Color.lerp(color, Colors.white, 0.6)!
+        ..strokeWidth = 2
+        ..strokeCap = StrokeCap.round,
     );
   }
 
@@ -745,8 +749,8 @@ class _EffectsPainter extends CustomPainter {
     final ink = Paint()
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
-      ..strokeWidth = w * 1.7
-      ..color = const Color(0xFF1A0F06).withValues(alpha: 0.8 * fade);
+      ..strokeWidth = w * 2.8
+      ..color = color.withValues(alpha: 0.28 * fade); // neon glow under the dashes
     final body = Paint()
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round
@@ -766,7 +770,14 @@ class _EffectsPainter extends CustomPainter {
         ..lineTo(a.dx - dir.dx * w * 3 + side.dx * w * 2.2, a.dy - dir.dy * w * 3 + side.dy * w * 2.2)
         ..lineTo(a.dx - dir.dx * w * 3 - side.dx * w * 2.2, a.dy - dir.dy * w * 3 - side.dy * w * 2.2)
         ..close();
-      canvas.drawPath(head, Paint()..color = const Color(0xFF1A0F06).withValues(alpha: fade));
+      canvas.drawPath(
+        head,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = w * 1.6
+          ..strokeJoin = StrokeJoin.round
+          ..color = color.withValues(alpha: 0.35 * fade),
+      );
       canvas.drawPath(head.shift(Offset.zero), body..style = PaintingStyle.fill);
     }
     // crossed swords over the target once the arrow lands
@@ -781,15 +792,15 @@ class _EffectsPainter extends CustomPainter {
     final blade = Paint()
       ..strokeWidth = r * 0.22
       ..strokeCap = StrokeCap.round
-      ..color = const Color(0xFFE8E8E8).withValues(alpha: alpha);
+      ..color = Colors.white.withValues(alpha: alpha);
     final edge = Paint()
-      ..strokeWidth = r * 0.36
+      ..strokeWidth = r * 0.5
       ..strokeCap = StrokeCap.round
-      ..color = const Color(0xFF1A0F06).withValues(alpha: alpha);
+      ..color = AppColors.neon.withValues(alpha: 0.35 * alpha);
     final hilt = Paint()
       ..strokeWidth = r * 0.26
       ..strokeCap = StrokeCap.round
-      ..color = const Color(0xFFD4A64A).withValues(alpha: alpha);
+      ..color = AppColors.neon.withValues(alpha: alpha);
     for (final s in [1.0, -1.0]) {
       final a = c + Offset(-r * s, r), b = c + Offset(r * s, -r);
       canvas.drawLine(a, b, edge);
@@ -819,6 +830,17 @@ class _EffectsPainter extends CustomPainter {
         ..color = Colors.white.withValues(alpha: 0.6 * (1 - spread)),
     );
     canvas.restore();
+    // an energy shockwave leaves the land: a bright core ring inside a soft glow ring
+    for (final (k, a) in const [(1.0, 0.25), (0.6, 0.9)]) {
+      canvas.drawCircle(
+        c,
+        maxR * 0.25 + maxR * 0.9 * spread,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = size.height * 0.012 / k
+          ..color = Color.lerp(color, Colors.white, 0.4 * k)!.withValues(alpha: a * (1 - spread)),
+      );
+    }
     // the flag is driven into the ground
     final plant = Curves.elasticOut.transform((p / 0.5).clamp(0.0, 1.0));
     final fade = p < 0.8 ? 1.0 : 1 - (p - 0.8) / 0.2;
@@ -836,9 +858,10 @@ class _EffectsPainter extends CustomPainter {
       Paint()
         ..strokeWidth = h * 0.07
         ..strokeCap = StrokeCap.round
-        ..color = const Color(0xFF3B2610).withValues(alpha: alpha),
+        ..color = const Color(0xFFBFE9FF).withValues(alpha: alpha),
     );
-    canvas.drawCircle(top, h * 0.06, Paint()..color = const Color(0xFFE2B85A).withValues(alpha: alpha));
+    canvas.drawCircle(top, h * 0.1, Paint()..color = AppColors.neon.withValues(alpha: 0.35 * alpha));
+    canvas.drawCircle(top, h * 0.06, Paint()..color = Colors.white.withValues(alpha: alpha));
     final w = h * 0.62 * s, fh = h * 0.38 * s;
     final y0 = top.dy + h * 0.04;
     final cloth = Path()..moveTo(top.dx, y0);
@@ -857,8 +880,8 @@ class _EffectsPainter extends CustomPainter {
       cloth,
       Paint()
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2
-        ..color = const Color(0xFF1A0F06).withValues(alpha: alpha * 0.8),
+        ..strokeWidth = 1.4
+        ..color = Color.lerp(color, Colors.white, 0.5)!.withValues(alpha: alpha * 0.9),
     );
   }
 
@@ -879,7 +902,7 @@ class _EffectsPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = r * 0.14
-        ..color = const Color(0xFFE2B85A).withValues(alpha: fade),
+        ..color = AppColors.neon.withValues(alpha: fade),
     );
     // a glint sweeping across
     final gx = c.dx - r + 2 * r * p;
@@ -899,7 +922,7 @@ class _EffectsPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = size.height * 0.008
-        ..color = Colors.white.withValues(alpha: 0.7 * fade),
+        ..color = AppColors.neon.withValues(alpha: 0.8 * fade),
     );
   }
 
@@ -911,7 +934,7 @@ class _EffectsPainter extends CustomPainter {
     canvas.save();
     canvas.translate(c.dx + sin(p * 40) * h * 0.08 * (1 - p), c.dy - h + fall * h * 0.9);
     canvas.rotate(fall * 0.5);
-    final body = Paint()..color = const Color(0xFF9C8B6E).withValues(alpha: 1 - fall * 0.7);
+    final body = Paint()..color = const Color(0xFF7FA6D9).withValues(alpha: 1 - fall * 0.7); // a hologram block
     canvas.drawRect(Rect.fromCenter(center: Offset.zero, width: h * 0.55, height: h), body);
     for (var i = -1; i <= 1; i++) {
       canvas.drawRect(Rect.fromCenter(center: Offset(i * h * 0.2, -h * 0.58), width: h * 0.14, height: h * 0.18), body);
@@ -924,8 +947,8 @@ class _EffectsPainter extends CustomPainter {
       final ang = r.nextDouble() * pi; // upward half
       final dist = h * (0.4 + r.nextDouble() * 1.4) * Curves.easeOut.transform(p);
       final o = c + Offset(cos(ang) * dist * (r.nextBool() ? 1 : -1), -sin(ang) * dist * 0.6);
-      dust.color = const Color(0xFF8A7556).withValues(alpha: 0.55 * (1 - p));
-      canvas.drawCircle(o, h * (0.12 + 0.25 * p) * (0.6 + r.nextDouble() * 0.6), dust);
+      dust.color = (i.isEven ? AppColors.neon : AppColors.bad).withValues(alpha: 0.6 * (1 - p)); // sparks
+      canvas.drawCircle(o, h * (0.05 + 0.08 * (1 - p)) * (0.6 + r.nextDouble() * 0.6), dust);
     }
     _floatText(canvas, '−1', c - Offset(0, h * (1.6 + p)), h * 0.75, AppColors.bad, 1 - p);
   }
@@ -941,12 +964,8 @@ class _EffectsPainter extends CustomPainter {
           fontWeight: FontWeight.w900,
           foreground: Paint()..color = Colors.white.withValues(alpha: alpha),
           shadows: [
-            Shadow(
-              color: color.withValues(alpha: alpha),
-              blurRadius: 0,
-              offset: const Offset(0, 2),
-            ),
-            Shadow(color: const Color(0xFF000000).withValues(alpha: alpha), blurRadius: 3),
+            Shadow(color: color.withValues(alpha: alpha), blurRadius: 10),
+            Shadow(color: color.withValues(alpha: alpha), blurRadius: 3),
           ],
         ),
       ),
@@ -1103,7 +1122,7 @@ class _AmbientPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // cloud shadows: big soft ovals sliding slowly from right to left, wrapping around
+    // faint cyan haze: big soft ovals sliding slowly from right to left, wrapping around
     for (var i = 0; i < 3; i++) {
       final speed = 0.012 + i * 0.004;
       final x = (1.3 - ((t * speed + i * 0.41) % 1.6)) * size.width;
@@ -1112,7 +1131,7 @@ class _AmbientPainter extends CustomPainter {
       final rect = Rect.fromCenter(center: Offset(x, y), width: r * 2.6, height: r * 1.3);
       canvas.drawOval(
         rect,
-        Paint()..shader = const RadialGradient(colors: [Color(0x22000000), Color(0x00000000)]).createShader(rect),
+        Paint()..shader = const RadialGradient(colors: [Color(0x123FD0FF), Color(0x003FD0FF)]).createShader(rect),
       );
     }
     final h = size.height * 0.13;
@@ -1133,7 +1152,7 @@ class _AmbientPainter extends CustomPainter {
       final base = Offset(l.dx * size.width, l.dy * size.height - h * 0.2);
       canvas.drawOval(
         Rect.fromCenter(center: base + Offset(0, h * 0.2), width: h * 0.9, height: h * 0.35),
-        Paint()..color = const Color(0x993A2414),
+        Paint()..color = const Color(0x99020410),
       );
       _smoke(canvas, base, h, puffs: 4, dark: true);
       _fire(canvas, base + Offset(0, h * 0.15), h * 0.35);
@@ -1150,7 +1169,7 @@ class _AmbientPainter extends CustomPainter {
         top + Offset(0, poleH),
         Paint()
           ..strokeWidth = 2
-          ..color = const Color(0xFF3A2414),
+          ..color = const Color(0xFFBFE9FF),
       );
       final w = h * 0.38, fh = h * 0.2;
       final cloth = Path()..moveTo(top.dx, top.dy);
@@ -1169,7 +1188,7 @@ class _AmbientPainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.2
-          ..color = const Color(0xFF2B1A0E),
+          ..color = Color.lerp(AppColors.seat(owner), Colors.white, 0.5)!,
       );
     }
   }

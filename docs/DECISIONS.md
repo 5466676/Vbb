@@ -628,3 +628,9 @@ they stay small and exact):
   secrets, migrate, seed, one uvicorn worker in the background, Tailscale Funnel on 443), with
   `start-server.bat` / `stop-server.bat` to double-click. Needs Python 3.12+ and Tailscale.
   Not run on Windows yet (no PowerShell in the build container); the owner tests it first.
+
+## Neon polish of the map effects
+- Attack arrows, the crossed swords, flags, the capture effect (now with an energy shockwave),
+  the defence shield, falling towers (hologram block and sparks), castle banners, value tags,
+  the troops' pad and the treasure chest use neon glows (stacked strokes, no blur filters)
+  instead of ink outlines; cloud shadows became a faint cyan haze.
