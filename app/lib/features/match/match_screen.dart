@@ -598,13 +598,16 @@ class _TopBar extends StatelessWidget {
     return Container(
       height: 58,
       padding: const EdgeInsets.fromLTRB(6, 5, 6, 5),
+      // wood & paper: a varnished plank with a lighter top edge and a dark rail
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFB57A43), Color(0xFF8A5528)],
+          stops: [0, 0.08, 0.5, 1],
+          colors: [Color(0xFFE0A86A), Color(0xFFC08850), Color(0xFFA56B37), Color(0xFF7E4B22)],
         ),
         border: Border(bottom: BorderSide(color: Color(0xFF3A2414), width: 3)),
+        boxShadow: [BoxShadow(color: Color(0x66000000), offset: Offset(0, 3), blurRadius: 4)],
       ),
       child: Row(
         children: [
@@ -754,7 +757,11 @@ class _TopBar extends StatelessWidget {
       opacity: p.eliminated ? 0.45 : 1,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF3D6),
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFFFFF8E6), Color(0xFFEFDDB4)],
+          ),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: p.seat == m.mySeat ? const Color(0xFFFFC233) : const Color(0xFF3A2414),
@@ -770,8 +777,13 @@ class _TopBar extends StatelessWidget {
             // colour tab with the portrait
             Container(
               width: 48,
+              // royal banner tab: seat colour with a gold thread on its inner edge
               decoration: BoxDecoration(
-                color: c,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color.lerp(c, Colors.white, 0.12)!, Color.lerp(c, Colors.black, 0.18)!],
+                ),
                 borderRadius: const BorderRadiusDirectional.horizontal(start: Radius.circular(7))
                     .resolve(TextDirection.rtl),
               ),
@@ -805,6 +817,7 @@ class _TopBar extends StatelessWidget {
                 ],
               ),
             ),
+            Container(width: 2.5, color: AppColors.bannerGold),
             const SizedBox(width: 6),
             Expanded(
               child: Padding(

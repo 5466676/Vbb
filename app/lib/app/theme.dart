@@ -18,16 +18,19 @@ abstract final class AppColors {
   static const glassBorder = Color(0x55D4A64A);
 
   /// One colour per seat (flags, borders, territories). Distinct and readable on the maps.
+  // «رايات ملكية»: deep banner tones that stay readable on the painted map
   static const seats = [
-    Color(0xFFC0392B), // red
-    Color(0xFF2E86C1), // blue
-    Color(0xFF27AE60), // green
-    Color(0xFFD68910), // amber
-    Color(0xFF8E44AD), // purple
-    Color(0xFF16A085), // teal
-    Color(0xFFD35400), // orange
-    Color(0xFF5D6D7E), // slate
+    Color(0xFFA4161A), // crimson
+    Color(0xFF1D3D7A), // royal blue
+    Color(0xFF2D6A4F), // forest green
+    Color(0xFFC98A00), // gold amber
+    Color(0xFF5B2A86), // royal purple
+    Color(0xFF0E6E73), // deep teal
+    Color(0xFFB4531C), // burnt orange
+    Color(0xFF4A4E57), // iron
   ];
+  static const bannerGold = Color(0xFFE8C15A);
+  static const bannerText = Color(0xFFFFF3D6);
 
   static Color seat(int? s) => s == null || s < 0 ? const Color(0x00000000) : seats[s % seats.length];
 }

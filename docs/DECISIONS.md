@@ -568,3 +568,11 @@ they stay small and exact):
   (`emote`, at most one every 2 s per player); offline, bots react to captures now and then.
 - The player cards slide to their new place when the ranking changes, and every score change
   floats a «+150» / «−150» over the card.
+
+## Royal-banner palette and wood & paper bar (owner's picks)
+- Seat colours are now «رايات ملكية»: deep crimson, royal blue, forest green, gold amber, then
+  purple, teal, burnt orange, iron for seats 5–8. Owned land is filled at 50% with a thin gold
+  thread (`AppColors.bannerGold`) inside the dark border.
+- Top bar: varnished plank gradient with a light top edge; player cards on paper gradient with a
+  gold thread beside the banner tab.
+- Question screen: the owner rejected the first four options; four new ones are on a picker page.

@@ -509,7 +509,7 @@ class _OwnershipPainter extends CustomPainter {
         continue;
       }
       final c = AppColors.seat(owner);
-      fill.color = c.withValues(alpha: 0.46);
+      fill.color = c.withValues(alpha: 0.5);
       canvas.drawPath(path, fill);
       canvas.save();
       canvas.clipPath(path);
@@ -526,9 +526,10 @@ class _OwnershipPainter extends CustomPainter {
         ..strokeWidth = size.height * (owner == null ? 0.0035 : 0.0075);
       canvas.drawPath(path, ink);
       if (owner != null) {
+        // royal banners: a thin gold thread inside the dark ink
         ink
-          ..color = AppColors.seat(owner)
-          ..strokeWidth = size.height * 0.0022;
+          ..color = AppColors.bannerGold
+          ..strokeWidth = size.height * 0.0024;
         canvas.drawPath(path, ink);
       }
     }
